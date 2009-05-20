@@ -24,10 +24,10 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-BuildRequires: perl-Excel-Template
+# Automatically added by buildreq on Mon May 18 2009 (-bi)
+BuildRequires: perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Data-Structure-Util perl-Module-Build perl-Test-Pod perl-Test-Pod-Coverage
 
-# Automatically added by buildreq on Sun Sep 07 2008 (-bi)
-BuildRequires: perl-CGI perl-Class-Accessor-Chained perl-Class-Accessor-Class perl-Class-Accessor-Grouped perl-Class-ErrorHandler perl-Clone perl-Config-General perl-DBD-Multi perl-DBD-Pg perl-DBD-SQLite perl-DBD-mysql perl-Data-Structure-Util perl-Data-UUID perl-Encode perl-FCGI perl-HTML-Format perl-HTML-SimpleParse perl-HTML-Template-Pro perl-Log-Agent perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Text-CSV_XS perl-TimeDate perl-Unix-Syslog perl-XML-LibXSLT perl-libwww
+BuildRequires: perl-Excel-Template
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -56,7 +56,7 @@ NetSDS - это гибкий и простой в использовании ф�
 %files
 %perl_vendor_privlib/NetSDS*
 %perl_vendor_man3dir/*
-%doc samples
+#%doc samples
 
 %changelog
 * Mon Dec 22 2008 Michael Bochkaryov <misha@altlinux.ru> 1.01-alt3
