@@ -8,8 +8,8 @@
 
 
 Name: perl-NetSDS
-Version: 1.01
-Release: alt3
+Version: 1.02
+Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -57,6 +57,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples
 
 %changelog
+* Tue Jun 16 2009 Michael Bochkaryov <misha@altlinux.ru> 1.02-alt1
+- ported to last Sisyphus
+
 * Mon Dec 22 2008 Michael Bochkaryov <misha@altlinux.ru> 1.01-alt3
 - speak() method implemented
 
