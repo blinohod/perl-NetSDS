@@ -24,10 +24,8 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Mon May 18 2009 (-bi)
+# Automatically added by buildreq on Tue Jun 16 2009 (-bi)
 BuildRequires: perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Data-Structure-Util perl-Module-Build perl-Test-Pod perl-Test-Pod-Coverage
-
-BuildRequires: perl-Excel-Template
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
