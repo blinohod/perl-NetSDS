@@ -54,7 +54,7 @@ NetSDS - это гибкий и простой в использовании ф�
 %files
 %perl_vendor_privlib/NetSDS*
 %perl_vendor_man3dir/*
-#%doc samples
+%doc samples
 
 %changelog
 * Mon Dec 22 2008 Michael Bochkaryov <misha@altlinux.ru> 1.01-alt3
