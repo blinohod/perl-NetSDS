@@ -4,7 +4,7 @@
 %define m_name NetSDS
 %define m_author_id RATTLER
 %define _enable_test 1
-%def_without test
+#%def_without test
 
 
 Name: perl-NetSDS
