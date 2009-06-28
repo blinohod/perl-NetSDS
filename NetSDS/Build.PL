@@ -30,10 +30,10 @@ my $build = Module::Build->new(
 	create_readme      => 1,
 	license            => 'gpl',
 	build_requires     => {
-		'Test::More'          => '0.62',
-		'Test::Pod'           => '1.26',
-		'Test::Pod::Coverage' => '1.08',
-		'Module::Build'       => '0.2805',
+		'Test::More'          => '0',
+		'Test::Pod'           => '0',
+		'Test::Pod::Coverage' => '0',
+		'Module::Build'       => '0',
 	},
 	requires => {
 		'perl'                     => '5.008',

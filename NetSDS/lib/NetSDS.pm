@@ -16,7 +16,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use version; our $VERSION = '1.00';
+use version; our $VERSION = '1.02';
 
 1;
 
