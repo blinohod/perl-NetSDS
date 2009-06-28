@@ -1,0 +1,8 @@
+Build
+_build
+blib
+Makefile.PL
+README
+META.yml
+*.tar.gz
+MANIFEST*
