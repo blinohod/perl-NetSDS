@@ -129,7 +129,7 @@ sub render {
 	my $tpl = $this->{$name};
 
 	unless ($tpl) {
-		$this->error( " Wrong template '%s'", $name );
+		$this->error( "Wrong template '%s'", $name );
 		return undef;
 	}
 
