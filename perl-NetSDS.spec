@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 1.02
-Release: alt1
+Release: alt2
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -24,8 +24,8 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Tue Jun 16 2009 (-bi)
-BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-DBI perl-Data-Structure-Util perl-Data-UUID perl-Encode perl-Excel-Template perl-FCGI perl-HTML-SimpleParse perl-HTML-Template-Pro perl-HTML-Tree perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Text-CSV_XS perl-TimeDate perl-Unix-Syslog
+# Automatically added by buildreq on Mon Jul 13 2009 (-bi)
+BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-Data-Structure-Util perl-FCGI perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -57,6 +57,13 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples
 
 %changelog
+* Mon Jul 13 2009 Michael Bochkaryov <misha@altlinux.ru> 1.02-alt2
+- drop modules for further moving to separate packages
+- fix testcases
+- fix POD documentation
+- implement basic signal handlers in NetSDS::App
+- implement infinite loop inside main_loop()
+
 * Tue Jun 16 2009 Michael Bochkaryov <misha@altlinux.ru> 1.02-alt1
 - ported to last Sisyphus
 
