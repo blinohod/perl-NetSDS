@@ -23,11 +23,11 @@ NetSDS::Conf - API to configuration files
 
 =head1 DESCRIPTION
 
-C<NetSDS::Conf> module is a wrapper to Config::General handler for
+B<NetSDS::Conf> module is a wrapper to B<Config::General> handler for
 NetSDS configuration files.
 
-This package is called from C<NetSDS::App> module and should be never used
-directly from application code.
+This package is for internal usage and is called from B<NetSDS::App>
+or inherited modules and should be never used directly from applications.
 
 =cut
 
