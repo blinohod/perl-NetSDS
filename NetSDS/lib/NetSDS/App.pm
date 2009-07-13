@@ -445,7 +445,7 @@ sub initialize {
 
 #***********************************************************************
 
-=item B<use_auto_fetures()> - add features to application
+=item B<use_auto_features()> - add features to application
 
 This method implements automatic features inclusion by application
 configuration file (see C<feature> sections).
