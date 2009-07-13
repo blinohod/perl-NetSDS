@@ -269,7 +269,6 @@ sub file_copy {
 	}
 }
 
-
 #***********************************************************************
 
 =item B<file_move($in_file, $out_file)> - move file
@@ -431,7 +430,7 @@ sub path_read {
 
 #***********************************************************************
 
-=item B<exec_extrenal($prog, [$param1, ... $paramN])> - execute external program
+=item B<exec_external($prog, [$param1, ... $paramN])> - execute external program
 
 Paramters: pragram name, arguments list (see perldoc -f system)
 

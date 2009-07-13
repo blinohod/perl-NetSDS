@@ -45,7 +45,7 @@ use version; our $VERSION = '0.02';
 
 =over
 
-=item B<init_file()> - read parameters from configuration file
+=item B<getconf()> - read parameters from configuration file
 
 Paramters: configuration file name
 

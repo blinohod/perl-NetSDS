@@ -59,6 +59,25 @@ use CGI::Cookie;
 use version; our $VERSION = "0.02";
 our @EXPORT_OK = qw();
 
+
+#***********************************************************************
+
+=head1 CONSTRUCTOR
+
+=over
+
+=item B<new()> - constructor
+
+Paramters: class parameters
+
+Returns:
+
+This method provides..... 
+
+=cut 
+
+#-----------------------------------------------------------------------
+
 sub new {
 
 	my ( $class, %params ) = @_;
@@ -80,6 +99,8 @@ sub new {
 }
 
 #***********************************************************************
+
+=back
 
 =head1 CLASS AND OBJECT  METHODS
 
@@ -455,6 +476,17 @@ sub request_method {
 
 	return $this->cgi->request_method;
 }
+
+
+#***********************************************************************
+
+=item B<script_name()> - CGI script name
+
+Returns: script name from CGI.pm
+
+=cut 
+
+#-----------------------------------------------------------------------
 
 sub script_name {
 
