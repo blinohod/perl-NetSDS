@@ -60,7 +60,7 @@ use base qw(
   NetSDS::Class::Abstract
 );
 
-use version; our $VERSION = '1.01';
+use version; our $VERSION = '1.02';
 
 use NetSDS::Logger;
 use NetSDS::Conf;
@@ -96,6 +96,7 @@ Standard parameters are:
 	* conf_file - path to configuration file
 	* has_conf - set to 1 if configuration file is necessary
 	* auto_features - set to 1 for auto features inclusion
+	* infinite - set to 1 for inifinite loop
 
 =cut
 
@@ -117,6 +118,7 @@ sub new {
 		logger        => undef,                # logger object
 		has_conf      => 1,                    # is configuration file necessary
 		auto_features => 0,                    # are automatic features allowed or not
+		infinite      => 1,                    # is infinite loop
 		%params,
 	);
 
@@ -330,7 +332,7 @@ __PACKAGE__->mk_ro_accessors('daemon');
 
 #***********************************************************************
 
-=item B<auto_fatures()> - auto features flag
+=item B<auto_features()> - auto features flag
 
 Automatic features inclusion allowed if TRUE.
 
@@ -340,6 +342,17 @@ Automatic features inclusion allowed if TRUE.
 
 __PACKAGE__->mk_ro_accessors('auto_features');
 
+#***********************************************************************
+
+=item B<infinite([$bool])> - is application in infinite loop
+
+$app->infinite(1); # set infinite loop
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+__PACKAGE__->mk_accessors('infinite');
 #***********************************************************************
 
 =item B<initialize()>
@@ -362,6 +375,7 @@ Common application initialization:
 sub initialize {
 	my ( $this, %params ) = @_;
 
+	$this->speak("Initializing application.");
 	# Determine application name from process name
 	if ( !$this->{name} ) {
 		$this->_determine_name();
@@ -372,6 +386,8 @@ sub initialize {
 
 	# Daemonize, if needed
 	if ( $this->daemon() ) {
+		$this->speak("Daemonize, switch verbosity to false.");
+		$this->{verbose} = undef;
 		Proc::Daemon::Init;
 	}
 
@@ -386,6 +402,7 @@ sub initialize {
 	# Create syslog handler
 	if ( !$this->logger ) {
 		$this->logger( NetSDS::Logger->new( name => $this->{name} ) );
+		$this->log( "info", "Logger started" );
 	}
 
 	# Initialize configuration
@@ -410,6 +427,19 @@ sub initialize {
 		}
 
 	} ## end if ( $this->{has_conf})
+
+	# Process infinite loop
+	if ( $this->{infinite} ) {
+		$this->{to_finalize} = 0;
+	} else {
+		$this->{to_finalize} = 1;
+	}
+
+	# Add signal handlers
+	$SIG{INT} = sub {
+		$this->log( "warn", "SIGINT caught" );
+		$this->{to_finalize} = 1;
+	};
 
 } ## end sub initialize
 
@@ -467,20 +497,28 @@ sub add_feature {
 	my $class = shift @_;
 	my $conf  = shift @_;
 
+	# Try to use necessary classes
 	eval "use $class";
 	if ($@) {
 		return $this->error( "Cant add feature module $class: " . $@ );
 	}
 
+	# Feature class invocation
 	eval {
+		# Create feature instance
 		$this->{$name} = $class->create( $this, $conf, @_ );
+		# Add logger
 		$this->{$name}->{logger} = $this->logger;
 	};
 	if ($@) {
 		return $this->error( "Cant initialize feature module $class: " . $@ );
 	}
 
+	# Create accessor to feature
 	$this->mk_accessors($name);
+
+	# Send verbose output
+	$this->speak("Feature added: $name => $class");
 
 } ## end sub add_feature
 #***********************************************************************
@@ -495,20 +533,21 @@ This method called if we need to finish application.
 sub finalize {
 	my ( $this, $msg ) = @_;
 
-	$this->log( 'info', 'Application module stopped' );
+	$this->log( 'info', 'Application stopped' );
 
 	exit(0);
 }
 
 #***********************************************************************
 
-=item B<start()> - 
+=item B<start()> - user defined initialization
 
 Abstract method for postinitialization procedures execution.
 
 Arguments and return defined in inherited classes.
-
 This method should be overwritten in exact application.
+
+Remember that start() methhod is invoked after initialize()
 
 =cut
 
@@ -571,10 +610,15 @@ be rewritten for alternative logic.
 sub main_loop {
 	my ($this) = @_;
 
+	# Run startup hooks
 	my $ret = $this->start();
 
-	$ret = $this->process();
+	# Run processing hooks
+	while ( !$this->{to_finalize} ) {
+		$ret = $this->process();
+	}
 
+	# Run finalize hooks
 	$ret = $this->stop();
 
 }
@@ -600,11 +644,14 @@ sub log {
 
 	my ( $this, $level, $message ) = @_;
 
+	# Try to use syslog handler
 	if ( $this->logger() ) {
 		$this->logger->log( $level, $message );
 	} else {
+		# No syslog, send error to STDERR
 		carp "[$level] $message";
 	}
+
 	return undef;
 
 }    ## sub log
@@ -640,7 +687,7 @@ sub error {
 
 Paramters: list of strings to be written as verbose output
 
-This method implements verbose output.
+This method implements verbose output to STDOUT.
 
 	$this->speak("Do something");
 
@@ -653,7 +700,8 @@ sub speak {
 	my ( $this, @params ) = @_;
 
 	if ( $this->verbose ) {
-		print @params;
+		print join( "", @params );
+		print "\n";
 	}
 }
 
@@ -675,17 +723,26 @@ sub config_file {
 	if ( $file_name =~ /^\// ) {
 		$conf_file = $file_name;
 	} else {
+
+		# Try to find path by NETSDS_CONF_DIR environment
 		my $file = ( $ENV{NETSDS_CONF_DIR} || "/etc/NetSDS/" );
 		$file =~ s/([^\/])$/$1\//;
 		$conf_file = $file . $file_name;
 
+		# No config file in common place - try admin
 		unless ( -f $conf_file && -r $conf_file ) {
 			$conf_file = $file . "admin/" . $file_name;
 		}
+
+		# Last resort - local folder
+		unless ( -f $conf_file && -r $conf_file ) {
+			$conf_file = "./" . $file_name;
+		}
+
 	}
 
 	return $conf_file;
-}
+} ## end sub config_file
 
 # Determine application name from process name
 sub _determine_name {
