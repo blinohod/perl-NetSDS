@@ -137,11 +137,11 @@ sub log {
 
 	if ( !$LEV ) {
 		$LEV = LOG_INFO;
-	};
+	}
 
-	if (!$message) {
+	if ( !$message ) {
 		$message = "";
-	};
+	}
 
 	syslog( $LEV, "[$level] $message" );
 
