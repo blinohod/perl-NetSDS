@@ -60,7 +60,7 @@ use base qw(
   NetSDS::Class::Abstract
 );
 
-use version; our $VERSION = '1.02';
+use version; our $VERSION = '1.020';
 
 use NetSDS::Logger;
 use NetSDS::Conf;

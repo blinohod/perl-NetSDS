@@ -39,7 +39,7 @@ use warnings;
 
 use Config::General;
 
-use version; our $VERSION = '0.02';
+use version; our $VERSION = '1.020';
 
 #***********************************************************************
 

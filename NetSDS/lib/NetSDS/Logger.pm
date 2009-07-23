@@ -34,12 +34,11 @@ B<NOTE>: C<NetSDS::Logger> module is for internal use mostly from application fr
 package NetSDS::Logger;
 
 use 5.8.0;
-#use strict;
 use warnings;
 
 use Unix::Syslog qw(:macros :subs);
 
-use version; our $VERSION = '0.01';
+use version; our $VERSION = '1.020';
 
 #===============================================================================
 

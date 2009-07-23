@@ -67,7 +67,7 @@ use Storable qw(nfreeze thaw);
 
 use Data::Structure::Util;
 
-use version; our $VERSION = '1.01';
+use version; our $VERSION = '1.020';
 
 #***********************************************************************
 
