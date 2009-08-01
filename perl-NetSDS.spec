@@ -4,11 +4,10 @@
 %define m_name NetSDS
 %define m_author_id RATTLER
 %define _enable_test 1
-#%def_without test
 
 
 Name: perl-NetSDS
-Version: 1.020
+Version: 1.100
 Release: alt2
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -24,8 +23,8 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Mon Jul 13 2009 (-bi)
-BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-Data-Structure-Util perl-FCGI perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
+# Automatically added by buildreq on Sat Aug 01 2009 (-bi)
+BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-DBI perl-DBD-Pg perl-Data-Structure-Util perl-FCGI perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -57,6 +56,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples
 
 %changelog
+* Sat Aug 01 2009 Michael Bochkaryov <misha@altlinux.ru> 1.100-alt2
+- NetSDS::DBI module added
+
 * Thu Jul 23 2009 Michael Bochkaryov <misha@altlinux.ru> 1.020-alt2
 - version changed due to Perl version naming specific
 

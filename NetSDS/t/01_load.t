@@ -15,13 +15,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;                      # last test to print
+use Test::More tests => 9;                      # last test to print
 
 BEGIN {
 	use_ok('NetSDS');
 	use_ok('NetSDS::Class::Abstract');
 	use_ok('NetSDS::Conf');
 	use_ok('NetSDS::Const');
+	use_ok('NetSDS::DBI');
 	use_ok('NetSDS::Feature');
 	use_ok('NetSDS::Logger');
 	use_ok('NetSDS::App');
