@@ -105,8 +105,8 @@ sub new {
 	my $this = $class->SUPER::new(
 		dbh    => undef,
 		dsn    => $params{dsn},
-		user   => '',
-		passwd => '',
+		user   => $params{login},
+		passwd => $params{passwd},
 		attrs  => {},
 		sets   => [],
 	);
