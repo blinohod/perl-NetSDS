@@ -105,7 +105,7 @@ sub new {
 	my $this = $class->SUPER::new(
 		dbh    => undef,
 		dsn    => $params{dsn},
-		user   => $params{login},
+		login  => $params{login},
 		passwd => $params{passwd},
 		attrs  => {},
 		sets   => [],
@@ -125,7 +125,6 @@ sub new {
 	return $this;
 
 } ## end sub new
-
 
 #***********************************************************************
 
@@ -221,7 +220,6 @@ sub _add_attrs {
 	return %attrs;
 }
 
-
 #***********************************************************************
 
 =item B<_check_connection()> - ping and reconnect
@@ -242,7 +240,6 @@ sub _check_connection {
 		}
 	}
 }
-
 
 #***********************************************************************
 
