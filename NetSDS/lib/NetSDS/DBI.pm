@@ -166,7 +166,8 @@ sub call {
 	}
 
 	# Prepare cached SQL query
-	my $sth = $this->dbh->prepare_cached($sql);
+	# FIXME my $sth = $this->dbh->prepare_cached($sql);
+	my $sth = $this->dbh->prepare($sql);
 	unless ($sth) {
 		return $this->error("Cant prepare SQL query: $sql");
 	}
