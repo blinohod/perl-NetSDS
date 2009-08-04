@@ -30,7 +30,9 @@ BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-C
 NetSDS is an easy to use and flexible framework firstly intended
 for mobile VAS developent but may be used as more common thing.
 
-This package contains common Perl modules for NetSDS.
+This package contains common Perl modules for NetSDS:
+* abstract class implementation
+* abstract application
 
 %description -l ru_RU.UTF-8
 NetSDS - это гибкий и простой в использовании фреймворк, прежде всего
