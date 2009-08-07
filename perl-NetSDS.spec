@@ -7,8 +7,8 @@
 
 
 Name: perl-NetSDS
-Version: 1.100
-Release: alt2
+Version: 1.101
+Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -58,6 +58,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples
 
 %changelog
+* Fri Aug 07 2009 Michael Bochkaryov <misha@altlinux.ru> 1.101-alt1
+- Fix finalization detect in main_loop()
+
 * Sat Aug 01 2009 Michael Bochkaryov <misha@altlinux.ru> 1.100-alt2
 - NetSDS::DBI module added
 

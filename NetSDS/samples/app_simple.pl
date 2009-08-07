@@ -1,6 +1,6 @@
 #!/usr/bin/env perl 
 
-MyApp->run( daemon => 0, has_conf => 0 );
+MyApp->run( infinite => 1, daemon => 0, has_conf => 0, verbose => 1 );
 
 1;
 

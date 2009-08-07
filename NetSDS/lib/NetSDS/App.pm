@@ -428,16 +428,16 @@ sub initialize {
 
 	} ## end if ( $this->{has_conf})
 
-	# Process infinite loop
-	if ( $this->{infinite} ) {
-		$this->{to_finalize} = 0;
-	} else {
-		$this->{to_finalize} = 1;
-	}
-
 	# Add signal handlers
 	$SIG{INT} = sub {
+		$this->speak("SIGINT caught");
 		$this->log( "warn", "SIGINT caught" );
+		$this->{to_finalize} = 1;
+	};
+
+	$SIG{TERM} = sub {
+		$this->speak("SIGTERM caught");
+		$this->log( "warn", "SIGTERM caught" );
 		$this->{to_finalize} = 1;
 	};
 
@@ -615,13 +615,19 @@ sub main_loop {
 
 	# Run processing hooks
 	while ( !$this->{to_finalize} ) {
+
 		$ret = $this->process();
+
+		# Process infinite loop
+		if ( !$this->{infinite} or $this->{to_finalize} ) {
+			$this->{to_finalize} = 1;
+		}
 	}
 
 	# Run finalize hooks
 	$ret = $this->stop();
 
-}
+} ## end sub main_loop
 
 #***********************************************************************
 
