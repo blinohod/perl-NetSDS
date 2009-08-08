@@ -7,7 +7,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.101
+Version: 1.102
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -58,6 +58,10 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples
 
 %changelog
+* Sat Aug 08 2009 Michael Bochkaryov <misha@altlinux.ru> 1.102-alt1
+- automate --version and --help processing (Getopt::Long based)
+- pass through @ARGV to application
+
 * Fri Aug 07 2009 Michael Bochkaryov <misha@altlinux.ru> 1.101-alt1
 - Fix finalization detect in main_loop()
 
