@@ -67,7 +67,7 @@ use NetSDS::Conf;
 
 use Proc::Daemon;
 use Proc::PID::File;
-use Getopt::Long;
+use Getopt::Long qw(:config auto_version auto_help pass_through);
 
 use POSIX;
 use Carp;

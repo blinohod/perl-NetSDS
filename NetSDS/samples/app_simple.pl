@@ -1,5 +1,20 @@
 #!/usr/bin/env perl 
 
+=head1 SYNOPSIS
+
+Options:
+
+	--help - this message
+	--version - show application version
+	--verbose - increase verbosity level
+	--daemon - run as daemon
+
+C<app_simple.pl> is an example for NetSDS application developers.
+
+=cut
+
+use version; our $VERSION = "1.001";
+
 MyApp->run( infinite => 1, daemon => 0, has_conf => 0, verbose => 1 );
 
 1;
