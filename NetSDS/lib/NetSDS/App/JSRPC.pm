@@ -52,7 +52,7 @@ use strict;
 use warnings;
 
 use JSON;
-use base qw(NetSDS::App::FCGI);
+use base 'NetSDS::App::FCGI';
 
 use version; our $VERSION = "0.01";
 
@@ -72,7 +72,7 @@ sub new {
 
 	my ( $class, %params ) = @_;
 
-	my $this = $class->SUPER::new();
+	my $this = $class->SUPER::new(%params);
 
 	return $this;
 

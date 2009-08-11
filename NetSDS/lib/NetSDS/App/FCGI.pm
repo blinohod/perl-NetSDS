@@ -51,7 +51,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use base qw(NetSDS::App);
+use base 'NetSDS::App';
 
 use CGI::Fast;
 use CGI::Cookie;
