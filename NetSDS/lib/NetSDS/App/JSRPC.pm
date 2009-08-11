@@ -86,7 +86,8 @@ sub process {
 		if ( $this->can($js_method) ) {
 
 			# Call method and hope it will give some response
-			if ( my $result = $this->$js_method($js_params) ) {
+			my $result = $this->$js_method($js_params);
+			unless ( defined($result) ) {
 
 				# Make positive response
 				$this->data(
@@ -102,7 +103,7 @@ sub process {
 				$this->data(
 					$this->_make_error(
 						code    => -32000,
-						message => "Error response from method",
+						message => $this->errstr || "Error response from method $js_method",
 						id      => undef,
 					)
 				);
@@ -136,12 +137,12 @@ sub process {
 
 sub _request_parse {
 
-	my ($this, $post_data) = @_;
+	my ( $this, $post_data ) = @_;
 
 	my $js_request = eval { decode_json($post_data) };
 	return $this->error("Cant parse JSON data") if $@;
 
-	return ($js_request->{'method'}, $js_request->{'params'}, $js_request->{'id'});
+	return ( $js_request->{'method'}, $js_request->{'params'}, $js_request->{'id'} );
 
 }
 
@@ -222,7 +223,7 @@ None
 
 =head1 TODO
 
-None
+* move error codes to constants
 
 =head1 AUTHOR
 
