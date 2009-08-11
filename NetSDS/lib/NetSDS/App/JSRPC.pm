@@ -134,6 +134,17 @@ sub process {
 
 } ## end sub process
 
+sub _request_parse {
+
+	my ($this, $post_data) = @_;
+
+	my $js_request = eval { decode_json($post_data) };
+	return $this->error("Cant parse JSON data") if $@;
+
+	return ($js_request->{'method'}, $js_request->{'params'}, $js_request->{'id'});
+
+}
+
 sub _make_result {
 
 	my ( $this, %params ) = @_;
