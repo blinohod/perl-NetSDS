@@ -13,15 +13,35 @@
 
 =head1 NAME
 
-NetSDS::
+NetSDS::App::JSRPC - JSON-RPC server framework
 
 =head1 SYNOPSIS
 
-	use NetSDS::;
+	use 5.8.0;
+
+	JServer->run();
+
+	1;
+
+	package JServer;
+	use base 'NetSDS::App::JSRPC';
+
+	# This method is available via JSON-RPC
+	sub sum {
+		my ($this, $param) = @_;
+		return $$param[0] + $$param[1];
+	}
+
+	1;
 
 =head1 DESCRIPTION
 
-C<NetSDS> module contains superclass all other classes should be inherited from.
+C<NetSDS::App::JSRPC> module implements framework for common JSON-RPC service.
+
+This implementation is based on L<NetSDS::App::FCGI> module and expected to be
+executed as FastCGI or CGI service.
+
+Both request and response should be of 'application/x-json-rpc' MIME type.
 
 =cut
 
@@ -45,8 +65,6 @@ use version; our $VERSION = "0.01";
 
 =item B<new([...])> - class constructor
 
-    my $object = NetSDS::SomeClass->new(%options);
-
 =cut
 
 #-----------------------------------------------------------------------
@@ -63,6 +81,8 @@ sub new {
 #***********************************************************************
 
 =item B<process()> - main JSON-RPC iteration
+
+This is internal method that implements JSON-RPC call processing.
 
 =cut
 
@@ -86,8 +106,8 @@ sub process {
 		if ( $this->can($js_method) ) {
 
 			# Call method and hope it will give some response
-			my $result = $this->$js_method($js_params);
-			unless ( defined($result) ) {
+			my $result = $this->process_call( $js_method, $js_params );
+			if ( defined($result) ) {
 
 				# Make positive response
 				$this->data(
@@ -135,6 +155,38 @@ sub process {
 
 } ## end sub process
 
+#***********************************************************************
+
+=item B<process_call($method, $params)> - execute method call
+
+Paramters: method name, parameters.
+
+Returns parameters from executed method as is.
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub process_call {
+
+	my ( $this, $method, $params ) = @_;
+
+	return $this->$method($params);
+
+}
+
+#***********************************************************************
+
+=item B<_request_parse($post_data)> - parse HTTP POST
+
+Paramters: HTTP POST data as string
+
+Returns: request method, parameters, id
+
+=cut 
+
+#-----------------------------------------------------------------------
+
 sub _request_parse {
 
 	my ( $this, $post_data ) = @_;
@@ -145,6 +197,26 @@ sub _request_parse {
 	return ( $js_request->{'method'}, $js_request->{'params'}, $js_request->{'id'} );
 
 }
+
+#***********************************************************************
+
+=item B<_make_result(%params)> - prepare positive response
+
+Paramters:
+
+=over
+
+=item B<id> - the same as request Id (see specification)
+
+=item B<result> - method result
+
+=back
+
+Returns JSON encoded response message
+
+=cut 
+
+#-----------------------------------------------------------------------
 
 sub _make_result {
 
@@ -170,9 +242,15 @@ Internal method implementing error response.
 
 Paramters:
 
-	* B<id> - the same as request Id (see specification)
-	* B<code> - error code (default is -32603, internal error)
-	* B<message> - error message
+=over
+
+=item B<id> - the same as request Id (see specification)
+
+=item B<code> - error code (default is -32603, internal error)
+
+=item B<message> - error message
+
+=back
 
 Returns JSON encoded error message
 
@@ -212,6 +290,7 @@ __END__
 
 =head1 EXAMPLES
 
+See C<samples/app_jsrpc.fcgi> appliction.
 
 =head1 BUGS
 
