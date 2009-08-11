@@ -80,7 +80,7 @@ sub process {
 	$this->mime('application/x-json-rpc');
 
 	# Parse JSON-RPC call
-	if ( my ( $js_method, $js_params, $js_id ) = $this->_request_parse($js_request) ) {
+	if ( my ( $js_method, $js_params, $js_id ) = $this->_request_parse($http_request) ) {
 
 		# Try to call method
 		if ( $this->can($js_method) ) {
