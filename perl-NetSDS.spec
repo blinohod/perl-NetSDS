@@ -7,7 +7,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.102
+Version: 1.200
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -58,6 +58,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples
 
 %changelog
+* Tue Aug 11 2009 Michael Bochkaryov <misha@altlinux.ru> 1.200-alt1
+- Added JSON-RPC framework
+
 * Sat Aug 08 2009 Michael Bochkaryov <misha@altlinux.ru> 1.102-alt1
 - automate --version and --help processing (Getopt::Long based)
 - pass through @ARGV to application
