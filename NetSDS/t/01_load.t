@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;                      # last test to print
+use Test::More tests => 10;                      # last test to print
 
 BEGIN {
 	use_ok('NetSDS');
@@ -27,5 +27,6 @@ BEGIN {
 	use_ok('NetSDS::Logger');
 	use_ok('NetSDS::App');
 	use_ok('NetSDS::App::FCGI');
+	use_ok('NetSDS::App::JSRPC');
 }
 
