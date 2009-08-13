@@ -23,8 +23,8 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Sat Aug 01 2009 (-bi)
-BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-DBI perl-DBD-Pg perl-Data-Structure-Util perl-FCGI perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
+# Automatically added by buildreq on Thu Aug 13 2009 (-bi)
+BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-JSON perl-JSON-XS perl-Module-Build perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
