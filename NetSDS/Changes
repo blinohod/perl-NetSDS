@@ -1,3 +1,6 @@
+1.200 Thu Aug 13 17:13:56 EEST 2009
+- added NetSDS::App::JSRPC framework
+- updated versions for all modules
+
 1.103 Thu Aug 13 16:14:38 EEST 2009
-- use common version from NetSDS.pm for all modules
 - POD documentation improved

@@ -38,8 +38,8 @@ use warnings;
 
 use Unix::Syslog qw(:macros :subs);
 
-use NetSDS;
-use version; our $VERSION = NetSDS->VERSION;
+
+use version; our $VERSION = '1.200';
 
 #===============================================================================
 

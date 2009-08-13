@@ -42,8 +42,8 @@ use DBI;
 
 use base 'NetSDS::Class::Abstract';
 
-use NetSDS;
-use version; our $VERSION = NetSDS->VERSION;
+
+use version; our $VERSION = '1.200';
 
 #===============================================================================
 

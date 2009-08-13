@@ -67,8 +67,8 @@ use Storable qw(nfreeze thaw);
 
 use Data::Structure::Util;
 
-use NetSDS;
-use version; our $VERSION = NetSDS->VERSION;
+
+use version; our $VERSION = '1.200';
 
 #***********************************************************************
 

@@ -54,8 +54,8 @@ use warnings;
 use JSON;
 use base 'NetSDS::App::FCGI';
 
-use NetSDS;
-use version; our $VERSION = NetSDS->VERSION;
+
+use version; our $VERSION = '1.200';
 
 #===============================================================================
 #

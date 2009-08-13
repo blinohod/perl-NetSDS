@@ -39,8 +39,8 @@ use warnings;
 
 use Config::General;
 
-use NetSDS;
-use version; our $VERSION = NetSDS->VERSION;
+
+use version; our $VERSION = '1.200';
 
 #***********************************************************************
 
