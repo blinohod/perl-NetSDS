@@ -65,8 +65,8 @@ use warnings;
 
 use base qw(Class::Accessor Class::ErrorHandler);
 
-use version; our $VERSION = "1.020";
-our @EXPORT_OK = qw();
+use NetSDS;
+use version; our $VERSION = NetSDS->VERSION;
 
 #===============================================================================
 
@@ -109,7 +109,7 @@ This method should be rewritten with feature functionality implementation.
 
 sub init {
 
-	my $this = shift @_;
+	my ($this) = @_;
 
 }
 

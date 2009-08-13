@@ -35,7 +35,8 @@ use warnings;
 
 use base 'Exporter';
 
-use version; our $VERSION = '1.020';
+use NetSDS;
+use version; our $VERSION = NetSDS->VERSION;
 
 our @EXPORT = qw(
   LANG_BE

@@ -40,9 +40,10 @@ use warnings;
 
 use DBI;
 
-use base qw(NetSDS::Class::Abstract);
+use base 'NetSDS::Class::Abstract';
 
-use version; our $VERSION = "1.200";
+use NetSDS;
+use version; our $VERSION = NetSDS->VERSION;
 
 #===============================================================================
 
@@ -102,6 +103,7 @@ sub new {
 		return $class->error("Cant initialize DBI connection without DSN");
 	}
 
+	# initialize parent class
 	my $this = $class->SUPER::new(
 		dbh    => undef,
 		dsn    => $params{dsn},
@@ -109,8 +111,10 @@ sub new {
 		passwd => $params{passwd},
 		attrs  => {},
 		sets   => [],
+		%params,
 	);
 
+	# Create object accessor for DBMS handler
 	$this->mk_accessors('dbh');
 
 	# Add initialization SQL queries
@@ -225,6 +229,8 @@ sub _add_attrs {
 
 =item B<_check_connection()> - ping and reconnect
 
+Internal method checking connection and implement reconnect
+
 =cut 
 
 #-----------------------------------------------------------------------
@@ -245,6 +251,8 @@ sub _check_connection {
 #***********************************************************************
 
 =item B<_connect()> - connect to DBMS
+
+Internal method starting connection to DBMS
 
 =cut 
 

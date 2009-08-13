@@ -39,7 +39,8 @@ use warnings;
 
 use Config::General;
 
-use version; our $VERSION = '1.020';
+use NetSDS;
+use version; our $VERSION = NetSDS->VERSION;
 
 #***********************************************************************
 
@@ -98,7 +99,7 @@ __END__
 
 =head1 BUGS
 
-Crashes if configuration file unavailable
+Unknown
 
 =head1 SEE ALSO
 

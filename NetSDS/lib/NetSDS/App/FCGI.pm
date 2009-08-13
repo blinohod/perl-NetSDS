@@ -56,8 +56,8 @@ use base 'NetSDS::App';
 use CGI::Fast;
 use CGI::Cookie;
 
-use version; our $VERSION = "1.020";
-our @EXPORT_OK = qw();
+use NetSDS;
+use version; our $VERSION = NetSDS->VERSION;
 
 
 #***********************************************************************
