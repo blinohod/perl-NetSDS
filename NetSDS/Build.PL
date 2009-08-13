@@ -37,11 +37,11 @@ my $build = Module::Build->new(
 	},
 	requires => {
 		'perl'                   => '5.008',
-		'version'                => '0',
+		'version'                => '0.700',
 		'CGI'                    => '0',
 		'CGI::Cookie'            => '0',
 		'CGI::Fast'              => '0',
-		'DBI'                    => '0',
+		'DBI'                    => '1.600',
 		'DBD::Pg'                => '0',
 		'FCGI'                   => '0',
 		'Class::Accessor'        => '0',
