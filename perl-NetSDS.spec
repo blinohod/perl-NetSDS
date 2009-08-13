@@ -59,7 +59,9 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %changelog
 * Tue Aug 11 2009 Michael Bochkaryov <misha@altlinux.ru> 1.200-alt1
-- Added JSON-RPC framework
+- added JSON-RPC framework
+- improved POD documentation
+- added logging to features (plugins)
 
 * Sat Aug 08 2009 Michael Bochkaryov <misha@altlinux.ru> 1.102-alt1
 - automate --version and --help processing (Getopt::Long based)
