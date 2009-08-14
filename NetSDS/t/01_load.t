@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;                      # last test to print
+use Test::More tests => 11;                      # last test to print
 
 BEGIN {
 	use_ok('NetSDS');
@@ -23,6 +23,7 @@ BEGIN {
 	use_ok('NetSDS::Conf');
 	use_ok('NetSDS::Const');
 	use_ok('NetSDS::DBI');
+	use_ok('NetSDS::DBI::Table');
 	use_ok('NetSDS::Feature');
 	use_ok('NetSDS::Logger');
 	use_ok('NetSDS::App');
