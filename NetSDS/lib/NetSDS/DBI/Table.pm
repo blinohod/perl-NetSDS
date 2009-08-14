@@ -367,6 +367,7 @@ Bad documentation
 
 =head1 SEE ALSO
 
+L<NetSDS::DBI>
 L<http://en.wikipedia.org/wiki/Create,_read,_update_and_delete>
 
 =head1 TODO
