@@ -55,19 +55,14 @@ use version; our $VERSION = "0.002";
 
 =over
 
-=item B<new([...])>
+=item B<new([...])> - class constructor
 
-	my %options = (
+	my $tbl = NetSDS::DBI::Table->new(
 		dsn => 'dbi:Pg:dbname=content',
+		login => 'netsds',
+		passwd => 'topsecret,
 		table => 'content.meta',
 	);
-    my $object = NetSDS::DBI::Table->new(%options);
-
-	my @meta = $object->fetch(
-		filter => ['content_id = 12345'],
-		limit => 3, # fetch 3 records
-		for_update => 1, # for update
-	)
 
 =cut
 
@@ -76,24 +71,19 @@ sub new {
 
 	my ( $class, %params ) = @_;
 
-	my $this = $class->SUPER::new(
-		auto_quote => 1,
-		%params
-	);
+	# Initialize base DBMS connector
+	my $this = $class->SUPER::new(%params);
 
+	# Set table name
 	if ( $params{table} ) {
 		$this->{table} = $params{table};
-		# FIXME: implement checking if table exists and available
-
 	} else {
 		return $class->error('Table name is not specified to NetSDS::DBI::Table');
 	}
 
 	return $this;
 
-} ## end sub new
-
-__PACKAGE__->mk_accessors(qw/auto_quote/);
+}
 
 #***********************************************************************
 
@@ -183,7 +173,7 @@ sub fetch {
 	}
 
 	my @ret = ();
-	my $sth = $this->dbh->prepare($sql);
+	my $sth = $this->call($sql);
 	$sth->execute();
 	while ( my $row = $sth->fetchrow_hashref() ) {
 		push @ret, $row;
@@ -195,13 +185,66 @@ sub fetch {
 
 #***********************************************************************
 
-=item B<insert(%params)> - insert record into table
+=item B<insert(%key_val_pairs)> - insert record into table
 
 Paramters: record fields as hash
 
-Returns: inserted record as hash
+Returns: id of inserted record 
 
-This method insert new record into table and return inserted parameters.
+	my $user_id = $tbl->insert_row(
+		'login' => 'vasya',
+		'password' => $encrypted_passwd,
+	);
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub insert_row {
+
+	my ( $this, %params ) = @_;
+
+	my @fields = ();    # Fields list
+	my @values = ();    # Values list
+
+	# Prepare fields and values lists from input hash
+	foreach my $key ( keys %params ) {
+		push @fields, $key;
+		push @values, $this->dbh->quote( $params{$key} );
+	}
+
+	# Prepare SQL statement from fields and values lists
+	my $sql = 'insert into ' . $this->{table} . ' (' . join( ',', @fields ) . ')'    # fields list
+	  . ' values (' . join( ',', @values ) . ')'                                     # values list
+	  . ' returning id';                                                             # return "id" field
+
+	# Execute SQL query and fetch result
+	my ($row_id) = $this->call($sql)->fetchrow_array();
+
+	# Return "id" field from inserted row
+	return $row_id || $this->error( "Cant insert table record: " . $this->dbh->errstr );
+
+} ## end sub insert_row
+
+#***********************************************************************
+
+=item B<insert(@records_list)> - mass insert
+
+Paramters: list of records (as hashrefs)
+
+Returns: array of inserted records "id"
+
+This method allows mass insert of records.
+
+	my @user_ids = $tbl->insert(
+		{ login => 'vasya', password => $str1 },
+		{ login => 'masha', password => $str2 },
+		{ login => 'petya', password => $str3, active => 'false' },
+	);
+
+B<Warning!> This method use separate INSERT queries and in fact is only
+wrapper for multiple C<insert_row()> calls. So it's not so fast as
+one insert but allows to use different key-value pairs for different records.
 
 =cut 
 
@@ -209,25 +252,18 @@ This method insert new record into table and return inserted parameters.
 
 sub insert {
 
-	my ( $this, %params ) = @_;
+	my ( $this, @rows ) = @_;
 
-	my @fields = ();
-	my @values = ();
-	foreach my $key ( keys %params ) {
-		push @fields, $key;
-		push @values, $this->_quote( $params{$key} );
-	}
-	my $sql = 'insert into ' . $this->{table} . ' (' . join( ',', @fields ) . ') values (' . join( ',', @values ) . ') returning *';
+	my @ids = ();
 
-	my $res = $this->selectrow_hashref($sql);
-
-	if ($res) {
-		return %{$res};
-	} else {
-		return $this->error( "Cant insert table record: " . $this->dbh->errstr );
+	# Go through records and insert each one
+	foreach my $rec (@rows) {
+		push @ids, ( $this->insert_row( %{$rec} ) );
 	}
 
-} ## end sub insert
+	return @ids;
+
+}
 
 #***********************************************************************
 
@@ -322,28 +358,6 @@ sub delete {
 		return 1;
 	} else {
 		return $this->error( "Can't delete record: table='" . $this->{table} . "', $id_in'; " . $this->dbh->errstr );
-	}
-
-}
-
-#***********************************************************************
-
-=item B<_auote($value)> - quote value
-
-Internal method implementing autoquoting of data
-
-=cut 
-
-#-----------------------------------------------------------------------
-
-sub _quote {
-
-	my ( $this, $val ) = @_;
-
-	if ( $this->auto_quote ) {
-		return $this->dbh->($val);
-	} else {
-		return $val;
 	}
 
 }
