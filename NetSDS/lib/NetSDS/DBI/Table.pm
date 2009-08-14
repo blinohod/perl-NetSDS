@@ -91,7 +91,7 @@ sub new {
 
 	return $this;
 
-}
+} ## end sub new
 
 __PACKAGE__->mk_accessors(qw/auto_quote/);
 
@@ -100,6 +100,8 @@ __PACKAGE__->mk_accessors(qw/auto_quote/);
 =item B<fetch(%params)> - get records from table as array of hashrefs
 
 Paramters (hash):
+
+* fields - fetch fields by list
 
 * filter - arrayref of SQL expressions like C<status = 'active'> for C<WHERE> clause
 
@@ -183,9 +185,9 @@ sub fetch {
 	my @ret = ();
 	my $sth = $this->dbh->prepare($sql);
 	$sth->execute();
-	while (my $row = $sth->fetchrow_hashref()) {
+	while ( my $row = $sth->fetchrow_hashref() ) {
 		push @ret, $row;
-	};
+	}
 
 	return @ret;
 
@@ -222,7 +224,7 @@ sub insert {
 	if ($res) {
 		return %{$res};
 	} else {
-		return $this->error("Cant insert table record: " . $this->dbh->errstr);
+		return $this->error( "Cant insert table record: " . $this->dbh->errstr );
 	}
 
 } ## end sub insert
@@ -259,13 +261,13 @@ sub update {
 	}
 
 	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . " where id=$id returning *";
-    #warn "UPDATE: $sql";
+	#warn "UPDATE: $sql";
 	my $res = $this->selectrow_hashref($sql);
 
 	if ($res) {
 		return %{$res};
 	} else {
-		return $this->error("Cant update message" .  $this->dbh->errstr);
+		return $this->error( "Cant update message" . $this->dbh->errstr );
 	}
 
 }
@@ -284,8 +286,8 @@ Just return total number of contacts by calling:
 ## Returns number of records
 sub get_count {
 
-	my $this	= shift;
-	my %params	= @_;
+	my $this   = shift;
+	my %params = @_;
 
 	$params{fields} = ["COUNT(*) AS c"];
 	my @count = $this->fetch(%params);
@@ -309,22 +311,20 @@ Method deletes record from database table by it's identifier
 
 sub delete {
 
-	my $this	= shift;
-	my @id		= @_;
+	my $this = shift;
+	my @id   = @_;
 
 	# TODO: check for too long @id list
-	my $id_in = "id IN (" . join(", ", @id) . ")";
-	my $sql = "delete from " . $this->{table} . " where $id_in";
+	my $id_in = "id IN (" . join( ", ", @id ) . ")";
+	my $sql   = "delete from " . $this->{table} . " where $id_in";
 
 	if ( $this->do($sql) ) {
 		return 1;
 	} else {
-		return $this->error( "Can't delete record: table='" . $this->{table} . "', $id_in'; " .  $this->dbh->errstr);
+		return $this->error( "Can't delete record: table='" . $this->{table} . "', $id_in'; " . $this->dbh->errstr );
 	}
 
 }
-
-
 
 #***********************************************************************
 
