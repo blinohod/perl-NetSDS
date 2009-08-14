@@ -327,12 +327,24 @@ sub delete {
 
 }
 
+
+
+#***********************************************************************
+
+=item B<_auote($value)> - quote value
+
+Internal method implementing autoquoting of data
+
+=cut 
+
+#-----------------------------------------------------------------------
+
 sub _quote {
 
 	my ( $this, $val ) = @_;
 
 	if ( $this->auto_quote ) {
-		return $this->quote($val);
+		return $this->dbh->($val);
 	} else {
 		return $val;
 	}
