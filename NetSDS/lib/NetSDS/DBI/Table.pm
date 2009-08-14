@@ -4,12 +4,9 @@
 #
 #  DESCRIPTION:  NetSDS::DBI::Table - CRUD implementation for NetSDS
 #
-#        NOTES:  ---
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  25.07.2008 01:06:46 EEST
-#     REVISION:  $Id$
 #===============================================================================
 
 =head1 NAME
