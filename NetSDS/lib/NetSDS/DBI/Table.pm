@@ -159,7 +159,7 @@ sub fetch {
 
 #***********************************************************************
 
-=item B<insert(%key_val_pairs)> - insert record into table
+=item B<insert_row(%key_val_pairs)> - insert record into table
 
 Paramters: record fields as hash
 
