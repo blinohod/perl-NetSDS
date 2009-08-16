@@ -124,54 +124,28 @@ sub fetch {
 
 	my ( $this, %params ) = @_;
 
-	# Prepare fields list
-	my @fields = ();
-	if ( $params{fields} ) {
-		@fields = @{ $params{fields} };
-	}
-	my $fields_q = "*";
-	if (@fields) {
-		$fields_q = join( ", ", @fields );
-	}
+	# Prepare expected fields list
+	my $req_fields = $params{fields} ? join( ',', @{ $params{fields} } ) : '*';
 
-	# Prepare filtering rules
-	my @filter = ();
-	if ( $params{filter} ) {
-		@filter = @{ $params{filter} };
-	}
-	my $where_q = "";
-	if (@filter) {
-		$where_q = " where " . join( " and ", @filter );
-	}
+	# Prepare WHERE filter
+	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : '';
 
-	# Prepare ordering rules
-	my @order = ();
-	if ( $params{order} ) {
-		@order = @{ $params{order} };
-	}
-	my $order_q = "";
-	if (@order) {
-		$order_q = " order by " . join( ", ", @order );
-	}
+	# Prepare results order
+	my $req_order = $params{order} ? " order by " . join( ", ", @{ $params{order} } ) : '';
 
 	# Set limit and offset for fetching
-	my $limit_q  = "";
-	my $offset_q = "";
-	if ( $params{limit} ) {
-		$limit_q = " limit " . $params{limit};
-		if ( $params{offset} ) {
-			$offset_q = " offset " . $params{offset};
-		}
-	}
+	my $req_limit  = $params{limit}  ? " limit " . $params{limit}   : '';
+	my $req_offset = $params{offset} ? " offset " . $params{offset} : '';
 
 	# Request for messages
-	my $sql = "select $fields_q from " . $this->{table} . " $where_q $order_q $limit_q $offset_q";
+	my $sql = "select $req_fields from " . $this->{table} . " $req_filter $req_order $req_limit $req_offset";
 
 	# Set FOR UPDATE if necessary
 	if ( $params{for_update} ) {
 		$sql .= " for update";
 	}
 
+	# Execute SQL query and fetch results
 	my @ret = ();
 	my $sth = $this->call($sql);
 	$sth->execute();
