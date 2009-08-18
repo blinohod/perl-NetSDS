@@ -59,7 +59,7 @@ use warnings;
 use base 'NetSDS::Class::Abstract';
 
 
-use version; our $VERSION = '1.200';
+use version; our $VERSION = '1.201';
 
 use NetSDS::Logger;
 use NetSDS::Conf;

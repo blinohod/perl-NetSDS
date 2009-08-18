@@ -1,3 +1,6 @@
+1.201 Tue Aug 18 18:15:34 EEST 2009
+- NetSDS::DBI::Table implemented
+
 1.200 Thu Aug 13 17:13:56 EEST 2009
 - added NetSDS::App::JSRPC framework
 - updated versions for all modules
