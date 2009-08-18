@@ -262,17 +262,17 @@ After this %upd hash will contain updated table record.
 
 #-----------------------------------------------------------------------
 
-sub update {
+sub update_by_id {
 
 	my ( $this, $id, %params ) = @_;
 	my @up = ();
 	foreach my $key ( keys %params ) {
-		push @up, "$key = " . $this->_quote( $params{$key} );
+		push @up, "$key = " . $this->dbh->quote( $params{$key} );
 	}
 
 	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . " where id=$id returning *";
-	#warn "UPDATE: $sql";
-	my $res = $this->selectrow_hashref($sql);
+
+	my $res = $this->dbh->selectrow_hashref($sql);
 
 	if ($res) {
 		return %{$res};
@@ -281,13 +281,15 @@ sub update {
 	}
 
 }
+
 #***********************************************************************
 
 =item B<get_count()> - retrieve number of contacts
 
 Just return total number of contacts by calling:
 
-	SELECT COUNT(*) FROM cpa.table
+	# SELECT COUNT(id) FROM schema.table
+	my $count = $tbl->get_count();
 
 =cut 
 
@@ -299,7 +301,7 @@ sub get_count {
 	my $this   = shift;
 	my %params = @_;
 
-	$params{fields} = ["COUNT(*) AS c"];
+	$params{fields} = ["COUNT(id) AS c"];
 	my @count = $this->fetch(%params);
 
 	return $count[0]->{c};
@@ -307,13 +309,52 @@ sub get_count {
 
 #***********************************************************************
 
-=item B<delete($id)> - delete record from table
+=item B<delete_by_id(@ids)> - delete records by identifier
 
-Paramters: record id
+Paramters: list of record id
 
 Returns: 1 if ok, undef if error
 
-Method deletes record from database table by it's identifier
+Method deletes records from SQL table by it's identifiers.
+
+	if ($tbl->remove(5, 8 ,19)) {
+		print "Records successfully removed.";
+	}
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub delete_by_id {
+
+	my ( $this, @ids ) = @_;
+
+	# TODO check for too long @id list
+
+	# Prepare SQL condition
+	my $in_cond = "id IN (" . join( ", ", @ids ) . ")";
+	my $sql     = "delete from " . $this->{table} . " where $in_cond";
+
+	if ( $this->call($sql) ) {
+		return 1;
+	} else {
+		return $this->error( "Can't delete records by Id: table='" . $this->{table} . "'" );
+	}
+
+}
+
+#***********************************************************************
+
+=item B<delete(@filters)> - delete records
+
+Paramters: list of filters
+
+Returns: 1 if ok, undef if error
+
+	$tbl->delete(
+		'active = false',
+		'expire < now()',
+	);
 
 =cut 
 
@@ -321,18 +362,13 @@ Method deletes record from database table by it's identifier
 
 sub delete {
 
-	my $this = shift;
-	my @id   = @_;
+	my ( $this, @filter ) = @_;
 
-	# TODO: check for too long @id list
-	my $id_in = "id IN (" . join( ", ", @id ) . ")";
-	my $sql   = "delete from " . $this->{table} . " where $id_in";
+	# Prepare WHERE filter
+	my $req_filter = " where " . join( " and ", @filter );
 
-	if ( $this->do($sql) ) {
-		return 1;
-	} else {
-		return $this->error( "Can't delete record: table='" . $this->{table} . "', $id_in'; " . $this->dbh->errstr );
-	}
+	# Remove records
+	$this->call( "delete from " . $this->{table} . $req_filter );
 
 }
 
