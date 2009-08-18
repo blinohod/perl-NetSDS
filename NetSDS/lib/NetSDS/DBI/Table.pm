@@ -148,7 +148,6 @@ sub fetch {
 	# Execute SQL query and fetch results
 	my @ret = ();
 	my $sth = $this->call($sql);
-	$sth->execute();
 	while ( my $row = $sth->fetchrow_hashref() ) {
 		push @ret, $row;
 	}
@@ -241,7 +240,7 @@ sub insert {
 
 #***********************************************************************
 
-=item B<update($id, %params)> - update record parameters
+=item B<update_row($id, %params)> - update record parameters
 
 Paramters: id, new parameters as hash
 
@@ -250,7 +249,7 @@ Returns: updated record as hash
 Example:
 
 
-	my %upd = $table->update($msg_id,
+	my %upd = $table->update_row($msg_id,
 		status => 'failed',
 		dst_addr => '380121234567',
 		);
@@ -262,7 +261,7 @@ After this %upd hash will contain updated table record.
 
 #-----------------------------------------------------------------------
 
-sub update_by_id {
+sub update_row {
 
 	my ( $this, $id, %params ) = @_;
 	my @up = ();
@@ -270,15 +269,49 @@ sub update_by_id {
 		push @up, "$key = " . $this->dbh->quote( $params{$key} );
 	}
 
-	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . " where id=$id returning *";
+	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . " where id=$id";
 
-	my $res = $this->dbh->selectrow_hashref($sql);
+	my $res = $this->call($sql);
 
 	if ($res) {
 		return %{$res};
 	} else {
 		return $this->error( "Cant update message" . $this->dbh->errstr );
 	}
+
+}
+
+#***********************************************************************
+
+=item B<update(%params)> - update records by filter
+
+Paramters: filter, new values
+
+	$tbl->update(
+		filter => ['active = true', 'created > '2008-01-01'],
+		set => {
+			info => 'Created after 2007 year',
+		}
+	);
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub update {
+
+	my ( $this, %params ) = @_;
+
+	# Prepare WHERE filter
+	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : '';
+
+	my @up = ();
+	foreach my $key ( keys %{$params{set}} ) {
+		push @up, "$key = " . $this->dbh->quote( $params{set}->{$key} );
+	}
+
+	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . $req_filter;
+	my $res = $this->call($sql);
 
 }
 
