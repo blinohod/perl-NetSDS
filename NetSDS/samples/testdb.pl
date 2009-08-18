@@ -40,9 +40,18 @@ my $tbl = NetSDS::DBI::Table->new(
 #
 #print "Inserted: " . join (', ', @uids) . "\n";
 
+$tbl->update(
+	filter => ["login = 'misha'"],
+	set => {
+		active => 'false',
+	}
+);
+
+$tbl->update_row(2, active => 'true');
+
 my @res = $tbl->fetch(
-	fields => [ 'login',         'active as act' ],
-	filter => [ 'active = true', 'expire > now()' ],
+	fields => [ 'login', 'id',         'active as act' ],
+	#filter => [ 'active = true', 'expire > now()' ],
 	order  => ['login'],
 );
 
