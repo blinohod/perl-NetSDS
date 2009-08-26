@@ -15,7 +15,7 @@ C<app_simple.pl> is an example for NetSDS application developers.
 
 use version; our $VERSION = "1.001";
 
-MyApp->run( infinite => 1, daemon => 0, has_conf => 0, verbose => 1 );
+MyApp->run( infinite => 1, daemon => 0, has_conf => 0, verbose => 1, use_pidfile => 1 );
 
 1;
 

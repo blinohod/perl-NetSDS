@@ -57,7 +57,7 @@ use CGI::Fast;
 use CGI::Cookie;
 
 
-use version; our $VERSION = '1.201';
+use version; our $VERSION = '1.202';
 
 
 #***********************************************************************

@@ -55,7 +55,7 @@ use JSON;
 use base 'NetSDS::App::FCGI';
 
 
-use version; our $VERSION = '1.201';
+use version; our $VERSION = '1.202';
 
 #===============================================================================
 #

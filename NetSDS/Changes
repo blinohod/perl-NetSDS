@@ -1,3 +1,9 @@
+1.202 Wed Aug 26 20:22:56 EEST 2009
+- fixed PID retrieving after daemonization
+- added logging if already running
+- removed config search in 'admin' directory
+- removed stupid check for 'to_finalize' to set it
+
 1.201 Tue Aug 18 18:15:34 EEST 2009
 - NetSDS::DBI::Table implemented
 
