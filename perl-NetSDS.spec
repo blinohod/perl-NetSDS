@@ -7,7 +7,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.201
+Version: 1.202
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -55,9 +55,15 @@ NetSDS - это гибкий и простой в использовании ф�
 %files
 %perl_vendor_privlib/NetSDS*
 %perl_vendor_man3dir/*
-%doc samples
+%doc samples Changes
 
 %changelog
+* Wed Aug 26 2009 Michael Bochkaryov <misha@altlinux.ru> 1.202-alt1
+- fixed PID retrieving after daemonization
+- added logging if already running
+- removed config search in 'admin' directory
+- removed stupid check for 'to_finalize' to set it
+
 * Tue Aug 18 2009 Michael Bochkaryov <misha@altlinux.ru> 1.201-alt1
 - NetSDS::DBI::Table implemented (simple API to SQL tables)
 
