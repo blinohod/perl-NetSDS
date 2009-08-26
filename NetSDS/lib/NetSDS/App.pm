@@ -390,6 +390,9 @@ sub initialize {
 		Proc::Daemon::Init;
 	}
 
+	# Update PID if necessary
+	$this->{pid} = $$;
+
 	# Process PID file if necessary
 	if ( $this->use_pidfile() ) {
 		die "Already running!" if Proc::PID::File->running(
