@@ -10,7 +10,7 @@ use base 'NetSDS::App';
 
 sub new {
 	my ($class, %args) = @_;
-	my $self = $class->SUPER::new;
+	my $self = $class->SUPER::new(%args);
 	return $self->create_socket($args{'port'});
 };
 
@@ -48,12 +48,12 @@ sub get_msg      { +shift->{'msg'} };
 sub get_mail {
 	my ($self, $data) = @_;
 	my @lines = split /\r\n/, $$data;
-
+	
 	$self->{'headers'} = {};
 	my $i;
 
 	for ($i = 0; $lines[$i]; $i++) {
-		my ($key, $value) = split /:\s*/, $lines[0];
+		my ($key, $value) = split /:\s*/, $lines[$i];
 		$self->{'headers'}{lc $key} = $value; #TODO fix me could be several Received
 	}
 
