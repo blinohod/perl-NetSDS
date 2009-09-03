@@ -9,8 +9,11 @@ use IO::Socket;
 use base 'NetSDS::App';
 
 sub new {
-	my ($class, %args) = @_;
-	my $self = $class->SUPER::new(%args);
+	my ($proto, %args) = @_;
+	
+	my $class = ref $proto || $proto;
+	my $self = (%args ? $class->SUPER::new(%args) : bless {}, $class);
+	
 	return $self->create_socket($args{'port'});
 };
 
@@ -34,8 +37,10 @@ use base 'NSocket';
 
 sub set_smtp {
 	my $self = shift;
-	
-	$self->{'_smtp'} = Net::Server::Mail::SMTP->new( socket => $self->get_socket_handle );
+	$self->{'ip'} = shift;
+
+	$self->{'_smtp'} = Net::Server::Mail::SMTP->new( 
+		socket => $self->get_socket_handle );
 	return $self;
 };
 
@@ -44,18 +49,31 @@ sub process      { +shift->get_smtp->process(@_) };
 sub get_smtp     { +shift->{'_smtp'} };
 sub get_header   { $_[0]->{'headers'}{lc $_[1]} };
 sub get_msg      { +shift->{'msg'} };
+sub get_ip       { +shift->{'ip'} };
 
 sub get_mail {
 	my ($self, $data) = @_;
-	my @lines = split /\r\n/, $$data;
+	my @lines = split /\r\n(?! )/, $$data;
 	
 	$self->{'headers'} = {};
 	my $i;
 
 	for ($i = 0; $lines[$i]; $i++) {
-		my ($key, $value) = split /:\s*/, $lines[$i];
-		$self->{'headers'}{lc $key} = $value; #TODO fix me could be several Received
-	}
+		my ($key, $value) = split /:\s*/, $lines[$i], 2;
+		
+		$key = lc $key;
+
+		if (exists $self->{'headers'}{$key}) {
+			unless (ref $self->{'headers'}{$key}) {
+				my $temp = $self->{'headers'}{$key};
+				$self->{'headers'}{$key} = [ $temp, $value ];
+			} else {
+				push @{ $self->{'headers'}{$key} }, $value;
+			};
+		} else {
+			$self->{'headers'}{$key} = $value; #TODO fix me could be several Received
+		};
+	};
 
 	$self->{'msg'} = join "\r\n", @lines[$i + 1 .. $#lines];
 	return 1;
@@ -98,9 +116,8 @@ sub accept {
 	my $peer = accept($client->get_socket_handle, $self->get_socket_handle);
 	
 	if ($peer) {
-		$self->speak("connection from ip [" . (inet_ntoa((sockaddr_in($peer))[1])) . "]");
-	
-		$client->set_smtp;
+		$client->set_smtp(inet_ntoa((sockaddr_in($peer))[1]));
+		$self->speak("connection from ip [" . $client->get_ip . "]");
 		$client->set_callback(DATA => \&data, $client);
 		
 		$self->{'count'}++; #TODO remove
@@ -119,8 +136,9 @@ sub process {
 
 	return unless $client;
 	$client->process;
-	#do something with msg
+	
 	$client->close;
+	$self->speak("connection from ip [" . $client->get_ip  . "] closed");
 	
 	#TODO remove
 	if ($self->{'count'} == 1000) {
@@ -129,7 +147,151 @@ sub process {
 	};
 	#end TODO
 	
-	return $self;
+	return $client;
 };
 
 1;
+
+__END__
+
+=head1 NAME
+
+NetSDS::App::SMTPD
+
+=head1 SYNOPSIS
+
+use NetSDS::App::SMTPD
+
+=head1 Packages
+
+=over 4
+
+=head2 NSocket
+
+Needs for work with socket. This module is a parent for  NetSDS::App::SMTPD and NClient and
+a child of a NetSDS::APP
+
+=head3 ITEMS
+
+=over 4
+
+=item B<create_socket>
+
+Creating a simple socket which could be transformed into a listening in NetSDS::App::SMTPD and
+could be used in NClient for accept connection
+
+=item B<can_read>
+
+This method uses for making a timeout before connections to the server:
+if there is no connections to accept, program would be just waiting in select while the connection appeared.
+
+=item B<close_socket>
+
+Close socket
+
+=back
+
+=back
+
+=over 4
+
+=head2 NClient
+
+Provides the smtp protocol bu using Net::Server::Mail::SMTP.
+Had attributes: smtp - an object of Net::Server::Mail::SMTP, ip - 
+ip of the remote host, headers - ref hash with headers of a message, 
+msg - a body of a message.
+
+=head3 ITEMS
+
+=over 4
+
+=item B<set_callback> and B<process>
+
+All that subs do - its only call the methods of a Net::Server::Mail::SMTP with the same name.
+
+=item <get_mail>
+
+In this sub we parse message and set headers of the object and message body. This sub is call as a 
+callback on event DATA
+
+=item B<get_header> and B<get_msg>
+
+Get methods that make you access to a header of a msg and message body.
+Example: $client->get_header('FROM') or $client->get_header('to');
+
+=back
+
+=back
+
+=over 4
+
+=head2 NetSDS::App::SMTPD
+
+This module init a smtp-server.
+
+=head3 ITEMS
+
+=over 4
+
+=item B<create_socket>
+
+Init a listening socket by creating a simple socket Super::create_socket and make it listening.
+
+=item B<accept>
+
+Waiting for an smtp connection and that accept it.
+
+=item B<process>
+
+=back
+
+=back
+
+=head1 Example
+
+	#!/usr/bin/env perl
+
+	use strict;
+	use warnings;
+		  
+	Receiver->run(
+		infinite  => 1,
+		debug     => 1,
+		verbose   => 1,
+		conf_file => '../conf/mts-receiver.conf',
+	);
+
+	1;
+
+	package Receiver;
+	use base 'NetSDS::App::SMTPD';
+				    
+	sub process {
+		my $self = shift;
+		my $client = $self->SUPER::process;
+
+		#do something with msg;
+		my $from = $client->get_header('from');
+		my $msg = $client->get_msg;
+
+		.....
+
+		return $self;
+	};
+
+or you could reinit process like this:
+
+	sub process {
+		my $self = shift;
+		my $client = $self->accept;
+
+		return unless $client;
+		$client->process;
+	
+		#do something
+		......
+		$client->close;
+		return $self;
+	};
+
