@@ -28,11 +28,11 @@ NetSDS::App::FCGI - FastCGI applications superclass
 	use base 'NetSDS::App::FCGI';
 
 	sub process {
-		my ($this) = @_;
+		my ($self) = @_;
 
-		$this->data('Hello World');
-		$this->mime('text/plain');
-		$this->charset('utf-8');
+		$self->data('Hello World');
+		$self->mime('text/plain');
+		$self->charset('utf-8');
 
 	}
 
@@ -56,9 +56,7 @@ use base 'NetSDS::App';
 use CGI::Fast;
 use CGI::Cookie;
 
-
 use version; our $VERSION = '1.202';
-
 
 #***********************************************************************
 
@@ -82,7 +80,7 @@ sub new {
 
 	my ( $class, %params ) = @_;
 
-	my $this = $class->SUPER::new(
+	my $self = $class->SUPER::new(
 		cgi      => undef,
 		mime     => undef,
 		charset  => undef,
@@ -94,7 +92,7 @@ sub new {
 		%params,
 	);
 
-	return $this;
+	return $self;
 
 }
 
@@ -108,7 +106,7 @@ sub new {
 
 =item B<cgi()> - accessor to CGI.pm request handler
 
-	my $https_header = $this->cgi->https('X-Some-Header');
+	my $https_header = $self->cgi->https('X-Some-Header');
 
 =cut 
 
@@ -124,7 +122,7 @@ Paramters: new status to set
 
 Returns: response status value
 
-	$this->status('200 OK');
+	$self->status('200 OK');
 
 =cut 
 
@@ -138,7 +136,7 @@ __PACKAGE__->mk_accessors('status');
 
 Paramters: new MIME type for response
 
-	$this->mime('text/xml'); # output will be XML data
+	$self->mime('text/xml'); # output will be XML data
 
 =cut 
 
@@ -150,8 +148,8 @@ __PACKAGE__->mk_accessors('mime');
 
 =item B<charset()> - set response character set if necessary
 
-	$this->mime('text/plain');
-	$this->charset('koi8-r'); # ouput as KOI8-R text
+	$self->mime('text/plain');
+	$self->charset('koi8-r'); # ouput as KOI8-R text
 
 =cut 
 
@@ -165,8 +163,8 @@ __PACKAGE__->mk_accessors('charset');
 
 Paramters: new data "as is"
 
-	$this->mime('text/plain');
-	$this->data('Hello world!');
+	$self->mime('text/plain');
+	$self->data('Hello world!');
 
 =cut 
 
@@ -183,7 +181,7 @@ Paramters: new URL (relative or absolute)
 This method send reponse with 302 status and new location.
 
 	if (havent_data()) {
-		$this->redirect('http://www.google.com'); # to google!
+		$self->redirect('http://www.google.com'); # to google!
 	};
 
 =cut 
@@ -214,7 +212,7 @@ __PACKAGE__->mk_accessors('cookie');
 
 Paramters: new headers as hash reference
 
-	$this->headers({
+	$self->headers({
 		'X-Beer' => 'Guiness',
 	);
 
@@ -238,63 +236,66 @@ This method implements common FastCGI (or CGI) loop.
 
 sub main_loop {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
-	$this->start();
+	$self->start();
 
 	$SIG{TERM} = undef;
 	$SIG{INT}  = undef;
 
+	# Switch of verbosity
+	$self->{verbose} = undef;
+
 	# Enter FastCGI loop
-	while ( $this->cgi( CGI::Fast->new() ) ) {
+	while ( $self->cgi( CGI::Fast->new() ) ) {
 
 		# Retrieve request cookies
-		$this->_set_req_cookies();
+		$self->_set_req_cookies();
 
 		# Set default response parameters
-		$this->mime('text/plain');    # plain text output
-		$this->charset('utf-8');      # UTF-8 charset
-		$this->data('');              # empty string response
-		$this->status("200 OK");      # everything OK
-		$this->cookie( [] );          # no cookies
-		$this->redirect(undef);       # no redirects
+		$self->mime('text/plain');    # plain text output
+		$self->charset('utf-8');      # UTF-8 charset
+		$self->data('');              # empty string response
+		$self->status("200 OK");      # everything OK
+		$self->cookie( [] );          # no cookies
+		$self->redirect(undef);       # no redirects
 
 		# Call request processing method
-		$this->process();
+		$self->process();
 
 		# Send 302 and Location: header if redirect
-		if ( $this->redirect ) {
-			print $this->cgi->header(
-				-cookie    => $this->cookie,
+		if ( $self->redirect ) {
+			print $self->cgi->header(
+				-cookie    => $self->cookie,
 				-status    => '302 Moved',
-				'Location' => $this->redirect
+				'Location' => $self->redirect
 			);
 
 		} else {
 
 			# Implement generic content output
 			use bytes;
-			print $this->cgi->header(
-				-type           => $this->mime,
-				-status         => $this->status,
-				-charset        => $this->charset,
-				-cookie         => $this->cookie,
-				-Content_length => bytes::length( $this->data ),
-				%{ $this->headers },
+			print $self->cgi->header(
+				-type           => $self->mime,
+				-status         => $self->status,
+				-charset        => $self->charset,
+				-cookie         => $self->cookie,
+				-Content_length => bytes::length( $self->data ),
+				%{ $self->headers },
 			);
 			no bytes;
 
 			# Send return data to client
-			if ( $this->data ) {
+			if ( $self->data ) {
 				binmode STDOUT;
-				print $this->data;
+				print $self->data;
 			}
-		} ## end else [ if ( $this->redirect )
+		} ## end else [ if ( $self->redirect )
 
-	} ## end while ( $this->cgi( CGI::Fast...
+	} ## end while ( $self->cgi( CGI::Fast...
 
 	# Call finalization hooks
-	$this->stop();
+	$self->stop();
 
 } ## end sub main_loop
 
@@ -304,7 +305,7 @@ sub main_loop {
 
 Paramters: hash (name, value, expires)
 
-	$this->set_cookie(name => 'sessid', value => '343q5642653476', expires => '+1h');
+	$self->set_cookie(name => 'sessid', value => '343q5642653476', expires => '+1h');
 
 =cut 
 
@@ -312,9 +313,9 @@ Paramters: hash (name, value, expires)
 
 sub set_cookie {
 
-	my ( $this, %par ) = @_;
+	my ( $self, %par ) = @_;
 
-	push @{ $this->{cookie} }, $this->cgi->cookie( -name => $par{name}, -value => $par{value}, -expires => $par{expires} );
+	push @{ $self->{cookie} }, $self->cgi->cookie( -name => $par{name}, -value => $par{value}, -expires => $par{expires} );
 
 }
 
@@ -326,7 +327,7 @@ Paramters: cookie name
 
 Returns cookie value by it's name
 
-	my $sess = $this->get_cookie('sessid');
+	my $sess = $self->get_cookie('sessid');
 
 =cut 
 
@@ -334,9 +335,9 @@ Returns cookie value by it's name
 
 sub get_cookie {
 
-	my ( $this, $name ) = @_;
+	my ( $self, $name ) = @_;
 
-	return $this->{req_cookies}->{$name}->{value};
+	return $self->{req_cookies}->{$name}->{value};
 
 }
 
@@ -350,15 +351,15 @@ Returns: CGI parameter value
 
 This method returns CGI parameter value by it's name.
 
-	my $cost = $this->param('cost');
+	my $cost = $self->param('cost');
 
 =cut 
 
 #-----------------------------------------------------------------------
 
 sub param {
-	my ( $this, @par ) = @_;
-	return $this->cgi->param(@par);
+	my ( $self, @par ) = @_;
+	return $self->cgi->param(@par);
 }
 
 #***********************************************************************
@@ -372,15 +373,15 @@ Returns: URL parameter value
 This method works similar to B<param()> method, but returns only parameters
 from the query string.
 
-	my $action = $this->url_param('a');
+	my $action = $self->url_param('a');
 
 =cut
 
 #-----------------------------------------------------------------------
 
 sub url_param {
-	my ( $this, @par ) = @_;
-	return $this->cgi->url_param(@par);
+	my ( $self, @par ) = @_;
+	return $self->cgi->url_param(@par);
 }
 
 #***********************************************************************
@@ -393,7 +394,7 @@ Returns: header value
 
 This method returns HTTP request header value by name.
 
-	my $beer = $this->http('X-Beer');
+	my $beer = $self->http('X-Beer');
 
 =cut 
 
@@ -401,10 +402,10 @@ This method returns HTTP request header value by name.
 
 sub http {
 
-	my $this = shift;
+	my $self = shift;
 	my $par  = shift;
 
-	return $this->cgi->http($par);
+	return $self->cgi->http($par);
 }
 
 #***********************************************************************
@@ -414,7 +415,7 @@ sub http {
 This method returns HTTPS request header value by name and is almost
 the same as http() method except of it works with SSL requests.
 
-	my $beer = $this->https('X-Beer');
+	my $beer = $self->https('X-Beer');
 
 =cut 
 
@@ -422,10 +423,10 @@ the same as http() method except of it works with SSL requests.
 
 sub https {
 
-	my $this = shift;
+	my $self = shift;
 	my $par  = shift;
 
-	return $this->cgi->https($par);
+	return $self->cgi->https($par);
 }
 
 #***********************************************************************
@@ -439,32 +440,32 @@ Just proxying C<raw_cookie()> method from CGI.pm
 #-----------------------------------------------------------------------
 
 sub raw_cookie {
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return $this->cgi->raw_cookie;
+	return $self->cgi->raw_cookie;
 }
 
 #**************************************************************************
 
 =item B<user_agent()> - User-Agent request header
 
-	my $ua_info = $this->user_agent();
+	my $ua_info = $self->user_agent();
 
 =cut
 
 #-----------------------------------------------------------------------
 sub user_agent {
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return $this->cgi->user_agent;
+	return $self->cgi->user_agent;
 }
 
 #***********************************************************************
 
 =item B<request_method()> - HTTP request method
 
-	if ($this->request_method eq 'POST') {
-		$this->log("info", "Something POST'ed from client");
+	if ($self->request_method eq 'POST') {
+		$self->log("info", "Something POST'ed from client");
 	}
 
 =cut 
@@ -472,11 +473,10 @@ sub user_agent {
 #-----------------------------------------------------------------------
 
 sub request_method {
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return $this->cgi->request_method;
+	return $self->cgi->request_method;
 }
-
 
 #***********************************************************************
 
@@ -490,17 +490,17 @@ Returns: script name from CGI.pm
 
 sub script_name {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return $this->cgi->script_name();
+	return $self->cgi->script_name();
 }
 
 #***********************************************************************
 
 =item B<path_info()> - get PATH_INFO value
 
-	if ($this->path_info eq '/help') {
-		$this->data('Help yourself');
+	if ($self->path_info eq '/help') {
+		$self->data('Help yourself');
 	}
 
 =cut 
@@ -509,16 +509,16 @@ sub script_name {
 
 sub path_info {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return $this->cgi->path_info();
+	return $self->cgi->path_info();
 }
 
 #***********************************************************************
 
 =item B<remote_host()> - remote (client) host name
 
-	warn "Client from: " . $this->remote_host();
+	warn "Client from: " . $self->remote_host();
 
 =cut 
 
@@ -526,9 +526,9 @@ sub path_info {
 
 sub remote_host {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return $this->cgi->remote_host();
+	return $self->cgi->remote_host();
 
 }
 
@@ -538,8 +538,8 @@ sub remote_host {
 
 Returns: IP address of client from REMOTE_ADDR environment
 
-	if ($this->remote_addr eq '10.0.0.1') {
-		$this->data('Welcome people from our gateway!');
+	if ($self->remote_addr eq '10.0.0.1') {
+		$self->data('Welcome people from our gateway!');
 	}
 
 =cut 
@@ -548,7 +548,7 @@ Returns: IP address of client from REMOTE_ADDR environment
 
 sub remote_addr {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
 	return $ENV{REMOTE_ADDR};
 }
@@ -564,10 +564,10 @@ Fetching cookies from HTTP request to object C<req_cookies> variable.
 #-----------------------------------------------------------------------
 
 sub _set_req_cookies {
-	my ($this) = @_;
+	my ($self) = @_;
 
 	my %cookies = CGI::Cookie->fetch();
-	$this->{req_cookies} = \%cookies;
+	$self->{req_cookies} = \%cookies;
 
 	return 1;
 }
