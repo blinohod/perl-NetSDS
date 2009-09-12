@@ -7,7 +7,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.202
+Version: 1.203
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -58,6 +58,10 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Sat Sep 12 2009 Michael Bochkaryov <misha@altlinux.ru> 1.203-alt1
+- implemented EDR support for billing statistics
+- switch off verbosity for daemons and FCGI
+
 * Wed Aug 26 2009 Michael Bochkaryov <misha@altlinux.ru> 1.202-alt1
 - fixed PID retrieving after daemonization
 - added logging if already running
