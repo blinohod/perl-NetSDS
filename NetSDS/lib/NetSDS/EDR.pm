@@ -7,7 +7,6 @@
 #        NOTES:  ---
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  28.08.2009 16:43:02 EEST
 #===============================================================================
 
@@ -50,7 +49,7 @@ use JSON;
 use NetSDS::Util::DateTime;
 use base qw(NetSDS::Class::Abstract);
 
-use version; our $VERSION = "0.001";
+use version; our $VERSION = "1.202";
 
 #===============================================================================
 #
