@@ -1,3 +1,7 @@
+1.203 Sat Sep 12 20:49:47 EEST 2009
+- implemented EDR support for billing statistics
+- switch off verbosity for daemons and FCGI
+
 1.202 Wed Aug 26 20:22:56 EEST 2009
 - fixed PID retrieving after daemonization
 - added logging if already running
