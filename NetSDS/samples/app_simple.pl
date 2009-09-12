@@ -15,7 +15,14 @@ C<app_simple.pl> is an example for NetSDS application developers.
 
 use version; our $VERSION = "1.001";
 
-MyApp->run( infinite => 1, daemon => 0, has_conf => 0, verbose => 1, use_pidfile => 1 );
+MyApp->run(
+	infinite    => 1,              # infinite loop
+	daemon      => 0,              # not a daemon
+	has_conf    => 0,              # no configuration
+	verbose     => 1,              # verbose mode on
+	use_pidfile => 1,
+	edr_file    => './test.edr',
+);
 
 1;
 
@@ -24,6 +31,8 @@ package MyApp;
 use 5.8.0;
 use warnings;
 use strict;
+
+use lib '../lib';
 
 # Inherits NetSDS::App features
 use base 'NetSDS::App';
@@ -42,6 +51,7 @@ sub process {
 		# Do something and add messages to syslog
 		print "PID=" . $this->pid . "; iteration: $i\n";
 		$this->log( "info", "My PID: " . $this->pid . "; iteration: $i" );
+		$this->edr( { pid => $this->pid, iteration => $i } );
 		sleep 1;
 	}
 }
