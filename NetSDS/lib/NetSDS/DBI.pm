@@ -104,7 +104,7 @@ sub new {
 	}
 
 	# initialize parent class
-	my $this = $class->SUPER::new(
+	my $self = $class->SUPER::new(
 		dbh    => undef,
 		dsn    => $params{dsn},
 		login  => $params{login},
@@ -115,20 +115,39 @@ sub new {
 	);
 
 	# Create object accessor for DBMS handler
-	$this->mk_accessors('dbh');
+	$self->mk_accessors('dbh');
 
 	# Add initialization SQL queries
-	$this->_add_sets( @{$sets} );
+	$self->_add_sets( @{$sets} );
 
 	$attrs->{PrintError} = 0;
-	$this->_add_attrs( %{$attrs} );
+	$self->_add_attrs( %{$attrs} );
 
 	# Connect to DBMS
-	$this->_connect();
+	$self->_connect();
 
-	return $this;
+	return $self;
 
 } ## end sub new
+
+
+#***********************************************************************
+
+=item B<dbh()> - DBI connection handler accessor
+
+Returns: DBI object 
+
+This method provides accessor to DBI object and for low level access
+to database specific methods.
+
+Example (access to specific method):
+
+	my $quoted = $db->dbh->quote_identifier(undef, 'auth', 'services');
+	# $quoted contains "auth"."services" now
+
+=cut 
+
+#-----------------------------------------------------------------------
 
 #***********************************************************************
 
@@ -162,18 +181,18 @@ Example:
 
 sub call {
 
-	my ( $this, $sql, @params ) = @_;
+	my ( $self, $sql, @params ) = @_;
 
 	# First check connection and try to restore if necessary
-	unless ( $this->_check_connection() ) {
-		return $this->error("Database connection error!");
+	unless ( $self->_check_connection() ) {
+		return $self->error("Database connection error!");
 	}
 
 	# Prepare cached SQL query
-	# FIXME my $sth = $this->dbh->prepare_cached($sql);
-	my $sth = $this->dbh->prepare($sql);
+	# FIXME my $sth = $self->dbh->prepare_cached($sql);
+	my $sth = $self->dbh->prepare($sql);
 	unless ($sth) {
-		return $this->error("Cant prepare SQL query: $sql");
+		return $self->error("Cant prepare SQL query: $sql");
 	}
 
 	# Execute SQL query
@@ -202,9 +221,9 @@ Example:
 
 #-----------------------------------------------------------------------
 sub _add_sets {
-	my ( $this, @sets ) = @_;
+	my ( $self, @sets ) = @_;
 
-	push( @{ $this->{sets} }, @sets );
+	push( @{ $self->{sets} }, @sets );
 
 	return 1;
 }
@@ -213,15 +232,15 @@ sub _add_sets {
 
 =item B<_add_attrs()> - add DBI handler attributes
 
-    $this->add_attrs(AutoCommit => 1);
+    $self->add_attrs(AutoCommit => 1);
 
 =cut
 
 #-----------------------------------------------------------------------
 sub _add_attrs {
-	my ( $this, %attrs ) = @_;
+	my ( $self, %attrs ) = @_;
 
-	%attrs = ( %{ $this->{attrs} }, %attrs );
+	%attrs = ( %{ $self->{attrs} }, %attrs );
 	return %attrs;
 }
 
@@ -237,13 +256,13 @@ Internal method checking connection and implement reconnect
 
 sub _check_connection {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
-	if ( $this->dbh ) {
-		if ( $this->dbh->ping() ) {
+	if ( $self->dbh ) {
+		if ( $self->dbh->ping() ) {
 			return 1;
 		} else {
-			return $this->_connect();
+			return $self->_connect();
 		}
 	}
 }
@@ -260,25 +279,25 @@ Internal method starting connection to DBMS
 
 sub _connect {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
 	# Try to connect to DBMS
-	$this->dbh( DBI->connect_cached( $this->{dsn}, $this->{login}, $this->{passwd}, $this->{attrs} ) );
+	$self->dbh( DBI->connect_cached( $self->{dsn}, $self->{login}, $self->{passwd}, $self->{attrs} ) );
 
-	if ( $this->dbh ) {
+	if ( $self->dbh ) {
 
 		# All OK - drop error state
-		$this->error(undef);
+		$self->error(undef);
 
 		# Call startup SQL queries
-		foreach my $row ( @{ $this->{sets} } ) {
-			unless ( $this->dbh->do($row) ) {
-				return $this->error( $this->dbh->errstr || 'Set error in connect' );
+		foreach my $row ( @{ $self->{sets} } ) {
+			unless ( $self->dbh->do($row) ) {
+				return $self->error( $self->dbh->errstr || 'Set error in connect' );
 			}
 		}
 
 	} else {
-		return $this->error( "Cant connect to DBMS: " . $DBI::errsts );
+		return $self->error( "Cant connect to DBMS: " . $DBI::errsts );
 	}
 
 } ## end sub _connect
