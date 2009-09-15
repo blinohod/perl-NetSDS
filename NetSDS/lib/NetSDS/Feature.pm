@@ -7,7 +7,6 @@
 #        NOTES:  ---
 #       AUTHOR:  Michael Bochkaryov (RATTLER), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  14.09.2008 12:32:03 EEST
 #===============================================================================
 
@@ -23,21 +22,21 @@ NetSDS::Feature - abstract application feature
 	use base 'NetSDS::Feature';
 
 	sub init {
-		my ($this) = @_;
+		my ($self) = @_;
 
-		my $dsn = $this->conf->{dsn};
-		my $user = $this->conf->{user};
-		my $passwd = $this->conf->{passwd};
+		my $dsn = $self->conf->{dsn};
+		my $user = $self->conf->{user};
+		my $passwd = $self->conf->{passwd};
 
-		$this->{dbconn} = DBI->connect($dsn, $user, $passwd);
+		$self->{dbconn} = DBI->connect($dsn, $user, $passwd);
 
 	}
 
 	# Sample method - DBI::do proxy
 	sub do {
 
-		my $this = shift @_;
-		return $this->{dbconn}->do(@_);
+		my $self = shift @_;
+		return $self->{dbconn}->do(@_);
 	}
 
 	1;
@@ -84,16 +83,16 @@ sub create {
 
 	my ( $class, $app, $conf ) = @_;
 
-	my $this = {
+	my $self = {
 		app  => $app,
 		conf => $conf,
 	};
 
-	bless $this, $class;
+	bless $self, $class;
 
-	$this->init();
+	$self->init();
 
-	return $this;
+	return $self;
 
 }
 
@@ -109,7 +108,7 @@ This method should be rewritten with feature functionality implementation.
 
 sub init {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
 }
 
@@ -126,7 +125,7 @@ sub init {
 
 This method allows to use application methods and properties. 
 
-	print "Feature included from app: " . $this->app->name;
+	print "Feature included from app: " . $self->app->name;
 
 =cut
 
@@ -157,9 +156,9 @@ See L<NetSDS::Logger> documentation for details.
 
 sub log {
 
-	my ($this) = shift @_;
+	my ($self) = shift @_;
 
-	return $this->app->log(@_);
+	return $self->app->log(@_);
 
 }
 
