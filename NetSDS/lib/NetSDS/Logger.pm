@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  25.04.2008 17:32:37 EEST
 #===============================================================================
 
@@ -19,7 +18,7 @@ NetSDS::Logger - syslog wrapper for applications and classes
 	use NetSDS::Logger;
 
 	my $logger = NetSDS::Logger->new();
-	$logger->info("Syslog message here");
+	$logger->log("info", "Syslog message here");
 
 =head1 DESCRIPTION
 
@@ -37,7 +36,6 @@ use 5.8.0;
 use warnings;
 
 use Unix::Syslog qw(:macros :subs);
-
 
 use version; our $VERSION = '1.203';
 
@@ -77,7 +75,7 @@ sub new {
 
 	my ( $class, %params ) = @_;
 
-	my $this = {};
+	my $self = {};
 
 	# Set application identification name
 	my $name = 'NetSDS';
@@ -93,7 +91,7 @@ sub new {
 	openlog( $name, LOG_PID | LOG_CONS | LOG_NDELAY, $facility );
 	#setlogsock('unix');
 
-	return bless $this, $class;
+	return bless $self, $class;
 
 } ## end sub new
 
@@ -107,12 +105,25 @@ sub new {
 
 Wrapper to C<syslog()> method of L<Unix::Syslog> module.
 
+Level is passed as string and may be one of the following:
+
+	alert	- LOG_ALERT
+	crit	- LOG_CRIT
+	debug	- LOG_DEBUG
+	emerg	- LOG_EMERG
+	error	- LOG_ERR
+	info	- LOG_INFO
+	notice	- LOG_NOTICE
+	warning	- LOG_WARNING
+
 =cut
 
 #-----------------------------------------------------------------------
 sub log {
 
-	my ( $this, $level, $message ) = @_;
+	my ( $self, $level, $message ) = @_;
+
+	# Level aliases
 	my %LEVFIX = (
 		alert     => LOG_ALERT,
 		crit      => LOG_CRIT,
