@@ -22,9 +22,9 @@ NetSDS::Class::Abstract - superclass for all NetSDS APIs
 	__PACKAGE__->mk_accessors(qw/my_field/);
 
 	sub error_sub {
-		my ($this) = @_;
-		if (!$this->my_field) {
-			return $this->error("No my_field defined");
+		my ($self) = @_;
+		if (!$self->my_field) {
+			return $self->error("No my_field defined");
 		}
 	}
 
@@ -93,23 +93,23 @@ sub new {
 	my ($proto) = shift(@_);
 	my $class = ref($proto) || $proto;
 
-	my $this = undef;
+	my $self = undef;
 	my $cnt  = scalar(@_);
 
 	if ( $cnt == 0 ) {
-		$this = {};
+		$self = {};
 	} elsif ( ( $cnt == 1 ) and ( ref( $_[0] ) eq 'HASH' ) ) {
-		$this = { %{ $_[0] } };
+		$self = { %{ $_[0] } };
 	} elsif ( ( $cnt & 1 ) == 0 ) {
 		my %params = @_;
-		$this = \%params;
+		$self = \%params;
 	} else {
 		$class->error( "Wrong parameters for constructor: " . $cnt );
 	}
 
-	bless( $this, $class );
+	bless( $self, $class );
 
-	return $this;
+	return $self;
 
 } ## end sub new
 
@@ -126,15 +126,15 @@ This creates accessor/mutator methods for each named class variable.
 
 #-----------------------------------------------------------------------
 sub mk_class_var {
-	my $this  = shift(@_);
-	my $class = ref($this) || $this;
+	my $self  = shift(@_);
+	my $class = ref($self) || $self;
 
 	foreach my $name (@_) {
 		my $var = uc($name);
 
 		my $sub = sub {
-			my $this  = shift(@_);
-			my $class = ref($this) || $this;
+			my $self  = shift(@_);
+			my $class = ref($self) || $self;
 
 			if (@_) {
 				no strict 'refs';
@@ -169,12 +169,12 @@ Return C<TRUE> in case of success or C<FALSE> if failed.
 #-----------------------------------------------------------------------
 sub use_modules {
 
-	my $this = shift(@_);
+	my $self = shift(@_);
 
 	foreach my $mod (@_) {
 		eval "use $mod;";
 		if ($@) {
-			$this->last_error($@);
+			$self->last_error($@);
 			return undef;
 		}
 	}
@@ -197,9 +197,9 @@ Return non object copy of object data structure.
 #-----------------------------------------------------------------------
 sub unbless {
 
-	my ( $this, $self ) = @_;
+	my ( $self, $self ) = @_;
 
-	return Data::Structure::Util::unbless( $self ? $this : $this->clone );
+	return Data::Structure::Util::unbless( $self ? $self : $self->clone );
 }
 
 #***********************************************************************
@@ -214,9 +214,9 @@ This method returns serialized copy of object.
 
 sub serialize {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
-	return nfreeze($this);
+	return nfreeze($self);
 }
 
 #***********************************************************************
@@ -261,9 +261,9 @@ Save serialized object to file
 
 sub nstore {
 
-	my ( $this, $fname ) = @_;
+	my ( $self, $fname ) = @_;
 
-	Storable::nstore( $this, $fname );
+	Storable::nstore( $self, $fname );
 }
 
 #***********************************************************************
@@ -292,10 +292,10 @@ Paramters: log level, log message
 
 sub log {
 
-	my ( $this, $level, $msg ) = @_;
+	my ( $self, $level, $msg ) = @_;
 
-	if ( $this->logger() ) {
-		$this->logger->log( $level, $msg );
+	if ( $self->logger() ) {
+		$self->logger->log( $level, $msg );
 	} else {
 		warn "[$level] $msg\n";
 	}
@@ -307,8 +307,8 @@ sub log {
 
 	if (error_occured()) {
 
-		$this->error_code(1234); # secret error status
-		return $this->error("Oops! We have a 1234 error!");
+		$self->error_code(1234); # secret error status
+		return $self->error("Oops! We have a 1234 error!");
 
 	}
 
@@ -328,21 +328,31 @@ __END__
 
 See C<samples> directory and other C<NetSDS> moduleis for examples of code.
 
-=head1 BUGS
-
-Unknown yet
-
 =head1 SEE ALSO
 
 L<Class::Accessor>, L<Class::Accessor::Class>, L<Clone>, L<Class::ErrorHandler>
 
-=head1 TODO
-
-None
-
 =head1 AUTHOR
 
 Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=head1 LICENSE
+
+Copyright (C) 2008-2009 Michael Bochkaryov
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
 
