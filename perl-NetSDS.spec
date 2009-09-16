@@ -4,10 +4,11 @@
 %define m_name NetSDS
 %define m_author_id RATTLER
 %define _enable_test 1
+%def_without test
 
 
 Name: perl-NetSDS
-Version: 1.203
+Version: 1.204
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -23,8 +24,8 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Sat Sep 12 2009 (-bi)
-BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-JSON perl-JSON-XS perl-Module-Build perl-NetSDS-Util perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
+# Automatically added by buildreq on Wed Sep 16 2009 (-bi)
+BuildRequires: perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-JSON perl-JSON-XS perl-Module-Build perl-NetSDS-Util perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -58,6 +59,10 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Wed Sep 16 2009 Michael Bochkaryov <misha@altlinux.ru> 1.204-alt1
+- added NetSDS::App::SMTPD module
+- updated POD documentation
+
 * Sat Sep 12 2009 Michael Bochkaryov <misha@altlinux.ru> 1.203-alt1
 - implemented EDR support for billing statistics
 - switch off verbosity for daemons and FCGI
