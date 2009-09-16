@@ -1,3 +1,8 @@
+1.204 Wed Sep 16 21:34:45 EEST 2009
+- added NetSDS::App::SMTPD
+- renamed $this to $self everywhere
+- POD documentation improved
+
 1.203 Sat Sep 12 20:49:47 EEST 2009
 - implemented EDR support for billing statistics
 - switch off verbosity for daemons and FCGI

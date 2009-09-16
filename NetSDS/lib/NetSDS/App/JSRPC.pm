@@ -7,7 +7,6 @@
 #        NOTES:  ---
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  10.08.2009 20:57:57 EEST
 #===============================================================================
 
@@ -28,7 +27,7 @@ NetSDS::App::JSRPC - JSON-RPC server framework
 
 	# This method is available via JSON-RPC
 	sub sum {
-		my ($this, $param) = @_;
+		my ($self, $param) = @_;
 		return $$param[0] + $$param[1];
 	}
 
@@ -55,7 +54,7 @@ use JSON;
 use base 'NetSDS::App::FCGI';
 
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 #===============================================================================
 #
@@ -73,9 +72,9 @@ sub new {
 
 	my ( $class, %params ) = @_;
 
-	my $this = $class->SUPER::new(%params);
+	my $self = $class->SUPER::new(%params);
 
-	return $this;
+	return $self;
 
 }
 
@@ -91,28 +90,28 @@ This is internal method that implements JSON-RPC call processing.
 
 sub process {
 
-	my ($this) = @_;
+	my ($self) = @_;
 
 	# TODO - implement request validation
 	# Parse JSON-RPC2 request
-	my $http_request = $this->param('POSTDATA');
+	my $http_request = $self->param('POSTDATA');
 
 	# Set response MIME type
-	$this->mime('application/x-json-rpc');
+	$self->mime('application/x-json-rpc');
 
 	# Parse JSON-RPC call
-	if ( my ( $js_method, $js_params, $js_id ) = $this->_request_parse($http_request) ) {
+	if ( my ( $js_method, $js_params, $js_id ) = $self->_request_parse($http_request) ) {
 
 		# Try to call method
-		if ( $this->can($js_method) ) {
+		if ( $self->can($js_method) ) {
 
 			# Call method and hope it will give some response
-			my $result = $this->process_call( $js_method, $js_params );
+			my $result = $self->process_call( $js_method, $js_params );
 			if ( defined($result) ) {
 
 				# Make positive response
-				$this->data(
-					$this->_make_result(
+				$self->data(
+					$self->_make_result(
 						result => $result,
 						id     => $js_id
 					)
@@ -121,10 +120,10 @@ sub process {
 			} else {
 
 				# Cant get positive result
-				$this->data(
-					$this->_make_error(
+				$self->data(
+					$self->_make_error(
 						code    => -32000,
-						message => $this->errstr || "Error response from method $js_method",
+						message => $self->errstr || "Error response from method $js_method",
 						id      => undef,
 					)
 				);
@@ -133,8 +132,8 @@ sub process {
 		} else {
 
 			# Cant find proper method
-			$this->data(
-				$this->_make_error(
+			$self->data(
+				$self->_make_error(
 					code    => -32601,
 					message => "Cant find JSON-RPC method",
 					id      => undef,
@@ -145,8 +144,8 @@ sub process {
 	} else {
 
 		# Send error object as a response
-		$this->data(
-			$this->_make_error(
+		$self->data(
+			$self->_make_error(
 				code    => -32700,
 				message => "Cant parse JSON-RPC call",
 				id      => undef,
@@ -170,9 +169,9 @@ Returns parameters from executed method as is.
 
 sub process_call {
 
-	my ( $this, $method, $params ) = @_;
+	my ( $self, $method, $params ) = @_;
 
-	return $this->$method($params);
+	return $self->$method($params);
 
 }
 
@@ -190,10 +189,10 @@ Returns: request method, parameters, id
 
 sub _request_parse {
 
-	my ( $this, $post_data ) = @_;
+	my ( $self, $post_data ) = @_;
 
 	my $js_request = eval { decode_json($post_data) };
-	return $this->error("Cant parse JSON data") if $@;
+	return $self->error("Cant parse JSON data") if $@;
 
 	return ( $js_request->{'method'}, $js_request->{'params'}, $js_request->{'id'} );
 
@@ -221,7 +220,7 @@ Returns JSON encoded response message
 
 sub _make_result {
 
-	my ( $this, %params ) = @_;
+	my ( $self, %params ) = @_;
 
 	# Prepare positive response
 
@@ -261,7 +260,7 @@ Returns JSON encoded error message
 
 sub _make_error {
 
-	my ( $this, %params ) = @_;
+	my ( $self, %params ) = @_;
 
 	# Prepare error code and message
 	# http://groups.google.com/group/json-rpc/web/json-rpc-1-2-proposal
@@ -299,7 +298,9 @@ Unknown yet
 
 =head1 SEE ALSO
 
-None
+L<JSON>
+
+L<JSON::RPC2>
 
 =head1 TODO
 
@@ -308,6 +309,24 @@ None
 =head1 AUTHOR
 
 Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=head1 LICENSE
+
+Copyright (C) 2008-2009 Michael Bochkaryov
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
 

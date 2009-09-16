@@ -46,7 +46,7 @@ use warnings;
 
 use base 'NetSDS::DBI';
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 #===============================================================================
 #
@@ -72,16 +72,16 @@ sub new {
 	my ( $class, %params ) = @_;
 
 	# Initialize base DBMS connector
-	my $this = $class->SUPER::new(%params);
+	my $self = $class->SUPER::new(%params);
 
 	# Set table name
 	if ( $params{table} ) {
-		$this->{table} = $params{table};
+		$self->{table} = $params{table};
 	} else {
 		return $class->error('Table name is not specified to NetSDS::DBI::Table');
 	}
 
-	return $this;
+	return $self;
 
 }
 
@@ -122,7 +122,7 @@ Sample:
 
 sub fetch {
 
-	my ( $this, %params ) = @_;
+	my ( $self, %params ) = @_;
 
 	# Prepare expected fields list
 	my $req_fields = $params{fields} ? join( ',', @{ $params{fields} } ) : '*';
@@ -138,7 +138,7 @@ sub fetch {
 	my $req_offset = $params{offset} ? " offset " . $params{offset} : '';
 
 	# Request for messages
-	my $sql = "select $req_fields from " . $this->{table} . " $req_filter $req_order $req_limit $req_offset";
+	my $sql = "select $req_fields from " . $self->{table} . " $req_filter $req_order $req_limit $req_offset";
 
 	# Set FOR UPDATE if necessary
 	if ( $params{for_update} ) {
@@ -147,7 +147,7 @@ sub fetch {
 
 	# Execute SQL query and fetch results
 	my @ret = ();
-	my $sth = $this->call($sql);
+	my $sth = $self->call($sql);
 	while ( my $row = $sth->fetchrow_hashref() ) {
 		push @ret, $row;
 	}
@@ -175,7 +175,7 @@ Returns: id of inserted record
 
 sub insert_row {
 
-	my ( $this, %params ) = @_;
+	my ( $self, %params ) = @_;
 
 	my @fields = ();    # Fields list
 	my @values = ();    # Values list
@@ -183,19 +183,19 @@ sub insert_row {
 	# Prepare fields and values lists from input hash
 	foreach my $key ( keys %params ) {
 		push @fields, $key;
-		push @values, $this->dbh->quote( $params{$key} );
+		push @values, $self->dbh->quote( $params{$key} );
 	}
 
 	# Prepare SQL statement from fields and values lists
-	my $sql = 'insert into ' . $this->{table} . ' (' . join( ',', @fields ) . ')'    # fields list
+	my $sql = 'insert into ' . $self->{table} . ' (' . join( ',', @fields ) . ')'    # fields list
 	  . ' values (' . join( ',', @values ) . ')'                                     # values list
 	  . ' returning id';                                                             # return "id" field
 
 	# Execute SQL query and fetch result
-	my ($row_id) = $this->call($sql)->fetchrow_array();
+	my ($row_id) = $self->call($sql)->fetchrow_array();
 
 	# Return "id" field from inserted row
-	return $row_id || $this->error( "Cant insert table record: " . $this->dbh->errstr );
+	return $row_id || $self->error( "Cant insert table record: " . $self->dbh->errstr );
 
 } ## end sub insert_row
 
@@ -225,13 +225,13 @@ one insert but allows to use different key-value pairs for different records.
 
 sub insert {
 
-	my ( $this, @rows ) = @_;
+	my ( $self, @rows ) = @_;
 
 	my @ids = ();
 
 	# Go through records and insert each one
 	foreach my $rec (@rows) {
-		push @ids, ( $this->insert_row( %{$rec} ) );
+		push @ids, ( $self->insert_row( %{$rec} ) );
 	}
 
 	return @ids;
@@ -263,20 +263,20 @@ After this %upd hash will contain updated table record.
 
 sub update_row {
 
-	my ( $this, $id, %params ) = @_;
+	my ( $self, $id, %params ) = @_;
 	my @up = ();
 	foreach my $key ( keys %params ) {
-		push @up, "$key = " . $this->dbh->quote( $params{$key} );
+		push @up, "$key = " . $self->dbh->quote( $params{$key} );
 	}
 
-	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . " where id=$id";
+	my $sql = "update " . $self->{table} . " set " . join( ', ', @up ) . " where id=$id";
 
-	my $res = $this->call($sql);
+	my $res = $self->call($sql);
 
 	if ($res) {
 		return %{$res};
 	} else {
-		return $this->error( "Cant update message" . $this->dbh->errstr );
+		return $self->error( "Cant update message" . $self->dbh->errstr );
 	}
 
 }
@@ -300,18 +300,18 @@ Paramters: filter, new values
 
 sub update {
 
-	my ( $this, %params ) = @_;
+	my ( $self, %params ) = @_;
 
 	# Prepare WHERE filter
 	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : '';
 
 	my @up = ();
 	foreach my $key ( keys %{$params{set}} ) {
-		push @up, "$key = " . $this->dbh->quote( $params{set}->{$key} );
+		push @up, "$key = " . $self->dbh->quote( $params{set}->{$key} );
 	}
 
-	my $sql = "update " . $this->{table} . " set " . join( ', ', @up ) . $req_filter;
-	my $res = $this->call($sql);
+	my $sql = "update " . $self->{table} . " set " . join( ', ', @up ) . $req_filter;
+	my $res = $self->call($sql);
 
 }
 
@@ -331,11 +331,11 @@ Just return total number of contacts by calling:
 ## Returns number of records
 sub get_count {
 
-	my $this   = shift;
+	my $self   = shift;
 	my %params = @_;
 
 	$params{fields} = ["COUNT(id) AS c"];
-	my @count = $this->fetch(%params);
+	my @count = $self->fetch(%params);
 
 	return $count[0]->{c};
 }
@@ -360,18 +360,18 @@ Method deletes records from SQL table by it's identifiers.
 
 sub delete_by_id {
 
-	my ( $this, @ids ) = @_;
+	my ( $self, @ids ) = @_;
 
 	# TODO check for too long @id list
 
 	# Prepare SQL condition
-	my $in_cond = "id IN (" . join( ", ", @ids ) . ")";
-	my $sql     = "delete from " . $this->{table} . " where $in_cond";
+	my $in_cond = "id in (" . join( ", ", @ids ) . ")";
+	my $sql     = "delete from " . $self->{table} . " where $in_cond";
 
-	if ( $this->call($sql) ) {
+	if ( $self->call($sql) ) {
 		return 1;
 	} else {
-		return $this->error( "Can't delete records by Id: table='" . $this->{table} . "'" );
+		return $self->error( "Can't delete records by Id: table='" . $self->{table} . "'" );
 	}
 
 }
@@ -395,13 +395,13 @@ Returns: 1 if ok, undef if error
 
 sub delete {
 
-	my ( $this, @filter ) = @_;
+	my ( $self, @filter ) = @_;
 
 	# Prepare WHERE filter
 	my $req_filter = " where " . join( " and ", @filter );
 
 	# Remove records
-	$this->call( "delete from " . $this->{table} . $req_filter );
+	$self->call( "delete from " . $self->{table} . $req_filter );
 
 }
 
@@ -422,6 +422,7 @@ Bad documentation
 =head1 SEE ALSO
 
 L<NetSDS::DBI>
+
 L<http://en.wikipedia.org/wiki/Create,_read,_update_and_delete>
 
 =head1 TODO
@@ -431,6 +432,24 @@ None
 =head1 AUTHOR
 
 Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=head1 LICENSE
+
+Copyright (C) 2008-2009 Michael Bochkaryov
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
 

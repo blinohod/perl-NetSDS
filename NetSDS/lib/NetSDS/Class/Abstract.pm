@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  24.04.2008 11:42:42 EEST
 #===============================================================================
 
@@ -68,7 +67,7 @@ use Storable qw(nfreeze thaw);
 use Data::Structure::Util;
 
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 #***********************************************************************
 

@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  24.04.2008 11:42:42 EEST
 #===============================================================================
 
@@ -16,7 +15,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 1;
 

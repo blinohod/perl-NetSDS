@@ -8,27 +8,29 @@ package NSocket;
 use IO::Socket;
 use base 'NetSDS::App';
 
+use version; our $VERSION = '1.204';
+
 sub new {
-	my ($proto, %args) = @_;
-	
+	my ( $proto, %args ) = @_;
+
 	my $class = ref $proto || $proto;
-	my $self = (%args ? $class->SUPER::new(%args) : bless {}, $class);
-	
-	return $self->create_socket($args{'port'});
-};
+	my $self = ( %args ? $class->SUPER::new(%args) : bless {}, $class );
+
+	return $self->create_socket( $args{'port'} );
+}
 
 sub create_socket {
-	my $self = shift;
+	my $self   = shift;
 	my $socket = IO::Socket->new;
-	
-	$socket->socket(PF_INET, SOCK_STREAM, scalar getprotobyname('tcp'));
+
+	$socket->socket( PF_INET, SOCK_STREAM, scalar getprotobyname('tcp') );
 	$socket->blocking(0);
 	$self->{'_socket'} = $socket;
 	return $self;
-};
+}
 
-sub get_socket_handle { +shift->{'_socket'} };
-sub close { +shift->get_socket_handle->close };
+sub get_socket_handle { +shift->{'_socket'} }
+sub close             { +shift->get_socket_handle->close }
 
 package NClient;
 
@@ -39,116 +41,115 @@ sub set_smtp {
 	my $self = shift;
 	$self->{'ip'} = shift;
 
-	$self->{'_smtp'} = Net::Server::Mail::SMTP->new( 
-		socket => $self->get_socket_handle );
+	$self->{'_smtp'} = Net::Server::Mail::SMTP->new( socket => $self->get_socket_handle );
 	return $self;
-};
+}
 
-sub set_callback { +shift->get_smtp->set_callback(@_) };
-sub process      { +shift->get_smtp->process(@_) };
-sub get_smtp     { +shift->{'_smtp'} };
-sub get_header   { $_[0]->{'headers'}{lc $_[1]} };
-sub get_msg      { +shift->{'msg'} };
-sub get_ip       { +shift->{'ip'} };
+sub set_callback { +shift->get_smtp->set_callback(@_) }
+sub process      { +shift->get_smtp->process(@_) }
+sub get_smtp     { +shift->{'_smtp'} }
+sub get_header   { $_[0]->{'headers'}{ lc $_[1] } }
+sub get_msg      { +shift->{'msg'} }
+sub get_ip       { +shift->{'ip'} }
 
 sub get_mail {
-	my ($self, $data) = @_;
+	my ( $self, $data ) = @_;
 	my @lines = split /\r\n(?! )/, $$data;
-	
+
 	$self->{'headers'} = {};
 	my $i;
 
-	for ($i = 0; $lines[$i]; $i++) {
-		my ($key, $value) = split /:\s*/, $lines[$i], 2;
-		
+	for ( $i = 0 ; $lines[$i] ; $i++ ) {
+		my ( $key, $value ) = split /:\s*/, $lines[$i], 2;
+
 		$key = lc $key;
 
-		if (exists $self->{'headers'}{$key}) {
-			unless (ref $self->{'headers'}{$key}) {
+		if ( exists $self->{'headers'}{$key} ) {
+			unless ( ref $self->{'headers'}{$key} ) {
 				my $temp = $self->{'headers'}{$key};
 				$self->{'headers'}{$key} = [ $temp, $value ];
 			} else {
 				push @{ $self->{'headers'}{$key} }, $value;
-			};
+			}
 		} else {
-			$self->{'headers'}{$key} = $value; #TODO fix me could be several Received
-		};
-	};
+			$self->{'headers'}{$key} = $value;    #TODO fix me could be several Received
+		}
+	}
 
-	$self->{'msg'} = join "\r\n", @lines[$i + 1 .. $#lines];
+	$self->{'msg'} = join "\r\n", @lines[ $i + 1 .. $#lines ];
 	return 1;
-};
+} ## end sub get_mail
 
-package NetSDS::App::SMTPD; 
+package NetSDS::App::SMTPD;
 
 use base 'NSocket';
 use IO::Socket;
 
 sub create_socket {
-	my ($self, $port) = @_;
+	my ( $self, $port ) = @_;
 	$port ||= 2525;
 	return unless $port;
 
 	$self->SUPER::create_socket;
-	
-	setsockopt ($self->get_socket_handle, SOL_SOCKET, SO_REUSEADDR, 1);
-	bind ($self->get_socket_handle, sockaddr_in($port, INADDR_ANY)) or die "Can't use port $port";
-	listen ($self->get_socket_handle, SOMAXCONN) or die "Can't listen on port: $port";
-	
-	$self->{'count'} = 0; #TODO remove
+
+	setsockopt( $self->get_socket_handle, SOL_SOCKET, SO_REUSEADDR, 1 );
+	bind( $self->get_socket_handle, sockaddr_in( $port, INADDR_ANY ) ) or die "Can't use port $port";
+	listen( $self->get_socket_handle, SOMAXCONN ) or die "Can't listen on port: $port";
+
+	$self->{'count'} = 0;    #TODO remove
 	return $self;
-};
+}
 
 sub can_read {
 	my $self = shift;
-	my $rin = '';
+	my $rin  = '';
 
-	vec($rin, fileno($self->get_socket_handle), 1) = 1;
-	return select($rin, undef, undef, undef);
-};
+	vec( $rin, fileno( $self->get_socket_handle ), 1 ) = 1;
+	return select( $rin, undef, undef, undef );
+}
 
 sub accept {
 	my $self = shift;
 	$self->can_read;
- 	$self->{'time'} = time unless $self->{'count'}; #TODO remove
-	
+	$self->{'time'} = time unless $self->{'count'};    #TODO remove
+
 	my $client = NClient->new;
-	my $peer = accept($client->get_socket_handle, $self->get_socket_handle);
-	
+	my $peer   = accept( $client->get_socket_handle, $self->get_socket_handle );
+
 	if ($peer) {
-		$client->set_smtp(inet_ntoa((sockaddr_in($peer))[1]));
-		$self->speak("connection from ip [" . $client->get_ip . "]");
-		$client->set_callback(DATA => \&data, $client);
-		
-		$self->{'count'}++; #TODO remove
+		$client->set_smtp( inet_ntoa( ( sockaddr_in($peer) )[1] ) );
+		$self->speak( "connection from ip [" . $client->get_ip . "]" );
+		$client->set_callback( DATA => \&data, $client );
+
+		$self->{'count'}++;                            #TODO remove
 		return $client;
-	};
-};
+	}
+}
 
 sub data {
-	my ($smtp, $data) = @_;
+	my ( $smtp, $data ) = @_;
 	return $smtp->{'_context'}->get_mail($data);
-};
+}
 
 sub process {
-	my $self = shift;
+	my $self   = shift;
 	my $client = $self->accept;
 
 	return unless $client;
 	$client->process;
-	
+
 	$client->close;
-	$self->speak("connection from ip [" . $client->get_ip  . "] closed");
-	
+	$self->speak( "connection from ip [" . $client->get_ip . "] closed" );
+
 	#TODO remove
-	if ($self->{'count'} == 1000) {
-		warn (($self->{'time'} - time)/$self->{'count'});
+	if ( $self->{'count'} == 1000 ) {
+		warn( ( $self->{'time'} - time ) / $self->{'count'} );
 		die;
-	};
+	}
 	#end TODO
-	
+
 	return $client;
-};
+}
 
 1;
 
@@ -295,3 +296,8 @@ or you could reinit process like this:
 		return $self;
 	};
 
+=head1 AUTHOR
+
+Yana Kornienko <yana@netstyle.com.ua>
+
+=cut

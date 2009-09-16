@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  24.04.2008 16:48:24 EEST
 #===============================================================================
 
@@ -58,7 +57,7 @@ use warnings;
 
 use base 'NetSDS::Class::Abstract';
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 use NetSDS::Logger;    # API to syslog daemon
 use NetSDS::Conf;      # Configuration file processor
@@ -891,6 +890,24 @@ Fix and cleanup!
 Valentyn Solomko <val@pere.org.ua>
 
 Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=head1 LICENSE
+
+Copyright (C) 2008-2009 Michael Bochkaryov
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
 

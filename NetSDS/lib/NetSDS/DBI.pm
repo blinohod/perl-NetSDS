@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  31.07.2009 13:56:33 UTC
 #===============================================================================
 
@@ -43,7 +42,7 @@ use DBI;
 use base 'NetSDS::Class::Abstract';
 
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 #===============================================================================
 

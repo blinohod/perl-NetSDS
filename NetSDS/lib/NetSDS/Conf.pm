@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  0.02
 #      CREATED:  16.05.2008 12:24:55 EEST
 #===============================================================================
 
@@ -40,7 +39,7 @@ use warnings;
 use Config::General;
 
 
-use version; our $VERSION = '1.203';
+use version; our $VERSION = '1.204';
 
 #***********************************************************************
 
