@@ -42,7 +42,7 @@ use DBI;
 use base 'NetSDS::Class::Abstract';
 
 
-use version; our $VERSION = '1.204';
+use version; our $VERSION = '1.205';
 
 #===============================================================================
 

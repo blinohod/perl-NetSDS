@@ -55,7 +55,7 @@ use base 'NetSDS::App';
 use CGI::Fast;
 use CGI::Cookie;
 
-use version; our $VERSION = '1.204';
+use version; our $VERSION = '1.205';
 
 #***********************************************************************
 

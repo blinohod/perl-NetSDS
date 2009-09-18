@@ -8,7 +8,7 @@ package NSocket;
 use IO::Socket;
 use base 'NetSDS::App';
 
-use version; our $VERSION = '1.204';
+use version; our $VERSION = '1.205';
 
 sub new {
 	my ( $proto, %args ) = @_;

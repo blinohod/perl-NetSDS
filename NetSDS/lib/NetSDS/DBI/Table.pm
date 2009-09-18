@@ -46,7 +46,7 @@ use warnings;
 
 use base 'NetSDS::DBI';
 
-use version; our $VERSION = '1.204';
+use version; our $VERSION = '1.205';
 
 #===============================================================================
 #
