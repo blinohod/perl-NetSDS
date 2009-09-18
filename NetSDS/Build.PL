@@ -1,11 +1,8 @@
 #!/usr/bin/env perl
-########################################################################
-# $Id: Build.PL 27 2008-07-21 23:23:15Z anvil $
-########################################################################
 
 =head1 NAME
 
-Build.PL - Build script generator for NetSDS common
+Build.PL - Build script generator for NetSDS core libraries
 
 =head1 SYNOPSIS
 
@@ -53,6 +50,8 @@ my $build = Module::Build->new(
 		'Config::General'        => '0',
 		'Data::Structure::Util'  => '0',
 		'Getopt::Long'           => '0',
+		'HTML::Template::Pro'    => '0.81',
+		'Locale::gettext'        => '1.00',
 		'POSIX'                  => '0',
 		'Proc::Daemon'           => '0',
 		'Proc::PID::File'        => '0',
