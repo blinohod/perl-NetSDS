@@ -38,7 +38,6 @@ use warnings;
 
 use Config::General;
 
-
 use version; our $VERSION = '1.204';
 
 #***********************************************************************
@@ -68,12 +67,14 @@ sub getconf {
 	if ( $cf and ( -f $cf ) and ( -r $cf ) ) {
 
 		my $conf = Config::General->new(
-										-ConfigFile			=> $cf,
-										-AllowMultiOptions	=> 'yes',
-										-UseApacheInclude	=> 'yes',
-										-InterPolateVars	=> 'yes',
-										-ConfigPath			=> [ $ENV{NETSDS_CONF_DIR}, '/etc/NetSDS' ],
-										-IncludeRelative	=> 'yes',
+			-ConfigFile        => $cf,
+			-AllowMultiOptions => 'yes',
+			-UseApacheInclude  => 'yes',
+			-InterPolateVars   => 'yes',
+			-ConfigPath        => [ $ENV{NETSDS_CONF_DIR}, '/etc/NetSDS' ],
+			-IncludeRelative   => 'yes',
+			-IncludeGlob       => 'yes',
+			-UTF8              => 'yes',
 		);
 
 		# Parse configuration file
