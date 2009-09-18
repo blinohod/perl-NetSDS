@@ -3,7 +3,7 @@ package NetSDS::App::SMTPD;
 use strict;
 use warnings;
 
-package NSocket;
+package NetSDS::App::SMTPD::Socket;
 
 use IO::Socket;
 use base 'NetSDS::App';
@@ -15,7 +15,7 @@ sub new {
 
 	my $class = ref $proto || $proto;
 	my $self = ( %args ? $class->SUPER::new(%args) : bless {}, $class );
-
+	
 	return $self->create_socket( $args{'port'} );
 }
 
@@ -32,10 +32,10 @@ sub create_socket {
 sub get_socket_handle { +shift->{'_socket'} }
 sub close             { +shift->get_socket_handle->close }
 
-package NClient;
+package NetSDS::App::SMTPD::Client;
 
 use Net::Server::Mail::SMTP;
-use base 'NSocket';
+use base 'NetSDS::App::SMTPD::Socket';
 
 sub set_smtp {
 	my $self = shift;
@@ -82,7 +82,7 @@ sub get_mail {
 
 package NetSDS::App::SMTPD;
 
-use base 'NSocket';
+use base 'NetSDS::App::SMTPD::Socket';
 use IO::Socket;
 
 sub create_socket {
@@ -96,7 +96,6 @@ sub create_socket {
 	bind( $self->get_socket_handle, sockaddr_in( $port, INADDR_ANY ) ) or die "Can't use port $port";
 	listen( $self->get_socket_handle, SOMAXCONN ) or die "Can't listen on port: $port";
 
-	$self->{'count'} = 0;    #TODO remove
 	return $self;
 }
 
@@ -111,9 +110,8 @@ sub can_read {
 sub accept {
 	my $self = shift;
 	$self->can_read;
-	$self->{'time'} = time unless $self->{'count'};    #TODO remove
 
-	my $client = NClient->new;
+	my $client = NetSDS::App::SMTPD::Client->new;
 	my $peer   = accept( $client->get_socket_handle, $self->get_socket_handle );
 
 	if ($peer) {
@@ -121,7 +119,6 @@ sub accept {
 		$self->speak( "connection from ip [" . $client->get_ip . "]" );
 		$client->set_callback( DATA => \&data, $client );
 
-		$self->{'count'}++;                            #TODO remove
 		return $client;
 	}
 }
@@ -141,13 +138,6 @@ sub process {
 	$client->close;
 	$self->speak( "connection from ip [" . $client->get_ip . "] closed" );
 
-	#TODO remove
-	if ( $self->{'count'} == 1000 ) {
-		warn( ( $self->{'time'} - time ) / $self->{'count'} );
-		die;
-	}
-	#end TODO
-
 	return $client;
 }
 
@@ -165,21 +155,19 @@ use NetSDS::App::SMTPD
 
 =head1 Packages
 
-=over 4
+=head1 NetSDS::App::SMTPD::Socket
 
-=head2 NSocket
-
-Needs for work with socket. This module is a parent for  NetSDS::App::SMTPD and NClient and
+Needs for work with socket. This module is a parent for  NetSDS::App::SMTPD and NetSDS::App::SMTPD::Client and
 a child of a NetSDS::APP
 
 =head3 ITEMS
 
-=over 4
+=over 8
 
 =item B<create_socket>
 
 Creating a simple socket which could be transformed into a listening in NetSDS::App::SMTPD and
-could be used in NClient for accept connection
+could be used in NetSDS::App::SMTPD::Client for accept connection
 
 =item B<can_read>
 
@@ -192,11 +180,7 @@ Close socket
 
 =back
 
-=back
-
-=over 4
-
-=head2 NClient
+=head1 NetSDS::App::SMTPD::Client
 
 Provides the smtp protocol bu using Net::Server::Mail::SMTP.
 Had attributes: smtp - an object of Net::Server::Mail::SMTP, ip - 
@@ -205,13 +189,13 @@ msg - a body of a message.
 
 =head3 ITEMS
 
-=over 4
+=over 8
 
 =item B<set_callback> and B<process>
 
 All that subs do - its only call the methods of a Net::Server::Mail::SMTP with the same name.
 
-=item <get_mail>
+=item B<get_mail>
 
 In this sub we parse message and set headers of the object and message body. This sub is call as a 
 callback on event DATA
@@ -223,17 +207,13 @@ Example: $client->get_header('FROM') or $client->get_header('to');
 
 =back
 
-=back
-
-=over 4
-
-=head2 NetSDS::App::SMTPD
+=head1 NetSDS::App::SMTPD
 
 This module init a smtp-server.
 
 =head3 ITEMS
 
-=over 4
+=over 8
 
 =item B<create_socket>
 
@@ -247,15 +227,13 @@ Waiting for an smtp connection and that accept it.
 
 =back
 
-=back
-
 =head1 Example
 
 	#!/usr/bin/env perl
 
 	use strict;
 	use warnings;
-		  
+
 	Receiver->run(
 		infinite  => 1,
 		debug     => 1,
