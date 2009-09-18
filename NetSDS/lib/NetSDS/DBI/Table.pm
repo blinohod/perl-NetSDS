@@ -306,7 +306,7 @@ sub update {
 	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : '';
 
 	my @up = ();
-	foreach my $key ( keys %{$params{set}} ) {
+	foreach my $key ( keys %{ $params{set} } ) {
 		push @up, "$key = " . $self->dbh->quote( $params{set}->{$key} );
 	}
 
@@ -317,12 +317,14 @@ sub update {
 
 #***********************************************************************
 
-=item B<get_count()> - retrieve number of contacts
+=item B<get_count(%params)> - retrieve number of records
 
-Just return total number of contacts by calling:
+Just return total number of records by calling:
 
 	# SELECT COUNT(id) FROM schema.table
 	my $count = $tbl->get_count();
+
+	my $count_active = $tbl->get_count(filter => ['active = true']);
 
 =cut 
 
@@ -332,10 +334,14 @@ Just return total number of contacts by calling:
 sub get_count {
 
 	my $self   = shift;
-	my %params = @_;
+	my $filter = \@_;
 
-	$params{fields} = ["COUNT(id) AS c"];
-	my @count = $self->fetch(%params);
+	# Fetch number of records
+	# SQL: select count(id) as c from $table where [filter]
+	my @count = $self->fetch(
+		fields => ['count(id) as c'],
+		filter => $filter,
+	);
 
 	return $count[0]->{c};
 }
