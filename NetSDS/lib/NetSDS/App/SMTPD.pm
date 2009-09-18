@@ -223,6 +223,8 @@ Init a listening socket by creating a simple socket Super::create_socket and mak
 
 Waiting for an smtp connection and that accept it.
 
+=item B<data>
+
 =item B<process>
 
 =back
