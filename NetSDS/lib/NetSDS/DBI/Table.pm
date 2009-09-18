@@ -81,9 +81,14 @@ sub new {
 		return $class->error('Table name is not specified to NetSDS::DBI::Table');
 	}
 
+	# 'fields' paramter is hash reference describing supported/allowed fields
+	#
+	if ( $params{fields} ) {
+	}
+
 	return $self;
 
-}
+} ## end sub new
 
 #***********************************************************************
 
@@ -127,8 +132,11 @@ sub fetch {
 	# Prepare expected fields list
 	my $req_fields = $params{fields} ? join( ',', @{ $params{fields} } ) : '*';
 
+	# Set default filter
+	my $default_filter = $self->{default_filter} ? " where " . join( " and ", @{ $self->{default_filter} } ) : '';
+
 	# Prepare WHERE filter
-	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : '';
+	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : $default_filter;
 
 	# Prepare results order
 	my $req_order = $params{order} ? " order by " . join( ", ", @{ $params{order} } ) : '';
@@ -409,6 +417,51 @@ sub delete {
 	# Remove records
 	$self->call( "delete from " . $self->{table} . $req_filter );
 
+}
+
+#***********************************************************************
+
+=item B<get_fields()> - get list of fields
+
+Example:
+
+	my @fields = @{ $tbl->get_fields() };
+	print "Table fields: " . join (', ', @fields);
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub get_fields {
+	return [ keys %{ +shift->{'fields'} } ];
+}
+
+
+#***********************************************************************
+
+=item B<has_field($field)> - check if field exists
+
+Paramters: field name
+
+Example:
+
+	if ($tbl->has_field('uuid')) {
+		$tbl->call("delete tbldata where uuid=?", $uuid);
+	}
+
+B<NOTE>: this method works only for restricted tables that
+use C<fields> parameter at construction time.
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub has_field {
+
+	# TODO 
+	# - check if fields defined at all
+	# - think about multiple values
+	return $_[0]->{'fields'}{ $_[1] } 
 }
 
 1;
