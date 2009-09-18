@@ -8,7 +8,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.204
+Version: 1.205
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -59,6 +59,10 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Fri Sep 18 2009 Michael Bochkaryov <misha@altlinux.ru> 1.205-alt1
+- added support for glob includes
+- added UTF-8 support in config
+
 * Wed Sep 16 2009 Michael Bochkaryov <misha@altlinux.ru> 1.204-alt1
 - added NetSDS::App::SMTPD module
 - updated POD documentation
