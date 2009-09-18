@@ -219,6 +219,11 @@ This module init a smtp-server.
 
 Init a listening socket by creating a simple socket Super::create_socket and make it listening.
 
+=item B<data>
+
+Takes - a message that has been received, parses them and prepare 
+the structure of headers, body for next actions
+
 =item B<accept>
 
 Waiting for an smtp connection and that accept it.
