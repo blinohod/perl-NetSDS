@@ -73,16 +73,16 @@ sub new {
 		ua => 'ua_UK.UTF-8',
 	);
 
-	my $this = $class->SUPER::new(
+	my $self = $class->SUPER::new(
 		lang   => DEFAULT_LANG,
 		domain => 'NetSDS',
 		%params,
 	);
 
-	setlocale( LC_MESSAGES, $locale{$this->{lang}} );
-	$this->{translator} = Locale::gettext->domain($this->{domain});
+	setlocale( LC_MESSAGES, $locale{$self->{lang}} );
+	$self->{translator} = Locale::gettext->domain($self->{domain});
 
-	return $this;
+	return $self;
 
 }
 
@@ -100,9 +100,9 @@ Return translated string.
 
 sub translate {
 
-	my ( $this, $str ) = @_;
+	my ( $self, $str ) = @_;
 
-	return $this->{translator}->get($str);
+	return $self->{translator}->get($str);
 
 }
 
