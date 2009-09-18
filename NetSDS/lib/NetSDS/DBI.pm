@@ -41,7 +41,6 @@ use DBI;
 
 use base 'NetSDS::Class::Abstract';
 
-
 use version; our $VERSION = '1.205';
 
 #===============================================================================
@@ -129,7 +128,6 @@ sub new {
 
 } ## end sub new
 
-
 #***********************************************************************
 
 =item B<dbh()> - DBI connection handler accessor
@@ -200,6 +198,36 @@ sub call {
 	return $sth;
 
 } ## end sub call
+
+#***********************************************************************
+
+=item B<fetch_call($sql, @params)> - call and fetch result
+
+Paramters: SQL query, parameters
+
+Returns: arrayref of records as hashrefs
+
+Example:
+
+	my $table_data = $db->fetch_call("select * from users");
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub fetch_call {
+
+	my ( $self, $sql, @params ) = @_;
+
+	# Try to prepare and execute SQL statement
+	if ( my $sth = $self->call( $sql, @params ) ) {
+		# Fetch all data as arrayref of hashrefs
+		return $sth->fetchall_arrayref( {} );
+	} else {
+		return $self->error("Cant execute SQL: $sql");
+	}
+
+}
 
 #***********************************************************************
 
