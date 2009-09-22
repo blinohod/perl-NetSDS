@@ -82,7 +82,6 @@ sub new {
 	}
 
 	# 'fields' paramter is hash reference describing supported/allowed fields
-	#
 	if ( $params{fields} ) {
 	}
 
