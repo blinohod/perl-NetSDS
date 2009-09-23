@@ -61,10 +61,8 @@ sub get {
 sub close_session {
 	my $self = shift;
 
-	my $res = $self->[ MEMCACH ]->set(
-		$self->get_session, $self->[ SESSION ]);
-#	my $res = $self->[ MEMCACH ] ? $self->[ MEMCACH ]->set(
-#		$self->get_session, $self->[ SESSION ]) : undef;
+	my $res = $self->[ MEMCACH ] ? $self->[ MEMCACH ]->set(
+		$self->get_session, $self->[ SESSION ]) : undef;
 	
 	@$self[ SESSION, SESSION_ID ] = (undef, undef);
 	return $res;
