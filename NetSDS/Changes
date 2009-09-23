@@ -1,3 +1,10 @@
+1.205 Fri Sep 18 19:09:48 EEST 2009
+- added NetSDS::Translate wrapper to gettext
+- added NetSDS::Template wrapper to HTML::Template::Pro
+- fixed get_count() in NetSDS::DBI::Table
+- added default_filter parameter to NetSDS::DBI::Table
+- added fetch_call() method to NetSDS::DBI
+
 1.204 Wed Sep 16 21:34:45 EEST 2009
 - added NetSDS::App::SMTPD
 - renamed $this to $self everywhere

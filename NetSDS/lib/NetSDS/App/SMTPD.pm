@@ -228,6 +228,8 @@ the structure of headers, body for next actions
 
 Waiting for an smtp connection and that accept it.
 
+=item B<data>
+
 =item B<process>
 
 =back

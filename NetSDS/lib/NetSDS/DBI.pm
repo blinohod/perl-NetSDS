@@ -112,6 +112,11 @@ sub new {
 		%params,
 	);
 
+	# Implement SQL debugging
+	if ($params{debug_sql}) {
+		$self->{debug_sql} = 1;
+	};
+
 	# Create object accessor for DBMS handler
 	$self->mk_accessors('dbh');
 
@@ -179,6 +184,11 @@ Example:
 sub call {
 
 	my ( $self, $sql, @params ) = @_;
+
+	# Debug SQL
+	if ($self->{debug_sql}) {
+		$self->log("debug", "SQL: $sql");
+	};
 
 	# First check connection and try to restore if necessary
 	unless ( $self->_check_connection() ) {
