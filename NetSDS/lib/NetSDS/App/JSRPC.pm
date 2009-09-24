@@ -103,7 +103,7 @@ sub process {
 	if ( my ( $js_method, $js_params, $js_id ) = $self->_request_parse($http_request) ) {
 
 		# Try to call method
-		if ( $self->can($js_method) ) {
+		if ( $self->can_method($js_method) ) {
 
 			# Call method and hope it will give some response
 			my $result = $self->process_call( $js_method, $js_params );
@@ -154,6 +154,24 @@ sub process {
 	}
 
 } ## end sub process
+
+
+#***********************************************************************
+
+=item B<can_method($method_name)> - check method availability
+
+Paramters: method name (string)
+
+C<can_method()> 
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub can_method {
+	my ($self, $method) = @_;
+	return $self->can($method);
+}
 
 #***********************************************************************
 
