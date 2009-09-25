@@ -135,7 +135,8 @@ sub fetch {
 	my $default_filter = $self->{default_filter} ? " where " . join( " and ", @{ $self->{default_filter} } ) : '';
 
 	# Prepare WHERE filter
-	my $req_filter = $params{filter} ? " where " . join( " and ", @{ $params{filter} } ) : $default_filter;
+	my $req_filter = ($params{filter} and grep { $_ } @{ $params{filter} }) ? 
+		" where " . join( " and ", grep { $_ } @{ $params{filter} } ) : $default_filter;
 
 	# Prepare results order
 	my $req_order = $params{order} ? " order by " . join( ", ", @{ $params{order} } ) : '';
@@ -319,7 +320,13 @@ sub update {
 
 	my $sql = "update " . $self->{table} . " set " . join( ', ', @up ) . $req_filter;
 	my $res = $self->call($sql);
+	
+	if ($self->dbh->errstr) {
+		$self->error( "Cant update message" . $self->dbh->errstr );
+		return;
+	};
 
+	return 1;
 }
 
 #***********************************************************************
