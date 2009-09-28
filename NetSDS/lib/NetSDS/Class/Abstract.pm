@@ -250,7 +250,7 @@ sub deserialize {
 
 #***********************************************************************
 
-=item B<nstore($file_name)> - store serialized object
+=item B<nstore($file_name)> - serialize and store object
 
 Save serialized object to file
 
@@ -293,7 +293,7 @@ sub log {
 
 	my ( $self, $level, $msg ) = @_;
 
-	if ( $self->logger() ) {
+	if ( $self->logger() and $self->logger()->can('log') ) {
 		$self->logger->log( $level, $msg );
 	} else {
 		warn "[$level] $msg\n";
