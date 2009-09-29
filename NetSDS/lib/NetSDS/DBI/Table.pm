@@ -194,13 +194,15 @@ sub insert_row {
 		push @values, $self->dbh->quote( $params{$key} );
 	}
 
+	my $return_value = $self->has_field('id') ? ' returning id' : '';
 	# Prepare SQL statement from fields and values lists
 	my $sql = 'insert into ' . $self->{table} . ' (' . join( ',', @fields ) . ')'    # fields list
 	  . ' values (' . join( ',', @values ) . ')'                                     # values list
-	  . ' returning id';                                                             # return "id" field
+	  . $return_value;                                                               # return "id" field
 
 	# Execute SQL query and fetch result
-	my ($row_id) = $self->call($sql)->fetchrow_array();
+	my $sth = $self->call($sql);
+	my ($row_id) = $return_value ? $sth->fetchrow_array : $sth->rows;
 
 	# Return "id" field from inserted row
 	return $row_id || $self->error( "Cant insert table record: " . $self->dbh->errstr );
@@ -349,7 +351,7 @@ sub get_count {
 
 	my $self   = shift;
 	my $filter = \@_;
-
+	
 	# Fetch number of records
 	# SQL: select count(id) as c from $table where [filter]
 	my @count = $self->fetch(
