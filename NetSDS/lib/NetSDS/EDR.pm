@@ -35,7 +35,13 @@ NetSDS::EDR - read/write Event Details Records
 
 =head1 DESCRIPTION
 
-C<NetSDS> module contains superclass all other classes should be inherited from.
+C<NetSDS::EDR> module implements API for writing EDR (Event Details Record) files
+form applications.
+
+EDR itself is set of structured data describing details of some event. Exact
+structure depends on event type and so hasn't fixed structure.
+
+In NetSDS EDR data is written to plain text files as JSON structures one row per record.
 
 =cut
 
@@ -59,6 +65,12 @@ use version; our $VERSION = '1.205';
 =over
 
 =item B<new(%params)> - class constructor
+
+Parameters:
+
+* filename - EDR file name
+
+Example:
 
     my $edr = NetSDS::EDR->new(
 		filename => '/mnt/stat/ivr.dat',
@@ -93,6 +105,10 @@ sub new {
 
 This methods converts records to JSON and write to file.
 Each record writing to one separate string.
+
+Example:
+
+	$edr->write({from => '380441234567', to => '5552222', status => 'busy'});
 
 =cut
 
@@ -137,6 +153,24 @@ None
 =head1 AUTHOR
 
 Michael Bochkaryov <misha@rattler.kiev.ua>
+
+=head1 LICENSE
+
+Copyright (C) 2008-2009 Michael Bochkaryov
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
 
