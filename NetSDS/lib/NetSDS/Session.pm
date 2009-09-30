@@ -58,6 +58,11 @@ sub get {
 	return $self->[ SESSION ]->{$key};
 };
 
+sub delete {
+	my ($self, $key) = @_;
+	return delete $self->[ SESSION ]->{$key};
+};
+
 sub close_session {
 	my $self = shift;
 
@@ -177,6 +182,13 @@ Takes a key for a value that has been saved in session earlier or undef.
 
 	Example:
 		$session->get('order').
+
+=item B<delete>
+
+Takes a key that should be remover from current session.
+	
+	Example:
+		$sessopn->delete('order');
 
 =item B<close_session>
 

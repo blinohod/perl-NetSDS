@@ -91,7 +91,6 @@ This is internal method that implements JSON-RPC call processing.
 sub process {
 
 	my ($self) = @_;
-
 	# TODO - implement request validation
 	# Parse JSON-RPC2 request
 	my $http_request = $self->param('POSTDATA');
