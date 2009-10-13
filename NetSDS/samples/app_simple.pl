@@ -41,6 +41,10 @@ sub start {
 	my ($this) = @_;
 	print "Application started: name=" . $this->name . "\n";
 	if ( $this->debug ) { print "We are under debug!\n"; }
+
+	use Data::Structure::Util;
+	my $zuka = Data::Structure::Util::signature($this);
+	print "Z: $zuka\n";
 }
 
 sub process {

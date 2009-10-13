@@ -8,7 +8,7 @@ package NetSDS::App::SMTPD::Socket;
 use IO::Socket;
 use base 'NetSDS::App';
 
-use version; our $VERSION = '1.205';
+use version; our $VERSION = '1.206';
 
 sub new {
 	my ( $proto, %args ) = @_;

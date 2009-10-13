@@ -1,3 +1,13 @@
+1.206 Tue Oct 13 16:49:19 EEST 2009
+- POD documentation improved
+- added autoflushing in NetSDS::App::FCGI
+- implement can_method() in JSRPC.pm to use instead of can()
+- avoid log() call if can't execute one
+- added "sql_debug" feature to NetSDS::DBI
+- added fields list support to NetSDS::DBI::Table
+- new NetSDS::EDR module to manage EDR files
+- new NetSDS::Session module to manage sessions in MemcacheD
+
 1.205 Fri Sep 18 19:09:48 EEST 2009
 - added NetSDS::Translate wrapper to gettext
 - added NetSDS::Template wrapper to HTML::Template::Pro
