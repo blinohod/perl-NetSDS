@@ -1,5 +1,6 @@
 package NetSDS::Session;
 
+use 5.8.0;
 use strict;
 use warnings;
 
