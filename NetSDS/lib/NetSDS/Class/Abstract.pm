@@ -39,7 +39,9 @@ C<NetSDS::Class::Abstract> is a superclass for all other NetSDS classes, contain
 
 =item * safe modules inclusion
 
-=item * class and objects accessors and cloning;
+=item * class and objects accessors 
+
+=item * logging
 
 =item * error handling;
 
@@ -56,16 +58,14 @@ use strict;
 use warnings;
 
 use base qw(
-  Clone
-  Class::Accessor
   Class::Accessor::Class
-  Class::ErrorHandler
 );
 
-use Storable qw(nfreeze thaw);
+# Error handling class variables
+our $_ERRSTR;     # error string
+our $_ERRCODE;    # error code
 
-use Data::Structure::Util;
-
+use Data::Structure::Util;    # unblessing objects
 
 use version; our $VERSION = '1.206';
 
@@ -75,93 +75,71 @@ use version; our $VERSION = '1.206';
 
 =over
 
-=item B<new([...])>
+=item B<new(%params)> - common constructor
 
-Common constructor for NetSDS classes.
+C<new()> method implements common constructor for NetSDS classes.
+Constructor may be overwriten in inherited classes and usually
+this happens to implement module specific functionality.
 
-    my $object = NetSDS::SomeClass->new(%options);
+Constructor requres parameters as hash that are set as object properties.
 
-Constructor may be overwriten in inherited classes and usually is.
-Parameters for constructor may be given as hash or hash reference.
+	my $object = NetSDS::SomeClass->new(
+		foo => 'abc',
+		bar => 'def',
+	);
 
 =cut
 
 #-----------------------------------------------------------------------
 sub new {
 
-	my ($proto) = shift(@_);
+	my ( $proto, %params ) = @_;
 	my $class = ref($proto) || $proto;
 
-	my $self = undef;
-	my $cnt  = scalar(@_);
-
-	if ( $cnt == 0 ) {
-		$self = {};
-	} elsif ( ( $cnt == 1 ) and ( ref( $_[0] ) eq 'HASH' ) ) {
-		$self = { %{ $_[0] } };
-	} elsif ( ( $cnt & 1 ) == 0 ) {
-		my %params = @_;
-		$self = \%params;
-	} else {
-		$class->error( "Wrong parameters for constructor: " . $cnt );
-	}
+	my $self = \%params;
 
 	bless( $self, $class );
 
 	return $self;
 
-} ## end sub new
+}
 
 #***********************************************************************
 
-=item B<mk_class_var(@variables)>
+=item B<mk_class_accessors(@properties)> - class properties accessor
 
-    Class->mk_class_var(@variables);
+See L<Class::Accessor> for details.
 
-This creates accessor/mutator methods for each named class variable.
+	__PACKAGE__->mk_class_accessors('foo', 'bar');
 
+=item B<mk_accessors(@propertire)> - object properties accessors
 
-=cut
+See L<Class::Accessor::Class> for details.
+
+	$self->mk_accessors('foo', 'bar');
+
+Other C<Class::Accessor::Class> methods available as well.
+
+=cut 
 
 #-----------------------------------------------------------------------
-sub mk_class_var {
-	my $self  = shift(@_);
-	my $class = ref($self) || $self;
-
-	foreach my $name (@_) {
-		my $var = uc($name);
-
-		my $sub = sub {
-			my $self  = shift(@_);
-			my $class = ref($self) || $self;
-
-			if (@_) {
-				no strict 'refs';
-
-				${ sprintf( '%s\::%s', $class, $var ) } = $_[0];
-
-				return $_[0];
-			} else {
-				no strict 'refs';
-
-				return ${ sprintf( '%s\::%s', $class, $var ) };
-			}
-		};
-
-		no strict 'refs';
-
-		*{ sprintf( '%s::%s', $class, lc($name) ) } = $sub;
-	} ## end foreach my $name (@_)
-
-} ## end sub mk_class_var
 
 #***********************************************************************
 
-=item B<use_modules(ARRAY)>
+=item B<use_modules(@modules_list)> - load modules on demand
 
-Invoke modules from list given in parameters.
+C<use_modules()> provides safe on demand modules loader.
+It requires list of modules names as parameters
 
-Return C<TRUE> in case of success or C<FALSE> if failed.
+Return 1 in case of success or C<undef> if faied. Error messages in case
+of failure are available using C<errstr()> call.
+
+Example:
+
+	# Load modules for daemonization
+	if ($daemon_mode) {
+		$self->use_modules("Proc::Daemon", "Proc::PID::File");
+	}
 
 =cut
 
@@ -173,8 +151,7 @@ sub use_modules {
 	foreach my $mod (@_) {
 		eval "use $mod;";
 		if ($@) {
-			$self->last_error($@);
-			return undef;
+			return $self->error($@);
 		}
 	}
 
@@ -184,92 +161,44 @@ sub use_modules {
 
 #***********************************************************************
 
-=item B<unbless()>
+=item B<unbless()> - return unblessed object
 
-Return non object copy of object data structure.
+Return unblessed data structure of object that may be used when some
+code requires non blessed structures (like JSON serialization).
 
-	$copy = $obj->unbless();
-	$same = $obj->unbless( 1 );
+Example:
+
+	my $var = $obj->unbless();
 
 =cut
 
 #-----------------------------------------------------------------------
 sub unbless {
 
-	my ( $self, $ret_self ) = @_;
-
-	return Data::Structure::Util::unbless( $ret_self ? $self : $self->clone );
-}
-
-#***********************************************************************
-
-=item B<serialize()> - returns serialized object
-
-This method returns serialized copy of object.
-
-=cut 
-
-#-----------------------------------------------------------------------
-
-sub serialize {
-
 	my ($self) = @_;
-
-	return nfreeze($self);
+	return Data::Structure::Util::unbless($self);
 }
 
 #***********************************************************************
 
-=item B<deserialize($serialized)> - returns deserialized object
+=back
 
-Paramters: serialized object as string
+=head1 LOGGING
 
-Returns: object
+=over
 
-	my $obj = NetSDS::SomeClass->deserialize($str);
+=item B<logger()> - get/set logging handler
 
-=cut 
+C<logger> property is an object that should provide functionality
+handling log messaging. Usually it's object of L<NetSDS::Logger>
+class or C<undef>. However it may another object implementing
+non-standard features like sending log to e-mail or to DBMS.
 
-#-----------------------------------------------------------------------
+Example:
 
-sub deserialize {
-
-	my ( $proto, $ser ) = @_;
-
-	my $obj = undef;
-
-	eval { $obj = thaw($ser); };
-
-	if ($@) {
-		return undef;
-	} else {
-		return $obj;
-	}
-
-}
-
-#***********************************************************************
-
-=item B<nstore($file_name)> - serialize and store object
-
-Save serialized object to file
-
-=cut 
-
-#-----------------------------------------------------------------------
-
-sub nstore {
-
-	my ( $self, $fname ) = @_;
-
-	Storable::nstore( $self, $fname );
-}
-
-#***********************************************************************
-
-=item B<logger()> - set logger handler
-
-This method allows to set class logger (NetSDS::Logger object)
+	# Set logger and send log message
+	$obj->logger(NetSDS::Logger->new());
+	$obj->log("info", "Logger connected");
 
 =cut 
 
@@ -293,6 +222,7 @@ sub log {
 
 	my ( $self, $level, $msg ) = @_;
 
+	# Logger expected to provide "log()" method
 	if ( $self->logger() and $self->logger()->can('log') ) {
 		$self->logger->log( $level, $msg );
 	} else {
@@ -302,20 +232,90 @@ sub log {
 
 #***********************************************************************
 
-=item B<error_code($new_code)> - set/get error code
+=back
 
-	if (error_occured()) {
+=head1 ERROR HANDLING
 
-		$self->error_code(1234); # secret error status
-		return $self->error("Oops! We have a 1234 error!");
+=over
 
-	}
+=item B<error($msg, [$code])> - set error message and code
 
-=cut 
+C<error()> method set error message and optional error code.
+It can be invoked in both class and object contexts.
+
+Example 1: set class error
+
+	NetSDS::Foo->error("Mistake found");
+
+Example 2: set object error with code
+
+	$obj->error("Cant launch rocket", BUG_STUPID);
+
+=cut
 
 #-----------------------------------------------------------------------
 
-__PACKAGE__->mk_class_accessors('error_code');
+sub error {
+
+	my ( $self, $msg, $code ) = @_;
+
+	$msg  ||= '';    # error message
+	$code ||= '';    # error code
+
+	if ( ref($self) ) {
+		$self->{_errstr}  = $msg;
+		$self->{_errcode} = $code;
+	} else {
+		$_ERRSTR  = $msg;
+		$_ERRCODE = $code;
+	}
+
+	return undef;
+}
+
+#***********************************************************************
+
+=item B<errstr()> - retrieve error message
+
+C<errstr()> method returns error string in both object and class contexts.
+
+Example:
+
+	warn "We have an error: " . $obj->errstr;
+
+=cut
+
+#-----------------------------------------------------------------------
+
+sub errstr {
+
+	my $self = shift;
+	return ref($self) ? $self->{_errstr} : $_ERRSTR;
+
+}
+
+#***********************************************************************
+
+=item B<errcode()> - retrieve error code
+
+C<errcode()> method returns error code in both object and class contexts. 
+
+Example:
+
+	if ($obj->errcode == 42) {
+		print "Epic fail! We've found an answer!";
+	}
+
+=cut
+
+#-----------------------------------------------------------------------
+
+sub errcode {
+
+	my $self = shift;
+	return ref($self) ? $self->{_errcode} : $_ERRCODE;
+
+}
 
 1;
 
@@ -329,7 +329,7 @@ See C<samples> directory and other C<NetSDS> moduleis for examples of code.
 
 =head1 SEE ALSO
 
-L<Class::Accessor>, L<Class::Accessor::Class>, L<Clone>, L<Class::ErrorHandler>
+L<Class::Accessor::Class>
 
 =head1 AUTHOR
 
