@@ -6,7 +6,6 @@
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      VERSION:  1.0
 #      CREATED:  03.08.2009 13:34:51 UTC
 #===============================================================================
 
@@ -41,7 +40,7 @@ use POSIX;
 use Locale::gettext;
 use NetSDS::Const;
 
-use base qw(NetSDS::Class::Abstract);
+use base 'NetSDS::Class::Abstract';
 
 use version; our $VERSION = '1.206';
 

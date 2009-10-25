@@ -30,7 +30,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use base qw(NetSDS::Class::Abstract);
+use base 'NetSDS::Class::Abstract';
 
 use HTML::Template::Pro;
 use NetSDS::Util::File;
