@@ -17,7 +17,9 @@ NetSDS::Logger - syslog wrapper for applications and classes
 
 	use NetSDS::Logger;
 
-	my $logger = NetSDS::Logger->new();
+	my $logger = NetSDS::Logger->new(
+		name => 'NetSDS-SuperDaemon',
+	);
 	$logger->log("info", "Syslog message here");
 
 =head1 DESCRIPTION
@@ -26,7 +28,8 @@ This module contains implementation of logging functionality for NetSDS componen
 
 By default, messages are logged with C<local0> facility and C<pid,ndelay,nowait> options.
 
-B<NOTE>: C<NetSDS::Logger> module is for internal use mostly from application frameworks like C<NetSDS::App>, C<NetSDS::App::FCGI>, etc.
+B<NOTE>: C<NetSDS::Logger> module is for internal use mostly from application
+frameworks like C<NetSDS::App>, C<NetSDS::App::FCGI>, etc.
 
 =cut
 
@@ -41,32 +44,31 @@ use version; our $VERSION = '1.206';
 
 #===============================================================================
 
-=head1 CONSTRUCTOR
+=head1 CLASS API
 
 =over
 
-=item B<new(%parameters)>
+=item B<new(%parameters)> - constructor
 
 Constructor B<new()> creates new logger object and opens socket with default
 NetSDS logging parameters.
 
 Arguments allowed (as hash):
 
-=over
+B<name> - application name for identification
 
-=item B<name> - application name
+	Use only ASCII characters in "name" to avoid possible errors.
+	Default value is "NetSDS".
 
-This parameter may be used for identifying application in syslog messages
+B<facility> - logging facility
 
-=item B<facility> - logging facility
+	Available facility values:
 
-If not set 'local0' is used as default value
+		* local0..local7
+		* user
+		* daemon
 
-=back
-
-    my $object = NetSDS->new(%options);
-
-=back 
+	If not set 'local0' is used as default value
 
 =cut
 
@@ -83,23 +85,32 @@ sub new {
 		$name = $params{name};
 	}
 
-	my $facility = LOG_LOCAL0;
-	#if ( $params{facility} ) {
-	#	$facility = $params{facility};
-	#}
+	# Set logging facility
+	my %facility_map = (
+		'local0' => LOG_LOCAL0,
+		'local1' => LOG_LOCAL1,
+		'local2' => LOG_LOCAL2,
+		'local3' => LOG_LOCAL3,
+		'local4' => LOG_LOCAL4,
+		'local5' => LOG_LOCAL5,
+		'local6' => LOG_LOCAL6,
+		'local7' => LOG_LOCAL7,
+		'user'   => LOG_USER,
+		'daemon' => LOG_DAEMON,
+	);
+
+	my $facility = LOG_LOCAL0;    # default is local0
+	if ( $params{facility} ) {
+		$facility = $facility_map{ $params{facility} } || LOG_LOCAL0;
+	}
 
 	openlog( $name, LOG_PID | LOG_CONS | LOG_NDELAY, $facility );
-	#setlogsock('unix');
 
 	return bless $self, $class;
 
 } ## end sub new
 
 #***********************************************************************
-
-=head1 OBJECT/CLASS METHODS
-
-=over
 
 =item B<log($level, $message)> - write record to log
 
@@ -160,9 +171,7 @@ sub log {
 
 #***********************************************************************
 
-=back
-
-=head1 DESTRUCTOR
+=item B<DESTROY> - class destructor
 
 Destructor (DESTROY method) calls C<closelog()> function. That's all.
 
@@ -179,14 +188,11 @@ sub DESTROY {
 
 __END__
 
+=back
 
 =head1 EXAMPLES
 
 See L<NetSDS::App> for example.
-
-=head1 BUGS
-
-Unknown yet
 
 =head1 SEE ALSO
 
@@ -200,6 +206,23 @@ L<Sys::Syslog>
 
 Michael Bochkaryov <misha@rattler.kiev.ua>
 
-=cut
+=head1 LICENSE
 
+Copyright (C) 2008-2009 Net Style Ltd.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+=cut
 
