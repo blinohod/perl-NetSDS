@@ -24,7 +24,7 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Tue Oct 13 2009 (-bi)
+# Automatically added by buildreq on Mon Oct 26 2009 (-bi)
 BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Clone perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Module-Build perl-NetSDS-Util perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
 
 %description
