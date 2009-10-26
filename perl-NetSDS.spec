@@ -8,7 +8,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.206
+Version: 1.300
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -59,6 +59,20 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Mon Oct 26 2009 Michael Bochkaryov <misha@altlinux.ru> 1.300-alt1
+- changed copyright (license unchanged)
+- improved POD documentation
+- added INTERVAL_MINUTE and LANG_DE constants
+- fixed facility support in Logger.pm
+- fixed error handling in NetSDS::DBI::_connect()
+- removed clone() support from NetSDS::Class::Abstract (move to separate module)
+- removed Class::Accessor inheritance due to Class::Accessor::Class do the same things
+- simplified abstract constructor (now we accept only hashes)
+- removed Storable based (de)serialization from abstract class
+- implemented own error handling instead of Class::ErrorHandler
+- updated testcases
+- fixed some small bugs
+
 * Tue Oct 13 2009 Michael Bochkaryov <misha@altlinux.ru> 1.206-alt1
 - POD documentation improved
 - added autoflushing in NetSDS::App::FCGI
