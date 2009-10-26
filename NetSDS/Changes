@@ -1,3 +1,17 @@
+1.300 Mon Oct 26 19:41:54 EEST 2009
+- changed copyright to Net Style Ltd. without license changes
+- improved POD documentation
+- added INTERVAL_MINUTE and LANG_DE constants
+- fixed facility support in Logger.pm
+- fixed error handling in NetSDS::DBI::_connect()
+- removed clone() support from NetSDS::Class::Abstract (move to separate module)
+- removed Class::Accessor inheritance due to Class::Accessor::Class do the same things
+- simplified abstract constructor (now we accept only hashes)
+- removed Storable based (de)serialization from abstract class
+- implemented own error handling instead of Class::ErrorHandler
+- updated testcases
+- fixed some small bugs
+
 1.206 Tue Oct 13 16:49:19 EEST 2009
 - POD documentation improved
 - added autoflushing in NetSDS::App::FCGI

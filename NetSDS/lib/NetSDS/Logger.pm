@@ -40,7 +40,7 @@ use warnings;
 
 use Unix::Syslog qw(:macros :subs);
 
-use version; our $VERSION = '1.206';
+use version; our $VERSION = '1.300';
 
 #===============================================================================
 

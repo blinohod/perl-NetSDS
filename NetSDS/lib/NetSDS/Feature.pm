@@ -65,7 +65,7 @@ use warnings;
 use base qw(Class::Accessor Class::ErrorHandler);
 
 
-use version; our $VERSION = '1.206';
+use version; our $VERSION = '1.300';
 
 #===============================================================================
 
