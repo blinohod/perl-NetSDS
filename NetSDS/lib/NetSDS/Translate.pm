@@ -78,6 +78,7 @@ sub new {
 		%params,
 	);
 
+	# Initialize proper locale
 	setlocale( LC_MESSAGES, $locale{$self->{lang}} );
 	$self->{translator} = Locale::gettext->domain($self->{domain});
 
@@ -111,9 +112,11 @@ __END__
 
 =back
 
-=head1 BUGS
+=head1 TODO
 
-Unknown yet
+1. Make configurable language to locale conversion in constructor.
+
+2. Implement placeholders support provided by gettext.
 
 =head1 SEE ALSO
 
