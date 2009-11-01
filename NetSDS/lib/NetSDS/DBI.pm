@@ -45,11 +45,11 @@ use version; our $VERSION = '1.300';
 
 #===============================================================================
 
-=head1 CLASS METHODS
+=head1 CLASS API
 
 =over
 
-=item B<new([...])> - constructor
+=item B<new(%params)> - class constructor
 
     $dbh = NetSDS::DBI->new(
 		dsn    => 'dbi:Pg:dbname=test;host=127.0.0.1;port=5432',
@@ -113,9 +113,9 @@ sub new {
 	);
 
 	# Implement SQL debugging
-	if ($params{debug_sql}) {
+	if ( $params{debug_sql} ) {
 		$self->{debug_sql} = 1;
-	};
+	}
 
 	# Create object accessor for DBMS handler
 	$self->mk_accessors('dbh');
@@ -186,9 +186,9 @@ sub call {
 	my ( $self, $sql, @params ) = @_;
 
 	# Debug SQL
-	if ($self->{debug_sql}) {
-		$self->log("debug", "SQL: $sql");
-	};
+	if ( $self->{debug_sql} ) {
+		$self->log( "debug", "SQL: $sql" );
+	}
 
 	# First check connection and try to restore if necessary
 	unless ( $self->_check_connection() ) {
