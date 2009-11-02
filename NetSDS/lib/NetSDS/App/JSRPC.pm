@@ -16,13 +16,21 @@ NetSDS::App::JSRPC - JSON-RPC server framework
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/env perl
+	# JSON-RPC server
+	
 	use 5.8.0;
+	use warnings;
+	use strict;
 
 	JServer->run();
 
 	1;
 
+	# Server application logic
+
 	package JServer;
+
 	use base 'NetSDS::App::JSRPC';
 
 	# This method is available via JSON-RPC
@@ -35,12 +43,116 @@ NetSDS::App::JSRPC - JSON-RPC server framework
 
 =head1 DESCRIPTION
 
-C<NetSDS::App::JSRPC> module implements framework for common JSON-RPC service.
+C<NetSDS::App::JSRPC> module implements framework for common JSON-RPC based
+server application. JSON-RPC is a HTTP based protocol providing remote
+procudure call (RPC) functionality using JSON for requests and responses
+incapsulation.
 
 This implementation is based on L<NetSDS::App::FCGI> module and expected to be
-executed as FastCGI or CGI service.
+executed as FastCGI or CGI application.
 
-Both request and response should be of 'application/x-json-rpc' MIME type.
+Diagram of class inheritance:
+
+	  [NetSDS::App::JSRPC] - JSON-RPC server
+	           |
+	  [NetSDS::App::FCGI] - CGI/FCGI application
+	           |
+	     [NetSDS::App] - common application
+	           |
+	[NetSDS::Class::Abstract] - abstract class
+
+Both request and response are JSON-encoded strings represented in HTTP protocol
+as data of 'application/json' MIME type.
+
+
+=head1 APPLICATION DEVELOPMENT
+
+To develop new JSON-RPC server application you need to create application
+class inherited from C<NetSDS::App::JSRPC>:
+
+It's just empty application:
+
+	#!/usr/bin/env perl
+	
+	JSApp->run(
+		conf_file => '/etc/NetSDS/jsonapp.conf'
+	);
+
+	package JSApp;
+
+	use base 'NetSDS::App::JSRPC';
+
+	1;
+
+Alsoe you may want to add some specific code for application startup:
+
+	sub start {
+		my ($self) = @_;
+
+		connect_to_dbms();
+		query_for_external_startup_config();
+		do_other_initialization();
+
+	}
+
+And of course you need to add methods providing necessary functions:
+
+	sub send_sms {
+		my ($self, $params) = @_;
+
+		return $self->{kannel}->send(
+			from => $params{'from'},
+			to => $params{'to'},
+			text => $params{'text'},
+		);
+	}
+
+	sub kill_smsc {
+		my ($self, $params) = @_;
+
+		# 1M of MT SM should be enough to kill SMSC!
+		# Otherwise we call it unbreakable :-)
+
+		for (my $i=1; $<100000000; $i++) {
+			$self->{kannel}->send(
+				%mt_sm_parameters,
+			);
+		}
+
+		if (smsc_still_alive()) {
+			return $self->error("Cant kill SMSC! Need more power!");
+		}
+	}
+
+=head1 ADVANCED FUNCTIONALITY
+
+C<NetSDS::App::JSRPC> module provides two methods that may be used to implement
+more complex logic than average RPC to one class.
+
+=over
+
+=item B<can_method()> - method availability checking
+
+By default it is just wrapper around C<UNIVERSAL::can> function.
+However it may be rewritten to check for methods in other classes
+or even construct necessary methods on the fly.
+
+=item B<process_call()> - method dispatching
+
+By default it just call local class method with the same name as in JSON-RPC call.
+Of course it can be overwritten and process query in some other way.
+
+=back
+
+This code describes logic of call processing:
+
+	# It's not real code
+
+	if (can_method($json_method)) {
+		process_call($json_method, $json_params);
+	}
+
+For more details read documentation below.
 
 =cut
 
@@ -57,13 +169,14 @@ use base 'NetSDS::App::FCGI';
 use version; our $VERSION = '1.300';
 
 #===============================================================================
-#
 
 =head1 CLASS API
 
 =over
 
-=item B<new([...])> - class constructor
+=item B<new(%params)> - class constructor
+
+It's internally used constructor that shouldn't be used from application directly.
 
 =cut
 
@@ -96,7 +209,7 @@ sub process {
 	my $http_request = $self->param('POSTDATA');
 
 	# Set response MIME type
-	$self->mime('application/x-json-rpc');
+	$self->mime('application/json');
 
 	# Parse JSON-RPC call
 	if ( my ( $js_method, $js_params, $js_id ) = $self->_request_parse($http_request) ) {
@@ -159,9 +272,13 @@ sub process {
 
 =item B<can_method($method_name)> - check method availability
 
+This method allows to check if some method is available for execution.
+By default it use C<UNIVERSAL::can> but may be rewritten to implement
+more complex calls dispatcher.
+
 Paramters: method name (string)
 
-C<can_method()> 
+Return true if method execution allowed, false otherwise.
 
 =cut 
 
@@ -219,6 +336,8 @@ sub _request_parse {
 
 =item B<_make_result(%params)> - prepare positive response
 
+This is internal method for encoding JSON-RPC response string.
+
 Paramters:
 
 =over
@@ -229,7 +348,7 @@ Paramters:
 
 =back
 
-Returns JSON encoded response message
+Returns JSON encoded response message.
 
 =cut 
 
@@ -255,7 +374,7 @@ sub _make_result {
 
 =item B<_make_error(%params)> - prepare error response
 
-Internal method implementing error response.
+Internal method implementing JSON-RPC error response.
 
 Paramters:
 
@@ -309,19 +428,21 @@ __END__
 
 See C<samples/app_jsrpc.fcgi> appliction.
 
-=head1 BUGS
-
-Unknown yet
-
 =head1 SEE ALSO
 
 L<JSON>
 
 L<JSON::RPC2>
 
+L<http://json-rpc.org/wiki/specification> - JSON-RPC 1.0
+
+L<http://groups.google.com/group/json-rpc/web/json-rpc-1-2-proposal> - JSON-RPC 2.0
+
 =head1 TODO
 
-* move error codes to constants
+1. Move error codes to constants to provide more clear code.
+
+2. Implement objects/classes support.
 
 =head1 AUTHOR
 
