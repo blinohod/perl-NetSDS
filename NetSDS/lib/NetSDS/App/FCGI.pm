@@ -63,7 +63,7 @@ use version; our $VERSION = '1.300';
 
 =over
 
-=item B<new()> - constructor
+=item B<new(%params)> - class constructor
 
 Normally constructor of application framework shouldn't be invoked directly.
 
@@ -572,17 +572,9 @@ __END__
 
 See C<samples> catalog for more example code.
 
-=head1 BUGS
-
-Unknown yet
-
 =head1 SEE ALSO
 
 L<CGI>, L<CGI::Fast>, L<NetSDS::App>
-
-=head1 TODO
-
-None
 
 =head1 AUTHOR
 
