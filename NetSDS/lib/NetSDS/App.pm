@@ -11,7 +11,7 @@
 
 =head1 NAME
 
-NetSDS::App - common application superclass
+B<NetSDS::App> - common application superclass
 
 =head1 SYNOPSIS
 
