@@ -120,7 +120,7 @@ And of course you need to add methods providing necessary functions:
 		}
 
 		if (smsc_still_alive()) {
-			return $self->error("Cant kill SMSC! Need more power!");
+			return $self->error("Can't kill SMSC! Need more power!");
 		}
 	}
 
@@ -231,7 +231,7 @@ sub process {
 
 			} else {
 
-				# Cant get positive result
+				# Can't get positive result
 				$self->data(
 					$self->_make_error(
 						code    => -32000,
@@ -243,11 +243,11 @@ sub process {
 
 		} else {
 
-			# Cant find proper method
+			# Can't find proper method
 			$self->data(
 				$self->_make_error(
 					code    => -32601,
-					message => "Cant find JSON-RPC method",
+					message => "Can't find JSON-RPC method",
 					id      => undef,
 				)
 			);
@@ -259,7 +259,7 @@ sub process {
 		$self->data(
 			$self->_make_error(
 				code    => -32700,
-				message => "Cant parse JSON-RPC call",
+				message => "Can't parse JSON-RPC call",
 				id      => undef,
 			)
 		);
@@ -326,7 +326,7 @@ sub _request_parse {
 	my ( $self, $post_data ) = @_;
 
 	my $js_request = eval { decode_json($post_data) };
-	return $self->error("Cant parse JSON data") if $@;
+	return $self->error("Can't parse JSON data") if $@;
 
 	return ( $js_request->{'method'}, $js_request->{'params'}, $js_request->{'id'} );
 

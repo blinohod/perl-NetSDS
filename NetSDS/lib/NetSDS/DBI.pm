@@ -98,7 +98,7 @@ sub new {
 		}
 
 	} else {
-		return $class->error("Cant initialize DBI connection without DSN");
+		return $class->error("Can't initialize DBI connection without DSN");
 	}
 
 	# initialize parent class
@@ -199,7 +199,7 @@ sub call {
 	# FIXME my $sth = $self->dbh->prepare_cached($sql);
 	my $sth = $self->dbh->prepare($sql);
 	unless ($sth) {
-		return $self->error("Cant prepare SQL query: $sql");
+		return $self->error("Can't prepare SQL query: $sql");
 	}
 
 	# Execute SQL query
@@ -234,7 +234,7 @@ sub fetch_call {
 		# Fetch all data as arrayref of hashrefs
 		return $sth->fetchall_arrayref( {} );
 	} else {
-		return $self->error("Cant execute SQL: $sql");
+		return $self->error("Can't execute SQL: $sql");
 	}
 
 }
@@ -334,7 +334,7 @@ sub _connect {
 		}
 
 	} else {
-		return $self->error( "Cant connect to DBMS: " . $DBI::errstr );
+		return $self->error( "Can't connect to DBMS: " . $DBI::errstr );
 	}
 
 } ## end sub _connect

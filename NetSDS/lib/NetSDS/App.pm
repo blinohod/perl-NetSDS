@@ -166,7 +166,7 @@ sub run {
 
 	} else {
 
-		carp "Cant start application";
+		carp "Can't start application";
 		return undef;
 
 	}
@@ -440,7 +440,7 @@ sub initialize {
 			$self->conf($conf);
 			$self->log( "info", "Configuration file read OK: " . $self->{conf_file} );
 		} else {
-			$self->log( "error", "Cant read configuration file: " . $self->{conf_file} );
+			$self->log( "error", "Can't read configuration file: " . $self->{conf_file} );
 		}
 
 		# Add automatic features
@@ -525,7 +525,7 @@ sub add_feature {
 	# Try to use necessary classes
 	eval "use $class";
 	if ($@) {
-		return $self->error( "Cant add feature module $class: " . $@ );
+		return $self->error( "Can't add feature module $class: " . $@ );
 	}
 
 	# Feature class invocation
@@ -536,7 +536,7 @@ sub add_feature {
 		$self->{$name}->{logger} = $self->logger;
 	};
 	if ($@) {
-		return $self->error( "Cant initialize feature module $class: " . $@ );
+		return $self->error( "Can't initialize feature module $class: " . $@ );
 	}
 
 	# Create accessor to feature
@@ -762,7 +762,7 @@ sub edr {
 	if ( $self->{edr_writer} ) {
 		return $self->{edr_writer}->write(@records);
 	} else {
-		return $self->error("Cant write EDR to undefined destination");
+		return $self->error("Can't write EDR to undefined destination");
 	}
 
 }

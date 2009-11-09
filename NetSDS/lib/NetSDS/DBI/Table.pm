@@ -205,7 +205,7 @@ sub insert_row {
 	my ($row_id) = $return_value ? $sth->fetchrow_array : $sth->rows;
 
 	# Return "id" field from inserted row
-	return $row_id || $self->error( "Cant insert table record: " . $self->dbh->errstr );
+	return $row_id || $self->error( "Can't insert table record: " . $self->dbh->errstr );
 
 } ## end sub insert_row
 
@@ -286,7 +286,7 @@ sub update_row {
 	if ($res) {
 		return %{$res};
 	} else {
-		return $self->error( "Cant update message" . $self->dbh->errstr );
+		return $self->error( "Can't update table row: " . $self->dbh->errstr );
 	}
 
 }
@@ -324,7 +324,7 @@ sub update {
 	my $res = $self->call($sql);
 	
 	if ($self->dbh->errstr) {
-		$self->error( "Cant update message" . $self->dbh->errstr );
+		$self->error( "Can't update table: " . $self->dbh->errstr );
 		return;
 	};
 
