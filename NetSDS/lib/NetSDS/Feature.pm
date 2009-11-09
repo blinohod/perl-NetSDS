@@ -148,6 +148,11 @@ __PACKAGE__->mk_ro_accessors('conf');
 
 =item B<log($level, $message)> - implements logging
 
+Example:
+
+	# Write log message
+	$self->log("info", "Application does something interesting.");
+
 See L<NetSDS::Logger> documentation for details.
 
 =cut 
