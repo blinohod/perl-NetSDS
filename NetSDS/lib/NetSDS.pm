@@ -34,11 +34,15 @@ the following technologies:
 
 =item B<PostgreSQL> - default DBMS
 
+=item B<MemcacheQ> - message queue manager
+
 =item B<Apache> - HTTP server with FastCGI support
 
 =item B<Kannel> - SMS and WAP gateway
 
 =item B<Asterisk> - VoIP / telephony applications
+
+=item B<Mbuni> - MMSC and MMS VAS gateway.
 
 =back
 
@@ -52,9 +56,17 @@ the following technologies:
 
 =item * L<NetSDS::App::FCGI> - FastCGI applicatrion framework
 
+=item * L<NetSDS::App::JSRPC> - JSON-RPC server framework
+
 =item * L<NetSDS::Conf> - configuration files management class.
 
 =item * L<NetSDS::Logger> - syslog API.
+
+=item * L<NetSDS::DBI> - DBI wrapper for DBMS integration.
+
+=item * L<NetSDS::DBI::Table> - SQL table data processing API.
+
+=item * L<NetSDS::EDR> - writing event detail records (EDR).
 
 =back
 
