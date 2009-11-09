@@ -280,13 +280,24 @@ Paramters: method name (string)
 
 Return true if method execution allowed, false otherwise.
 
+Example:
+
+	# Rewrite can_method() to search in other class
+	sub can_method {
+		my ($self, $method) = @_;
+		return Other::Class->can($method);
+	}
+
 =cut 
 
 #-----------------------------------------------------------------------
 
 sub can_method {
+
 	my ($self, $method) = @_;
+
 	return $self->can($method);
+
 }
 
 #***********************************************************************
@@ -296,6 +307,14 @@ sub can_method {
 Paramters: method name, parameters.
 
 Returns parameters from executed method as is.
+
+Example:
+
+	# Rewrite process_call() to use other class
+	sub process_call {
+		my ( $self, $method, $params ) = @_;
+		return Other::Class->$method($params);
+	}
 
 =cut 
 
