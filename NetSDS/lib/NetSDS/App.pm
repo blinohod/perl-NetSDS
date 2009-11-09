@@ -15,37 +15,196 @@ B<NetSDS::App> - common application superclass
 
 =head1 SYNOPSIS
 
+	#!/usr/bin/env perl
+	
+	use 5.8.0;
+	use warnings;
+	use strict;
+
 	MyApp->run(
-		conf_file => '/etc/NetSDS/myapp.conf',
-		daemon => 1,
-		use_pidfile => 1,
+		conf_file => '/etc/NetSDS/myapp.conf', # default place for config search
+		daemon => 1,      # run in daemon mode
+		use_pidfile => 1, # write PID file to avoid double processing
+		verbose => 0,     # no verbosity
 	);
 
+	1;
+
+	# Application logic here
 	package MyApp;
 
 	use base 'NetSDS::App';
 
+	# Startup hook
+	sub start {
+		my ($self) = @_;
+
+		# Use configuration
+		$self->{listen_port} = $self->conf->{listen_port};
+
+		# Use logging subsystem
+		$self->log("info", "Application successfully started with PID=".$self->pid);
+	}
+
+	# Main processing hook
 	sub process {
 		my ($self) = @_;
 		print "Hello!";
+
+		# Use verbose output
+		$self->speak("Trying to be more verbose");
+
 	}
 
 =head1 DESCRIPTION
 
-C<NetSDS::App> provides common application functionality implemented
-as superclass to inherit real applications from it.
+C<NetSDS::App> is a base class for NetSDS applications.
+It implements common functionality including the following:
 
-Common application workflow is looking like this:
+	* initialization
+	* configuration file processing
+	* command line parameters processing
+	* application workflow
+	* daemonization
+	* PID file processing
+	* logging
+	* event detail records writing
+	* default signal handling
 
-	start()
-		|
-	process()
-		|
-	stop()
+New application should be inherited from C<NetSDS::App> class
+directly or via child classes for more specific tasks like
+CGI, AGI, SMPP and other.
 
-It may be redefined in C<main_loop()> method if necessary. But about 90% of applications will match this scheme.
+Common application workflow is described on this diagram:
 
-So if you need to implement some common logic, it's necessary to rewrite C<start()>, C<process()> and C<stop()> methods.
+	App->run(%params)
+	   |
+	initialize()
+	   |
+	   ----------
+	   |        |
+	start()     |
+	   |        |
+	process()   --- main_loop()
+	   |        |
+	stop()      |
+	   |        |
+	   ----------
+	   |
+	finalize()
+
+When application is starting C<initialize()> method is invoked first.
+It provides common start time functionality like CLI parameters processing,
+daemonization, reading configuration.
+
+C<initialize()> method may be overwritten in more specific frameworks
+to change default behaviour of some application types.
+
+Then C<main_loop()> method invoked to process main application logic.
+This method provides three redefinable hooks: C<start()>, C<process()> and C<stop()>.
+Theese hooks should be overwritten to implement necessary logic.
+
+=over
+
+=item * B<start()> - start time hook
+
+=item * B<process()> - process iteration hook
+
+=item * B<stop()> - finish time hook
+
+=back
+
+Depending on C<infinite> flag main_loop() may call process() hook
+in infinite loop or only once.
+
+C<main_loop()> workflow may be redefined in inherited framework to implement
+some other process flow logic.
+
+On the last step C<finalize()> method is invoked to make necessary
+finalization actions on framework level.
+
+=head1 STARTUP PARAMETERS
+
+Application class may be provided with a number of parameters that allows to manage application behaviour.
+For example it may be a configuration file, daemonization mode or debugging flag.
+
+Such parameters are passed to run() method as hash:
+
+	MyApp->run(
+		has_conf => 1,
+		conf_file => '/etc/sample/file.conf',
+		daemon => 1,
+		use_pidfile => 1,
+	);
+
+=over
+
+=item * B<has_conf> - 1 if configuration file is required (default: yes)
+
+Mostly our applications requires configuration files but some of them
+doesn't require any configuration (e.g. small utilities, etc).
+Set C<has_conf> parameter to 0 to avoid search of configuration file.
+
+=item * B<conf_file> - default path to configuration file (default: autodetect)
+
+This parameter allows to set explicitly path to configuration file.
+By default it's determined from application name and is looking like
+C</etc/NetSDS/{name}.conf>
+
+=item * B<name> - application name (default: autodetect)
+
+This name is used for config and PID file names, logging.
+By default it's automatically detected by executable script name.
+
+=item * B<debug> - 1 for debugging flag (default: no)
+
+=item * B<daemon> - 1 for daemon mode (default: no)
+
+=item * B<verbose> - 1 for verbose mode (default: no)
+
+=item * B<use_pidfile> - 1 to use PID files (default: no)
+
+=item * B<pid_dir> - path to PID files catalog (default: '/var/run/NetSDS')
+
+=item * B<auto_features> - 1 for auto features inclusion (default: no)
+
+This parameter should be set to 1 if you plan to use automatically plugged
+application features. Read C<PLUGGABLE APPLICATION FEATURES> section below.
+
+=item * B<infinite> - 1 for inifinite loop (default: yes)
+
+=item * B<edr_file> - EDR (event detail records) file name (default: undef)
+
+=back
+ 
+=head1 COMMAND LINE PARAMETERS
+
+Command line parameters may be passed to NetSDS application to override defaults.
+
+=over
+
+=item * B<--conf> - path to config file
+
+=item * B<--[no]debug> - set debug mode
+
+=item * B<--[no]daemon> - set daemon/foreground mode
+
+=item * B<--[no]verbose> - set verbosity mode
+
+=item * B<--name> - set application name
+
+=back
+
+These CLI options overrides C<conf_file>, C<debug>, C<daemon>, C<verbose> and C<name> default parameters
+that are passed in run() method.
+
+Examples:
+
+	# Debugging in foreground mode
+	./application --config=/etc/myapp.conf --nodaemon --debug
+
+	# Set application name explicitly
+	./application --name=myapp
 
 =cut
 
@@ -73,11 +232,11 @@ use Carp;
 #===============================================================================
 #
 
-=head1 CONSTRUCTOR AND CLASS METHODS
+=head1 CLASS API
 
 =over
 
-=item B<new([%params])>
+=item B<new([%params])> - class constructor
 
 Constructor is usually invoked from C<run()> class method.
 It creates application object and set its initial properties
@@ -127,23 +286,32 @@ sub new {
 
 #***********************************************************************
 
-=item B<run(%parameters)>
+=item B<run(%parameters)> - application launcher
 
 This method calls class constructor and then switch to C<main_loop()> method.
 
 All method parameters are transparently passed to application constructor.
 
+	#!/usr/bin/env perl
+	
+	use 5.8.0;
+	use warnings;
+	use strict;
+
 	MyApp->run(
 		conf_file => '/etc/myapp.conf',
 		daemon => 1,
+		use_pidfile => 1,
 	);
+
 	1;
+
+	# **********************************
+	# Logic of application
 
 	package MyApp;
 	use base 'NetSDS::App';
 	1;
-
-=back
 
 =cut
 
@@ -174,10 +342,6 @@ sub run {
 } ## end sub run
 
 #***********************************************************************
-
-=head1 OBJECT METHODS
-
-=over
 
 =item B<name([$name])> - application name
 
@@ -345,7 +509,10 @@ __PACKAGE__->mk_ro_accessors('auto_features');
 
 =item B<infinite([$bool])> - is application in infinite loop
 
-$app->infinite(1); # set infinite loop
+Example:
+
+	# Switch to infinite loop mode
+	$app->infinite(1);
 
 =cut 
 
@@ -549,7 +716,8 @@ sub add_feature {
 	$self->log( "info", "Feature added: $name => $class" );
 
 } ## end sub add_feature
-    #***********************************************************************
+
+#***********************************************************************
 
 =item B<finalize()> - switch to finalization stage
 
@@ -568,7 +736,7 @@ sub finalize {
 
 #***********************************************************************
 
-=item B<start()> - user defined initialization
+=item B<start()> - user defined initialization hook
 
 Abstract method for postinitialization procedures execution.
 
@@ -589,7 +757,7 @@ sub start {
 
 #***********************************************************************
 
-=item B<process()> - main loop iteration processing
+=item B<process()> - main loop iteration hook
 
 Abstract method for main loop iteration procedures execution.
 
@@ -609,7 +777,7 @@ sub process {
 
 #***********************************************************************
 
-=item B<stop()> - post processing method
+=item B<stop()> - post processing hook
 
 This method should be rewritten in target class to contain real
 post processing routines.
@@ -801,18 +969,19 @@ sub config_file {
 	return $conf_file;
 } ## end sub config_file
 
-# Determine application name from process name
+# Determine application name from script name
 sub _determine_name {
 
 	my ($self) = @_;
 
+	# Dont override predefined name
 	if ( $self->{name} ) {
 		return $self->{name};
 	}
 
-	$self->{name} = $0;
-	$self->{name} =~ s/^.*\///;
-	$self->{name} =~ s/\.(pl|cgi|fcgi)$//;
+	$self->{name} = $0;    # executable script
+	$self->{name} =~ s/^.*\///;               # remove directory path
+	$self->{name} =~ s/\.(pl|cgi|fcgi)$//;    # remove standard extensions
 
 }
 
@@ -868,6 +1037,19 @@ sub _get_cli_param {
 __END__
 
 =back
+
+=head1 PLUGGABLE APPLICATION FEAUTURES
+
+To add more flexibility to application development C<NetSDS::App> framework allows to add pluggable features.
+Application feature is a class dynamically loaded into application using configuration file parameters.
+
+To use application features developer should do the following:
+
+* set auto_features run() parameter
+
+* create C<feature> sections in application as described
+
+* create feature classes inherited from L<NetSDS::Feature>
 
 =head1 EXAMPLES
 
