@@ -219,7 +219,21 @@ Returns: arrayref of records as hashrefs
 
 Example:
 
+	# SQL DDL script:
+	# create table users (
+	# 	id serial,
+	# 	login varchar(32),
+	# 	passwd varchar(32)
+	# );
+
+	# Now we fetch all data to perl structure
 	my $table_data = $db->fetch_call("select * from users");
+
+	# Process this data
+	foreach my $user (@{$table_data}) {
+		print "User ID: " . $user->{id};
+		print "Login: " . $user->{login};
+	}
 
 =cut 
 
@@ -237,6 +251,64 @@ sub fetch_call {
 		return $self->error("Can't execute SQL: $sql");
 	}
 
+}
+
+#***********************************************************************
+
+=item B<begin()> - start transaction
+
+=cut
+
+sub begin {
+
+	my ($self) = @_;
+
+	return $self->dbh->begin_work();
+}
+
+#***********************************************************************
+
+=item B<commit()> - commit transaction
+
+=cut
+
+sub commit {
+
+	my ($self) = @_;
+
+	return $self->dbh->commit();
+}
+
+#***********************************************************************
+
+=item B<rollback()> - rollback transaction
+
+=cut
+
+sub rollback {
+
+	my ($self) = @_;
+
+	return $self->dbh->rollback();
+}
+
+#***********************************************************************
+
+=item B<quote()> - quote SQL string
+
+Example:
+
+	# Encode $str to use in queries
+	my $str = "some crazy' string; with (dangerous characters";
+	$str = $db->quote($str);
+
+=cut
+
+sub quote {
+
+	my ( $self, $str ) = @_;
+
+	return $self->dbh->quote($str);
 }
 
 #***********************************************************************
