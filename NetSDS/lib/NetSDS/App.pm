@@ -1,12 +1,12 @@
 #===============================================================================
 #
-#         FILE:  App.pm
+#       MODULE:  NetSDS::App
 #
-#  DESCRIPTION:  Common NetSDS applications framework
+#  DESCRIPTION:  Common NetSDS application framework
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      CREATED:  24.04.2008 16:48:24 EEST
+#
 #===============================================================================
 
 =head1 NAME
