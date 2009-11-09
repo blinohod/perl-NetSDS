@@ -1,12 +1,12 @@
 #===============================================================================
 #
-#         FILE:  NetSDS.pm
+#       MODULE:  NetSDS
 #
 #  DESCRIPTION:  NetSDS framework
 #
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
-#      CREATED:  24.04.2008 11:42:42 EEST
+#
 #===============================================================================
 
 package NetSDS;
@@ -42,7 +42,7 @@ the following technologies:
 
 =item B<Asterisk> - VoIP / telephony applications
 
-=item B<Mbuni> - MMSC and MMS VAS gateway.
+=item B<Mbuni> - MMSC and MMS VAS gateway
 
 =back
 
@@ -67,6 +67,24 @@ the following technologies:
 =item * L<NetSDS::DBI::Table> - SQL table data processing API.
 
 =item * L<NetSDS::EDR> - writing event detail records (EDR).
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<http://www.netstyle.com.ua> - Net Style Ltd. Company that develops NetSDS.
+
+=item L<http://netsds.sourceforge.net/> - NetSDS page at SourceForge
+
+=item L<http://www.asterisk.org> - Asterisk IP PBX
+
+=item L<http://www.kannel.org> - Kannel WAP/SMS gateway
+
+=item L<http://www.mbuni.org> - Mbuni MMSC and MMS VAS gateway
+
+=item L<http://www.postgresql.org> - PostgreSQL object-relational DBMS
 
 =back
 
