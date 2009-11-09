@@ -1,208 +1,315 @@
+#===============================================================================
+#
+#       MODULE:  NetSDS::Session
+#
+#  DESCRIPTION:  Memcached based session data storage
+#
+#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
+#      COMPANY:  Net.Style
+#
+#===============================================================================
+
+=head1 NAME
+
+B<NetSDS::Session> - memcached based session storage API
+
+=head1 SYNOPSIS
+
+	use NetSDS::Session;
+
+	# Connecting to Memcached server
+	my $sess = NetSDS::Session->new(
+		host => '12.34.56.78',
+		port => '12345',
+	);
+
+	...
+
+	# Retrieve session key somehow
+	$session_key = $cgi->param('sess_key');
+
+	$sess->open($session_key);
+
+	my $filter = $sess->get('filter');
+	...
+	$sess->set('filter', $new_filter);
+	...
+	$sess->close();
+
+	1;
+
+=head1 DESCRIPTION
+
+C<NetSDS::Session> module provides API to session data storage based on Memcached server.
+
+Each session represented as hash reference structure identified by UUID string.
+Most reasonable usage of this module is a temporary data storing for web based GUI
+between HTTP requests. However it's possible to find some other tasks.
+
+Internally session structure is transformed to/from JSON string when interacting with Memcached.
+
+=cut
+
 package NetSDS::Session;
 
 use 5.8.0;
 use strict;
 use warnings;
 
+use version; our $VERSION = '1.300';
+
 use Cache::Memcached::Fast;
 use JSON;
 
-sub SESSION_ID() { 0 };
-sub MEMCACH()    { 1 };
-sub SESSION()    { 2 };
+use base 'NetSDS::Class::Abstract';
 
-sub new { 
-	my ($proto, %args) = @_;
-	my $class = ref $proto || $proto;
+=head1 CLASS API
 
-	my $self = bless [];
-	return $self->init(\%args);
-};
+=over
 
-sub init {
-	my ($self, $args) = @_;
-	
-	my $host = $args->{'host'};
-	my $port = $args->{'port'};
+=item B<new(%params)> - class constructor
 
-	return $self unless $host and $port;
-	
-	$self->[ MEMCACH ] = new Cache::Memcached::Fast({
-		servers => [ { address => "$host:$port" } ],
-		serialize_methods => [ \&JSON::encode_json, \&JSON::decode_json ],
-	});
+Constructor establish connection to memcached server and set default session parameters.
 
-	return $self;
-};
+Parameters:
 
-sub set_session { 
-	my ($self, $session_id) = @_;
-	
-	@$self[ SESSION, SESSION_ID ] = (
-		$self->_get( $session_id ) || undef, $session_id
+	* host - memcached server hostname or IP address (default: 127.0.0.1)
+	* port - memcached server TCP port (default: 11211)
+
+Example:
+
+	my $sess_hdl = NetSDS::Session->new(
+		host => '12.34.56.78',
+		port => '99999',
 	);
-	
-	$self->[ SESSION ] ||= {};
-	return $self;
-};
 
-sub get_session { +shift->[ SESSION_ID ] };
+=cut
+
+sub new {
+
+	my ( $class, %params ) = @_;
+
+	my $self = $class->SUPER::new(
+		session_id   => undef,    # session id (UUID string)
+		session_data => {},       # session data as hash reference
+		%params
+	);
+
+	# Prepare server address string (host:port)
+	my $mc_host = $params{'host'} || '127.0.0.1';
+	my $mc_port = $params{'port'} || '11211';
+
+	# Initialize memcached handler
+	$self->{memcached} = Cache::Memcached::Fast->new(
+		{
+			servers           => [                      { address => $mc_host . ':' . $mc_port } ],
+			serialize_methods => [ \&JSON::encode_json, \&JSON::decode_json ],
+		}
+	);
+
+	if ( $self->{memcached} ) {
+		return $self;
+	} else {
+		return $class->error("Can't create memcached connection handler");
+	}
+
+} ## end sub new
+
+=item B<open($sess_id)> - open session
+
+Retrieve session data from server by session key (UUID string)
+
+If no session exists then empty hashref is returned.
+
+=cut
+
+sub open {
+
+	my ( $self, $sess_id ) = @_;
+
+	# Initialize session key and retrieve data
+	$self->{_id}   = $sess_id;
+	$self->{_data} = $self->{memcached}->get($sess_id);
+
+	# If no such session stored then create empty hashref
+	$self->{_data} ||= {};
+
+	return $self;
+}
+
+=item B<id()> - get session id
+
+Returns current session id.
+
+Example:
+
+	my $sess_id = $sess->id();
+
+=cut
+
+sub id {
+	my $self = shift;
+	return $self->{_id};
+}
+
+=item B<set($key, $value)> - set session parameter
+
+Set new session parameter value identified by it's key.
+
+Example:
+
+	$sess->set('order', 'id desc');
+
+=cut
 
 sub set {
-	my ($self, $key, $value) = @_;
-	$self->[ SESSION ]->{$key} = $value;
+	my ( $self, $key, $value ) = @_;
+	$self->{_data}->{$key} = $value;
 	return 1;
-};
+}
 
-sub get { 
-	my ($self, $key) = @_;
-	return $self->[ SESSION ]->{$key};
-};
+=item B<get($key)> - get session parameter
+
+Return session parameter value by it's key.
+
+Example:
+
+	my $order = $sess->get('order');
+
+=cut
+
+sub get {
+	my ( $self, $key ) = @_;
+	return $self->{_data}->{$key};
+}
+
+=item B<delete($key)> - delete session parameter by key
+
+Delete session parameter by it's key.
+
+Returns updated session data as hash reference.
+
+Example:
+
+	$sess->delete('order');
+
+=cut
 
 sub delete {
-	my ($self, $key) = @_;
-	return delete $self->[ SESSION ]->{$key};
-};
+	my ( $self, $key ) = @_;
 
-sub close_session {
-	my $self = shift;
+	delete $self->{_data}->{$key};
+	return $self->{_data};
+}
 
-	my $res = $self->[ MEMCACH ] ? $self->[ MEMCACH ]->set(
-		$self->get_session, $self->[ SESSION ]) : undef;
-	
-	@$self[ SESSION, SESSION_ID ] = (undef, undef);
-	return $res;
-};
+=item B<clear()> - clear session data
+
+This method clears all session data.
+
+Example:
+
+	$sess->clear();
+
+=cut
 
 sub clear {
 	my $self = shift;
-	
-	$self->[ SESSION ] = {};
-	return unless $self->[ MEMCACH ];
+	$self->{_data} = {};
+}
 
-	return $self->[ MEMCACH ]->delete($self->get_session);
-};
+=item B<sync()> - save session
 
-sub _get { 
-	my ($self, $key) = @_;
-	return $self->[ MEMCACH ] ? $self->[ MEMCACH ]->get($key) : {};
-};
+Synchronize session data on Memcached server.
+
+Example:
+
+	$sess->sync();
+
+=cut
+
+sub sync {
+
+	my $self = shift;
+
+	return $self->id ? $self->{memcached}->set( $self->id, $self->{_data} ) : undef;
+
+}
+
+=item B<close()> - save and close session
+
+This method save all data to server and clear current session id and data from object.
+
+Example:
+
+	$session->close();
+
+=cut
+
+sub close {
+
+	my $self = shift;
+
+	# Nothing to store for non existent session key
+	unless ( $self->id ) {
+		return undef;
+	}
+
+	# Store session data to memcached server
+	# or clear it from server if it's empty
+	if ( $self->{_data} == {} ) {
+		$self->{memcached}->delete( $self->id );
+	} else {
+		$self->{memcached}->set( $self->id, $self->{_data} );
+	}
+
+	# Clear session id and data
+	$self->{_id}   = undef;
+	$self->{_data} = undef;
+
+	return;
+} ## end sub close
 
 1;
 
 __END__
 
-=head1 NAME
+=back
 
-NetSDS::Session
+=head1 SEE ALSO
 
-=head1 SYNOPSYS
+=over
 
-use NetSDS::Session
+=item * L<Cache::Memcached::Fast> - XS implementation of Memcached API
 
-=head1 ITEMS
+=item * L<JSON> - JSON encoding/decoding API
 
-=over 4
+=back
 
-=item B<SESSION_ID>
+=head1 AUTHORS
 
-Current session_id;
+Michael Bochkaryov <misha@rattler.kiev.ua>
 
-=item B<MEMCACH>
+=head1 THANKS
 
-object Cache::Memcached::Fast
+Yana Kornienko - for initial module implementation
 
-=item B<SESSION>
+=head1 LICENSE
 
-session - a perl structure like this { order => desc, filter => non_active }
+Copyright (C) 2008-2009 Net Style Ltd.
 
-=item B<new>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-Constructor. The object is an array ref. It takes a structure like this: 
-{ host => 'localhost', port => 12211 }. Calls a sub when initializing of a memcached server
-provides and returns the object NetSDS::Session.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	Example: 
-	my $session = NetSDS::Session->new(
-		host => 'localhost',
-		port => '12211'
-	);
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-=item B<init>
+=cut
 
-This method calls from a constructor. It provides an initializing the connection to a 
-memcached server with params that has been taken by a constructor (params of a memcached server). 
-Work with memcached server provides by an object Cache::Memcached::Fast. Params of a Cache::Memcached::Fast
-object: 
-	
-	serialize_methods => [ \&JSON::encode_json, \&JSON::decode_json ],
-	compress_threshold => -1,
-	connect_timeout => 0.25,
-	close_on_error => true,
-	failure_timeout => 10 sec
-
-Notice: If there is no host or port for memcached, it wouldn't be an error.
-Returns an object NetSDS::Session in any case.
-
-=item B<set_session>
-
-This method takes a session_id of the user's session. According to a session_id (has session been stored
-earlier and server params) there could be several cases:
-	
-	- when there is no session in server 
-		initialize an empty hash ref {} for a new session.
-	- when server is not initialize (this happens when you didn't gave a host or a port into constructor
-		initialize an empty hash ref (similar to a previous case) but notice that this session wouldn't be stored
-	- when session exists in server 
-		get this session
-
-	Example: 
-		$session->set_session($session_id);
-
-Returns an object NetSDS::Session
-
-=item B<get_session>
-
-Returns a current session_id.
-	
-	Example:
-		$session->get_session
-
-=item B<set>
-
-Takes a key and value that should be added or replaced in current session. Notice: this method doesn't 
-provide setting params into server. It's just connect with a perl-structure that has been get from a server
-by set_session method. For storing session the method $session->close_session should be used.
-
-	Example: 
-		$session->set('order', 'id desc');
-
-=item B<get>
-
-Takes a key for a value that has been saved in session earlier or undef.
-
-	Example:
-		$session->get('order').
-
-=item B<delete>
-
-Takes a key that should be remover from current session.
-	
-	Example:
-		$sessopn->delete('order');
-
-=item B<close_session>
-
-This method provides storing current session. In case that there is no server (host or port hasn;t been taken by
-constructor), session wouldnt be stored.
-
-	Example:
-		$session->close_session.
-
-After closing session you couldn't work with it.
-
-=item B<clear>
-
-This method deletes current session from server. 
-
-=back 
