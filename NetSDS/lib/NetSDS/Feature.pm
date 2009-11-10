@@ -90,6 +90,7 @@ sub create {
 
 	bless $self, $class;
 
+	# Module specific initialization
 	$self->init();
 
 	return $self;
@@ -101,6 +102,21 @@ sub create {
 =item B<init()> - feature initialization 
 
 This method should be rewritten with feature functionality implementation.
+It's possibly to use application and configuration handlers at this time.
+
+Example:
+
+	sub init {
+		my ($self) = @_;
+
+		$self->{answer} = $self->conf->{answer} || '42';
+
+		my $pid = $self->app->pid();
+
+		if ($self->app->daemon()) {
+			$self->log("info", "Seems we are in a daemon mode");
+		}
+	}
 
 =cut 
 
