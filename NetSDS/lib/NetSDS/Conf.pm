@@ -38,7 +38,7 @@ use warnings;
 
 use Config::General;
 
-use version; our $VERSION = '1.300';
+use version; our $VERSION = '1.301';
 
 #***********************************************************************
 

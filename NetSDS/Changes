@@ -1,3 +1,9 @@
+1.301 Tue Nov 10 11:13:39 EET 2009
+- significantly improved POD documentation
+- reimplemented NetSDS::Session
+- implemented transactions support in DBI wrapper
+- some minor fixes
+
 1.300 Mon Oct 26 19:41:54 EEST 2009
 - changed copyright to Net Style Ltd. without license changes
 - improved POD documentation

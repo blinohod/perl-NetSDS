@@ -67,7 +67,7 @@ our $_ERRCODE;    # error code
 
 use Data::Structure::Util;    # unblessing objects
 
-use version; our $VERSION = '1.300';
+use version; our $VERSION = '1.301';
 
 #***********************************************************************
 

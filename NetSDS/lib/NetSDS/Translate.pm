@@ -42,7 +42,7 @@ use NetSDS::Const;
 
 use base 'NetSDS::Class::Abstract';
 
-use version; our $VERSION = '1.300';
+use version; our $VERSION = '1.301';
 
 #===============================================================================
 #

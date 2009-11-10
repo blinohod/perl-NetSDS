@@ -216,7 +216,7 @@ use warnings;
 
 use base 'NetSDS::Class::Abstract';
 
-use version; our $VERSION = '1.300';
+use version; our $VERSION = '1.301';
 
 use NetSDS::Logger;    # API to syslog daemon
 use NetSDS::Conf;      # Configuration file processor

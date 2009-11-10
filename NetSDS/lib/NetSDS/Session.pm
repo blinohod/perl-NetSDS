@@ -56,7 +56,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use version; our $VERSION = '1.300';
+use version; our $VERSION = '1.301';
 
 use Cache::Memcached::Fast;
 use JSON;

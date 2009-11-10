@@ -35,7 +35,7 @@ use base 'NetSDS::Class::Abstract';
 use HTML::Template::Pro;
 use NetSDS::Util::File;
 
-use version; our $VERSION = '1.300';
+use version; our $VERSION = '1.301';
 
 #===============================================================================
 

@@ -45,7 +45,6 @@ my $build = Module::Build->new(
 		'JSON::XS'               => '2.0',
 		'Class::Accessor'        => '0',
 		'Class::Accessor::Class' => '0',
-		'Clone'                  => '0',
 		'Config::General'        => '0',
 		'Data::Structure::Util'  => '0',
 		'Getopt::Long'           => '0',
