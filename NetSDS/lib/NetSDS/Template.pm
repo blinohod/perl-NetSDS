@@ -7,6 +7,7 @@
 #       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
 #      COMPANY:  Net.Style
 #      CREATED:  16.07.2008 23:30:12 EEST
+#
 #===============================================================================
 
 =head1 NAME
@@ -35,7 +36,7 @@ use base 'NetSDS::Class::Abstract';
 use HTML::Template::Pro;
 use NetSDS::Util::File;
 
-use version; our $VERSION = '1.301';
+use version; our $VERSION = '1.400';
 
 #===============================================================================
 
@@ -178,7 +179,7 @@ Igor Vlasenko (http://search.cpan.org/~viy/) for HTML::Template::Pro
 
 =head1 LICENSE
 
-Copyright (C) 2008-2009 Net Style Ltd.
+Copyright (C) 2008-2010 Net Style Ltd.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -55,7 +55,7 @@ use base 'NetSDS::App';
 use CGI::Fast;
 use CGI::Cookie;
 
-use version; our $VERSION = '1.301';
+use version; our $VERSION = '1.400';
 
 #***********************************************************************
 
@@ -582,7 +582,7 @@ Michael Bochkaryov <misha@rattler.kiev.ua>
 
 =head1 LICENSE
 
-Copyright (C) 2008-2009 Net Style Ltd.
+Copyright (C) 2008-2010 Net Style Ltd.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
