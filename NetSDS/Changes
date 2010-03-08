@@ -1,3 +1,6 @@
+1.400 Mon Mar  8 16:17:26 EET 2010
+- NetSDS::LWP - simple wrapper around LWP HTTP library
+
 1.301 Tue Nov 10 11:13:39 EET 2009
 - significantly improved POD documentation
 - reimplemented NetSDS::Session
