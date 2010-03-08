@@ -8,7 +8,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.301
+Version: 1.400
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -24,8 +24,10 @@ Packager: Michael Bochkaryov <misha@altlinux.ru>
 BuildArch: noarch
 Source0: %m_distro-%version.tar.gz
 
-# Automatically added by buildreq on Tue Nov 10 2009 (-bi)
-BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Module-Build perl-NetSDS-Util perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
+BuildRequires: perl-libwww
+
+# Automatically added by buildreq on Mon Mar 08 2010 (-bi)
+BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Log-Agent perl-Module-Build perl-NetSDS-Util perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -59,6 +61,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Mon Mar 08 2010 Michael Bochkaryov <misha@altlinux.ru> 1.400-alt1
+- NetSDS::LWP - simple wrapper around LWP HTTP library
+
 * Tue Nov 10 2009 Michael Bochkaryov <misha@altlinux.ru> 1.301-alt1
 - significantly improved POD documentation
 - reimplemented NetSDS::Session
