@@ -5,7 +5,7 @@ use strict;
 
 use URI::Escape;
 
-use NetSDS::Util::Text qw(text_encode text_decode text_recode);
+use NetSDS::Util::String qw(text_encode text_decode text_recode);
 use NetSDS::Util::Misc qw(str2uri);
 
 my $var = "жопа жопа жопа проверка связи 3-й раз блин не то бегает, что нескол";
