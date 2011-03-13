@@ -65,19 +65,20 @@ sub convert_dataset {
 }
 
 sub tagrec_to_str {
-	my ($tagrec) = @_;
+	my ( $tagrec, %params ) = @_;
 	return '' unless $tagrec;
-	if ( scalar(@$tagrec) == 1 ) {
+	if ( ( scalar(@$tagrec) == 1 ) and ( scalar( keys %params ) == 0 ) ) {
 		return sprintf( "<%s>", $tagrec->[0] );
 	} else {
-		return sprintf( "<%s %s>", $tagrec->[0], _hash_to_attributes( %{ $tagrec->[1] } ) );
+		my %tagparams = defined( $tagrec->[1] ) ? ( %{ $tagrec->[1] }, %params ) : %params;
+		return sprintf( "<%s %s>", $tagrec->[0], _hash_to_attributes(%tagparams) );
 	}
 }
 
 sub start_tag {
-	my ( $self, $tag ) = @_;
+	my ( $self, $tag, %params ) = @_;
 	my $tagrec = $self->tags()->{$tag};
-	return tagrec_to_str($tagrec);
+	return tagrec_to_str( $tagrec, %params );
 }
 
 sub end_tag {
@@ -88,8 +89,8 @@ sub end_tag {
 }
 
 sub wrap_tag {
-	my ( $self, $tag, $content ) = @_;
-	return sprintf( '%s%s%s', $self->start_tag($tag), $content, $self->end_tag($tag) );
+	my ( $self, $tag, $content, %params ) = @_;
+	return sprintf( '%s%s%s', $self->start_tag( $tag, %params ), $content, $self->end_tag($tag) );
 }
 
 sub class {
@@ -132,8 +133,8 @@ sub format_table_header_columns {
 }
 
 sub format_header_cell {
-	my ( $self, $column ) = @_;
-	return $self->wrap_tag( 'cell_head', $self->columns()->{$column}->{header_text} );
+	my ( $self, $column, %params ) = @_;
+	return $self->wrap_tag( 'cell_head', $self->columns()->{$column}->{header_text}, %params );
 }
 
 sub format_table_footer {
@@ -205,6 +206,17 @@ sub builtin_render_cell_text {
 	my ( $self, $row, $column ) = @_;
 	my $value = $row->{$column};
 	return HTML::Entities::encode($value);
+}
+
+sub column_parameter {
+	my ( $self, $column, $parameter ) = @_;
+	my $result;
+	if ( !defined( $self->columns()->{$column}->{$parameter} ) ) {
+		$result = $self->column_defaults()->{$parameter};
+	} else {
+		$result = $self->columns()->{$column}->{$parameter};
+	}
+	return $result;
 }
 
 sub is_exhausted {
