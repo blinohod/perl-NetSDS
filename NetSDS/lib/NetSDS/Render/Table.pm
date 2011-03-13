@@ -23,16 +23,16 @@ __PACKAGE__->foot_renderers( [] );
 __PACKAGE__->understands(    [ 'NetSDS::Render::Table::Type::Array', 'NetSDS::Render::Table::Type::Iterator' ] );
 __PACKAGE__->tags(
 	{
-		'table'     => 'table',
-		'thead'     => 'thead',
-		'tbody'     => 'tbody',
-		'row_head'  => 'tr',
-		'row_body'  => 'tr',
-		'row_foot'  => 'tr',
-		'tfoot'     => 'tfoot',
-		'cell_head' => 'th',
-		'cell_body' => 'td',
-		'cell_foot' => 'td'
+		'table'     => [ 'table', { 'class' => 'grid' } ],
+		'thead'     => ['thead'],
+		'tbody'     => ['tbody'],
+		'row_head'  => ['tr'],
+		'row_body'  => ['tr'],
+		'row_foot'  => ['tr'],
+		'tfoot'     => ['tfoot'],
+		'cell_head' => ['th'],
+		'cell_body' => ['td'],
+		'cell_foot' => ['td']
 	}
 );
 
@@ -64,6 +64,34 @@ sub convert_dataset {
 	return undef;
 }
 
+sub tagrec_to_str {
+	my ($tagrec) = @_;
+	return '' unless $tagrec;
+	if ( scalar(@$tagrec) == 1 ) {
+		return sprintf( "<%s>", $tagrec->[0] );
+	} else {
+		return sprintf( "<%s %s>", $tagrec->[0], _hash_to_attributes( %{ $tagrec->[1] } ) );
+	}
+}
+
+sub start_tag {
+	my ( $self, $tag ) = @_;
+	my $tagrec = $self->tags()->{$tag};
+	return tagrec_to_str($tagrec);
+}
+
+sub end_tag {
+	my ( $self, $tag ) = @_;
+	my $tagrec = $self->tags()->{$tag};
+	return '' unless $tagrec;
+	return sprintf( "</%s>", $tagrec->[0] );
+}
+
+sub wrap_tag {
+	my ( $self, $tag, $content ) = @_;
+	return sprintf( '%s%s%s', $self->start_tag($tag), $content, $self->end_tag($tag) );
+}
+
 sub class {
 	my $self = shift;
 	return ref($self);
@@ -71,23 +99,16 @@ sub class {
 
 sub format_table_start {
 	my ($self) = @_;
-	my $fmt = "<%s %s>";
-	if ( !defined( $self->params()->{classes} ) ) {
-		$self->params()->{classes} = [];
-	}
-	my $classes = join ' ', 'grid', $self->params()->{classes};
-	my $params = { class => 'grid' };
-	return sprintf( $fmt, $self->tags()->{table}, _hash_to_attributes(%$params) );
+	return $self->start_tag("table");
 }
 
 sub format_table_end {
 	my $self = shift;
-	return sprintf( '</%s>', $self->tags()->{table} );
+	return $self->end_tag('table');
 }
 
 sub format_table_header {
 	my $self = shift;
-	my $container = sprintf( '<%s>%%s</%s>', $self->tags->{thead}, $self->tags->{thead} );
 	# Filling in container includes
 	# Rendering all header rows as put in head_renderers
 	# Each such method is presumed to return a row.
@@ -97,34 +118,34 @@ sub format_table_header {
 	}
 	# Rendering head columns
 	push @rows, $self->format_table_header_columns();
-	return sprintf( $container, join( "\n", @rows ) );
+	return $self->wrap_tag( 'thead', join( "\n", @rows ) );
 }
 
 sub format_table_header_columns {
 	my $self      = shift;
-	my $container = sprintf( "<%s>%%s</%s>", $self->tags()->{row_head}, $self->tags()->{row_head} );
+	my $container = sprintf( "%s%%s%s", $self->start_tag('row_head'), $self->end_tag('row_head') );
 	my @columns   = ();
 	foreach my $column ( @{ $self->columns_order } ) {
 		push @columns, $self->format_header_cell($column);
 	}
-	return sprintf( $container, join( "", @columns ) );
+	return $self->wrap_tag( 'row_head', join( "", @columns ) );
 }
 
 sub format_header_cell {
 	my ( $self, $column ) = @_;
-	my $container = sprintf( '<%s %%s>%%s</%s>', $self->tags()->{cell_head}, $self->tags()->{cell_head} );
-	my $attributes = '';
-	return sprintf( $container, $attributes, $self->columns()->{$column}->{header_text} );
+	return $self->wrap_tag( 'cell_head', $self->columns()->{$column}->{header_text} );
 }
 
 sub format_table_footer {
 	my $self = shift;
-	my $container = sprintf( '<%s>%%s</%s>', $self->tags->{tfoot}, $self->tags->{tfoot} );
 	# Filling in container includes
 	# Rendering all header rows as put in head_renderers
 	# Each such method is presumed to return a row.
-	my @rows = map { $_ = $self->$_(); } @{ $self->foot_renderers() };
-	return sprintf( $container, join( "\n", @rows ) );
+	my @rows = ();
+	for my $renderer ( @{ $self->foot_renderers() } ) {
+		push @rows, $self->$renderer();
+	}
+	return $self->wrap_tag( 'tfoot', join( "\n", @rows ) );
 }
 
 sub value {
@@ -137,14 +158,14 @@ sub value {
 		return $self->format_table_header();
 	} elsif ( $self->{__render_state} eq 'body_start' ) {
 		$self->{__render_state} = 'body';
-		return sprintf( "<%s>", $self->tags->{tbody} );
+		return $self->start_tag('tbody');
 	} elsif ( $self->{__render_state} eq 'body' ) {
 		if ( $self->dataset->isnt_exhausted ) {
 			my $row = $self->dataset->value();
 			return $self->format_table_body_row($row);
 		} else {
 			$self->{__render_state} = 'foot';
-			return sprintf( "</%s>", $self->tags->{tbody} );
+			return $self->end_tag('tbody');
 		}
 	} elsif ( $self->{__render_state} eq 'foot' ) {
 		$self->{__render_state} = 'exhausted';
@@ -154,16 +175,17 @@ sub value {
 
 sub format_table_body_row {
 	my ( $self, $row ) = @_;
-	my $container = sprintf( '<%s>%%s</%s>', $self->tags->{row_body}, $self->tags->{row_body} );
-	my @cells = map { $self->format_table_body_cell( $row, $_ ); } @{ $self->columns_order };
-	return sprintf( $container, join( "", @cells ) );
+	my @cells = ();
+	foreach my $cell ( @{ $self->columns_order } ) {
+		push @cells, $self->format_table_body_cell( $row, $cell );
+	}
+	return $self->wrap_tag( 'row_body', join( "", @cells ) );
 }
 
 sub format_table_body_cell {
 	my ( $self, $row, $column ) = @_;
-	my $container = sprintf( '<%s>%%s</%s>', $self->tags->{cell_body}, $self->tags->{cell_body} );
-	my $renderer  = 'builtin_render_cell_text';
-	my $r         = undef;
+	my $renderer = 'builtin_render_cell_text';
+	my $r        = undef;
 	if ( defined( $self->columns->{$column}->{renderer} ) ) {
 		$r = $self->columns->{$column}->{renderer};
 	} elsif ( defined( $self->column_defaults->{renderer} ) ) {
@@ -176,7 +198,7 @@ sub format_table_body_cell {
 		$renderer = $r;
 	}
 	my $content = $self->$renderer( $row, $column );
-	return sprintf( $container, $content );
+	return $self->wrap_tag( 'cell_body', $content );
 }
 
 sub builtin_render_cell_text {
