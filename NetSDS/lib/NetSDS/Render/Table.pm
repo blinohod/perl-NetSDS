@@ -99,8 +99,9 @@ sub class {
 }
 
 sub format_table_start {
-	my ($self) = @_;
-	return $self->start_tag("table");
+	my ($self, %params) = @_;
+	return $self->next::method(%params) if $self->next::can();
+	return  $self->start_tag("table", %params);
 }
 
 sub format_table_end {
@@ -134,6 +135,7 @@ sub format_table_header_columns {
 
 sub format_header_cell {
 	my ( $self, $column, %params ) = @_;
+	return $self->next::method(@_) if $self->next::can();
 	return $self->wrap_tag( 'cell_head', $self->columns()->{$column}->{header_text}, %params );
 }
 
@@ -209,12 +211,12 @@ sub builtin_render_cell_text {
 }
 
 sub column_parameter {
-	my ( $self, $column, $parameter ) = @_;
-	my $result;
-	if ( !defined( $self->columns()->{$column}->{$parameter} ) ) {
-		$result = $self->column_defaults()->{$parameter};
+	my ( $self, $column, $parameter, $default ) = @_;
+	my $result = $default;
+	if ( !defined ( $self->columns()->{$column}->{$parameter} ) ) {
+		$result = $self->column_defaults()->{$parameter} or $result = $default;
 	} else {
-		$result = $self->columns()->{$column}->{$parameter};
+		$result = $self->columns()->{$column}->{$parameter} or $result = $default;
 	}
 	return $result;
 }
