@@ -27,10 +27,10 @@ sub format_header_cell {
 }
 
 sub format_table_start {
-	my ($self, %params) = @_;
+	my ( $self, %params ) = @_;
 	$params{'ns:sort_url'} = $self->class()->sort_url();
 	return $self->next::method(%params) if $self->next::can();
-	return $self->start_tag('table', %params);
+	return $self->start_tag( 'table', %params );
 }
 
 1;

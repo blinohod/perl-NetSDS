@@ -99,9 +99,9 @@ sub class {
 }
 
 sub format_table_start {
-	my ($self, %params) = @_;
+	my ( $self, %params ) = @_;
 	return $self->next::method(%params) if $self->next::can();
-	return  $self->start_tag("table", %params);
+	return $self->start_tag( "table", %params );
 }
 
 sub format_table_end {
@@ -213,7 +213,7 @@ sub builtin_render_cell_text {
 sub column_parameter {
 	my ( $self, $column, $parameter, $default ) = @_;
 	my $result = $default;
-	if ( !defined ( $self->columns()->{$column}->{$parameter} ) ) {
+	if ( !defined( $self->columns()->{$column}->{$parameter} ) ) {
 		$result = $self->column_defaults()->{$parameter} or $result = $default;
 	} else {
 		$result = $self->columns()->{$column}->{$parameter} or $result = $default;
