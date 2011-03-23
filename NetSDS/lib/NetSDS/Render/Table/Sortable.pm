@@ -1,5 +1,6 @@
 package NetSDS::Render::Table::Sortable;
 
+use mro 'c3';
 use base qw(NetSDS::Render::Table);
 
 __PACKAGE__->mk_class_accessors(qw(sort_url));
@@ -8,6 +9,13 @@ sub _switch_dir {
 	my $param = shift;
 	my $result = ( lc($param) eq 'asc' ) ? 'desc' : 'asc';
 	return $result;
+}
+
+sub get_table_classes {
+	my $self = shift;
+	my $classes = $self->next::method();
+	push @$classes, 'sortable';
+	return $classes;
 }
 
 sub format_header_cell {

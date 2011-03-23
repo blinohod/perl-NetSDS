@@ -100,8 +100,13 @@ sub class {
 
 sub format_table_start {
 	my ( $self, %params ) = @_;
-	return $self->next::method(%params) if $self->next::can();
+	my $classes = $self->get_table_classes();
+	$params{'class'} = join " ", @$classes;
 	return $self->start_tag( "table", %params );
+}
+
+sub get_table_classes {
+	return ["grid",];
 }
 
 sub format_table_end {
@@ -124,13 +129,17 @@ sub format_table_header {
 }
 
 sub format_table_header_columns {
-	my $self      = shift;
-	my $container = sprintf( "%s%%s%s", $self->start_tag('row_head'), $self->end_tag('row_head') );
-	my @columns   = ();
+	my ($self) = @_;
+	return $self->wrap_tag( 'row_head', join( "", @{ $self->get_table_header_columns() } ) );
+}
+
+sub get_table_header_columns {
+	my ($self) = @_;
+	my @columns = ();
 	foreach my $column ( @{ $self->columns_order } ) {
 		push @columns, $self->format_header_cell($column);
 	}
-	return $self->wrap_tag( 'row_head', join( "", @columns ) );
+	return \@columns;
 }
 
 sub format_header_cell {
@@ -140,7 +149,7 @@ sub format_header_cell {
 }
 
 sub format_table_footer {
-	my $self = shift;
+	my ( $self, %params ) = @_;
 	# Filling in container includes
 	# Rendering all header rows as put in head_renderers
 	# Each such method is presumed to return a row.
@@ -148,6 +157,7 @@ sub format_table_footer {
 	for my $renderer ( @{ $self->foot_renderers() } ) {
 		push @rows, $self->$renderer();
 	}
+	return $self->next::method(@_) if $self->next::can();
 	return $self->wrap_tag( 'tfoot', join( "\n", @rows ) );
 }
 
@@ -178,11 +188,22 @@ sub value {
 
 sub format_table_body_row {
 	my ( $self, $row ) = @_;
+	my $cells = $self->get_table_row_cells($row);
+	return $self->wrap_tag( 'row_body', join( "", @$cells ), id => $self->get_table_row_id($row) );
+}
+
+sub get_table_row_cells {
+	my ( $self, $row ) = @_;
 	my @cells = ();
 	foreach my $cell ( @{ $self->columns_order } ) {
 		push @cells, $self->format_table_body_cell( $row, $cell );
 	}
-	return $self->wrap_tag( 'row_body', join( "", @cells ) );
+	return \@cells;
+}
+
+sub get_table_row_id {
+	my ( $self, $row ) = @_;
+	return $row->{id};
 }
 
 sub format_table_body_cell {
@@ -236,7 +257,7 @@ sub _hash_to_attributes {
 	my @results;
 	my $fmt = '%s="%s"';
 	foreach my $key ( keys %hash ) {
-		push @results, sprintf( $fmt, HTML::Entities::encode($key), HTML::Entities::encode( $hash{$key} ) );
+		push @results, sprintf( $fmt, HTML::Entities::encode($key), defined( $hash{$key} ) ? HTML::Entities::encode( $hash{$key} ) : "" );
 	}
 	return join " ", @results;
 }

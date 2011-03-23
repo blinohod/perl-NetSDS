@@ -1,5 +1,6 @@
 package NetSDS::Render::Table::Editable;
 
+use mro 'c3';
 use base qw(NetSDS::Render::Table);
 
 __PACKAGE__->mk_class_accessors(qw(edit_url));
@@ -9,6 +10,13 @@ sub format_table_start {
 	$params{'ns:edit_url'} = $self->class()->edit_url();
 	return $self->next::method(%params) if $self->next::can();
 	return $self->start_tag( 'table', %params );
+}
+
+sub get_table_classes {
+	my $self = shift;
+	my $classes = $self->next::method();
+	push @$classes, 'editable';
+	return $classes;
 }
 
 sub format_header_cell {
