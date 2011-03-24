@@ -18,7 +18,7 @@ sub get_table_row_cells {
 
 sub get_table_header_columns {
 	my ($self) = @_;
-	my $columns = [ $self->wrap_tag( 'cell_head', '<input type="checkbox" ns:row-selector="2" />' ), @{ $self->next::method() } ];
+	my $columns = [ $self->wrap_tag( 'cell_head', '<input type="checkbox" ns:row-selector="all" />' ), @{ $self->next::method() } ];
 	return $columns;
 }
 

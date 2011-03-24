@@ -106,7 +106,7 @@ sub format_table_start {
 }
 
 sub get_table_classes {
-	return ["grid",];
+	return [ "grid", ];
 }
 
 sub format_table_end {
@@ -163,7 +163,13 @@ sub format_table_footer {
 
 sub value {
 	my $self = shift;
-	if ( !defined( $self->{__render_state} ) ) {
+	if ( !defined( $self->{__render_state} ) && $self->params()->{body_only} ) {
+		$self->{__render_state} = 'body_start';
+		return '';
+	} elsif ( $self->params()->{body_only} && $self->{__render_state} eq 'foot' ) {
+		$self->{__render_state} = 'exhausted';
+		return '';
+	} elsif ( !defined( $self->{__render_state} ) ) {
 		$self->{__render_state} = 'head';
 		return $self->format_table_start();
 	} elsif ( $self->{__render_state} eq 'head' ) {
