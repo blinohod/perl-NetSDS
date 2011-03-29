@@ -164,7 +164,7 @@ sub format_table_footer {
 
 sub value {
 	my $self = shift;
-	return $self->value_json() if lc($self->params()->{output}) eq 'json';
+	return $self->value_json() if lc( $self->params()->{output} ) eq 'json';
 	return $self->value_xml();
 }
 
@@ -197,7 +197,7 @@ sub value_xml {
 		$self->{__render_state} = 'exhausted';
 		return $self->format_table_footer() . $self->format_table_end();
 	}
-} ## end sub value
+} ## end sub value_xml
 
 sub format_table_body_row {
 	my ( $self, $row ) = @_;
@@ -274,23 +274,23 @@ sub json_format_table_end {
 }
 
 sub json_format_table_header {
-	my  $self = shift;
-	return '"columns" : '.$self->{_JSON}->encode($self->columns_order()).", ";
+	my $self = shift;
+	return '"columns" : ' . $self->{_JSON}->encode( $self->columns_order() ) . ", ";
 }
 
 sub json_body_start {
-	my  $self = shift;
+	my $self = shift;
 	return '"data" : [';
 }
 
 sub json_body_end {
-	my  $self = shift;
+	my $self = shift;
 	return ']';
 }
 
 sub value_json {
 	my $self = shift;
-	if (!defined($self->{_JSON})) {
+	if ( !defined( $self->{_JSON} ) ) {
 		$self->{_JSON} = JSON->new();
 	}
 	if ( !defined( $self->{__render_state} ) ) {
@@ -305,7 +305,7 @@ sub value_json {
 	} elsif ( $self->{__render_state} eq 'body' ) {
 		if ( $self->dataset->isnt_exhausted ) {
 			my $row = $self->dataset->value();
-			return $self->json_format_table_body_row($row).($self->dataset->isnt_exhausted ? ", " : "");
+			return $self->json_format_table_body_row($row) . ( $self->dataset->isnt_exhausted ? ", " : "" );
 		} else {
 			$self->{__render_state} = 'foot';
 			return $self->json_body_end();
@@ -314,7 +314,7 @@ sub value_json {
 		$self->{__render_state} = 'exhausted';
 		return $self->json_format_table_end();
 	}
-} ## end sub value
+} ## end sub value_json
 
 sub json_format_table_body_row {
 	my ( $self, $row ) = @_;
@@ -335,7 +335,11 @@ sub json_format_table_body_cell {
 	my ( $self, $row, $column ) = @_;
 	my $renderer = 'builtin_render_cell_text';
 	my $r        = undef;
-	if ( defined( $self->columns->{$column}->{renderer} ) ) {
+	if ( defined( $self->columns->{$column}->{renderer_json} ) ) {
+		$r = $self->columns->{$column}->{renderer_json};
+	} elsif ( defined( $self->column_defaults->{renderer_json} ) ) {
+		$r = $self->column_defaults->{renderer_json};
+	} elsif ( defined( $self->columns->{$column}->{renderer} ) ) {
 		$r = $self->columns->{$column}->{renderer};
 	} elsif ( defined( $self->column_defaults->{renderer} ) ) {
 		$r = $self->column_defaults->{renderer};
@@ -348,9 +352,7 @@ sub json_format_table_body_cell {
 	}
 	my $content = $self->$renderer( $row, $column );
 	return $content;
-}
-
-
+} ## end sub json_format_table_body_cell
 
 sub _hash_to_attributes {
 	my %hash = @_;
@@ -361,6 +363,5 @@ sub _hash_to_attributes {
 	}
 	return join " ", @results;
 }
-
 
 1;

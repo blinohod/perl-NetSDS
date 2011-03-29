@@ -12,13 +12,13 @@ sub get_table_classes {
 
 sub get_table_row_cells {
 	my ( $self, $row ) = @_;
-	my $cells = [ $self->wrap_tag( 'cell_body', '<input type="checkbox" ns:row-selector="1" ns:select-row="' . $self->get_table_row_id($row) . '" />' ), @{ $self->next::method($row) } ];
+	my $cells = [ $self->wrap_tag( 'cell_body', '<input type="checkbox" ns:row-selector="1" ns:select-row="' . $self->get_table_row_id($row) . '" />', class => 'row-selector' ), @{ $self->next::method($row) } ];
 	return $cells;
 }
 
 sub get_table_header_columns {
 	my ($self) = @_;
-	my $columns = [ $self->wrap_tag( 'cell_head', '<input type="checkbox" ns:row-selector="all" />' ), @{ $self->next::method() } ];
+	my $columns = [ $self->wrap_tag( 'cell_head', '<input type="checkbox" ns:row-selector="all" />', class => 'row-selector' ), @{ $self->next::method() } ];
 	return $columns;
 }
 
