@@ -50,7 +50,7 @@ our @EXPORT = qw(
 
 use POSIX;
 use Time::Local;
-use Time::HiRes qw(gettimeofday clock_gettime);
+use Time::HiRes qw(gettimeofday);
 
 # Include parsing/formatting modules
 use HTTP::Date qw(parse_date);
