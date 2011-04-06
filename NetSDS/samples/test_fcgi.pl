@@ -4,7 +4,7 @@ use Data::Dumper;
 
 MyApp->run;
 
-print Dumper($c);
+#print Dumper($c);
 
 1;
 

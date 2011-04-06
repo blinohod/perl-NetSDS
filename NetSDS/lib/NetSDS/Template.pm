@@ -63,11 +63,11 @@ sub new {
 
 	# Get filenames of templates
 	my $tpl_dir = $params{dir};
-
 	# Initialize templates hash reference
 	my $tpl = {};
 
-	my @tpl_files = @{ dir_read( $tpl_dir, 'tmpl' ) };
+	my $fileref = dir_read( $tpl_dir, 'tmpl' );
+	my @tpl_files = $fileref ? @$fileref : ();
 
 	# Add support for 'include_path' option
 	foreach my $file (@tpl_files) {
@@ -85,7 +85,7 @@ sub new {
 				my $include_path = $params{include_path} ? $params{include_path} : undef;
 				my @inc = ();
 				if ( defined $include_path ) { push @inc, $include_path; }
-				push @inc, ( $params{dir} . '/inc', '/usr/share/NetSDS/templates/' );
+				push @inc, ( $params{dir} . '/', '/usr/share/NetSDS/templates/' );
 
 				# Create template processing object
 				my $tem = HTML::Template::Pro->new(

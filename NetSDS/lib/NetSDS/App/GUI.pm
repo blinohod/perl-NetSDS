@@ -6,13 +6,15 @@ use warnings;
 
 use base 'NetSDS::App';
 
-use CGI::Fast;
 use CGI::Cookie;
+use CGI::Fast;
+use JSON;
 
 use NetSDS::AuthDB;
 
 use NetSDS::Template;
 use NetSDS::Util::String;
+use NetSDS::Portal::User;
 
 #===============================================================================
 
@@ -50,30 +52,27 @@ sub initialize {
 
 	# Initialize accessors to resources and request parameters
 
-	$self->mk_accessors('cgi');             # CGI.pm object
-	$self->mk_accessors('authdb');          # AAA data source (see NetSDS::AuthDB)
-	$self->mk_accessors('auth_ok');         # Authentication status (0 - anonymous, 1 - authenticated)
-	$self->mk_accessors('action');          # Action called
-	$self->mk_accessors('cookie');          # cookies to set
-	$self->mk_accessors('auth_uid');        # authenticated user ID
-	$self->mk_accessors('auth_login');      # authenticated user login
-	$self->mk_accessors('auth_session');    # session key (transfered in cookies)
+	$self->mk_accessors('cgi');       # CGI.pm object
+	$self->mk_accessors('authdb');    # AAA data source (see NetSDS::AuthDB)
+	$self->mk_accessors('user');      # User object (see NetSDS::Portal::User)
+	$self->mk_accessors('action');    # Action called
+	$self->mk_accessors('cookie');    # cookies to set
 	$self->mk_accessors('remote_ip');
 
 	# Initialize common properties
-	$self->cookie( [] );                    # HTTP cookes
+	$self->cookie( [] );              # HTTP cookes
 
 	# Initialize template system
 	$self->{template_dir} = $self->conf->{template_dir};
-	$self->{tmpl} = NetSDS::Template->new( dir => $self->{template_dir} );
 
+	$self->{tmpl} = NetSDS::Template->new( dir => $self->{template_dir} );
 	# Initialize AAA component
 	$self->authdb( NetSDS::AuthDB->new( %{ $self->conf->{db}->{main} } ) );
 	if ( $self->authdb ) {
 		$self->log( "info", "Successfully connected to AAA data source" );
 	} else {
 		$self->log( "error", "Cannot connect to AAA data source" );
-		$self->{to_finalize} = 1;           # No sense to run without AuthDB
+		$self->{to_finalize} = 1;     # No sense to run without AuthDB
 	}
 
 } ## end sub initialize
@@ -104,33 +103,60 @@ sub main_loop {
 		}
 
 		# Find action handling method
-		my $action_method = "action_" . $self->action;
-		unless ( $self->can($action_method) ) {
-			$action_method = "action_unknown";
-		}
 
-		$self->authenticate();
+		$self->authenticate(session_key => $self->cgi->cookie('SESSID'));
 
 		# Call action method and get result
-		my ( $res_type, $res_data, $res_opts ) = $self->$action_method();
-
-		if ( $res_type eq 'html' ) {
-			print $cgi->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );
-			print $res_data;
-
-		} elsif ( $res_type eq 'page' ) {
-			print $cgi->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );
-			print $self->{tmpl}->render( $self->action, %$res_data );
-
-		} elsif ( $res_type eq 'redirect' ) {
-			print $cgi->header( -cookie => $self->cookie, -status => '302 Moved', 'Location' => $res_data );
-		}
+		my ( $res_type, $res_data, $res_opts ) = $self->dispatch_action($self->action);
+		$self->dispatch_result( $self->action, $res_type, $res_data, $res_opts );
 
 	} ## end while ( my $cgi = CGI::Fast...)
 
 	$self->stop();
 
 } ## end sub main_loop
+
+sub dispatch_action {
+	my ( $self, $action ) = @_;
+	$self->action($action);
+	my $action_method = "action_" . $action;
+	unless ( $self->can($action_method) ) {
+		$action_method = "action_unknown";
+	}
+	return $self->$action_method();
+}
+
+sub dispatch_result {
+	my ( $self, $action, $res_type, $res_data, $res_opts ) = @_;
+	if ( my $method = $self->can( 'dispatch_result_' . $res_type ) ) {
+		$self->$method( $action, $res_data, $res_opts );
+	} else {
+		$self->log( "info", "Cannot dispatch result type $res_type" );
+	}
+}
+
+sub dispatch_result_html {
+	my ( $self, $action, $res_data, $res_opts ) = @_;
+	print $self->cgi()->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );
+	print $res_data;
+}
+
+sub dispatch_result_page {
+	my ( $self, $action, $res_data, $res_opts ) = @_;
+	print $self->cgi()->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );
+	print $self->{tmpl}->render( $action, %$res_data );
+}
+
+sub dispatch_result_redirect {
+	my ( $self, $action, $res_data, $res_opts ) = @_;
+	print $self->cgi()->header( -cookie => $self->cookie, -status => '302 Moved', 'Location' => $res_data );
+}
+
+sub dispatch_result_json {
+	my ( $self, $action, $res_data, $res_opts ) = @_;
+	print $self->cgi()->header( -type => 'text/json', -charset => 'utf-8', -cookie => $self->cookie );
+	print JSON::encode($res_data);
+}
 
 sub action_unknown {
 
@@ -150,56 +176,20 @@ sub action_default {
 
 }
 
+sub forward {
+	my ($self, $action) = @_;
+	return $self->dispatch_action($action);
+}
+
 sub authenticate {
-
-	my ($self) = @_;
-
-	# Anonymous user by default
-	$self->auth_ok(0);
-	$self->auth_session(undef);
-	$self->auth_uid(undef);
-	$self->auth_login(undef);
-
-	# Check if we have username and password HTTP request parameters
-	if ( my $login = $self->cgi->param('u') and my $passwd = $self->cgi->param('p') ) {
-
-		# Try password based authentication
-		my ( $user_id, $new_sess ) = $self->authdb->auth_passwd( $login, $passwd, make_session => 1 );
-		if ($user_id) {
-			$self->log( "info", "UID: $user_id, SESS: $new_sess" );
-			$self->auth_ok(1);
-			$self->set_cookie( name => 'SESSID', value => $new_sess, expire => '+8h' );
-			$self->auth_session($new_sess);
-			$self->auth_uid($user_id);
-			$self->auth_login( $self->authdb->get_user($user_id)->{login} );
-		} else {
-			$self->log( "warning", "Cannot authenticate by password: user='$login'; IP='" . $self->remote_ip() . "'" );
-		}
-
-	} else {
-
-		# Try session based authentication
-		my $sess_cookie = $self->get_cookie('SESSID');
-		my ($sess_key) = $sess_cookie ? @{$sess_cookie} : undef;
-		if ($sess_key) {
-			$self->log( "info", "Try session based authentication: SESSID='$sess_key'" );
-			if ( my $user_id = $self->authdb->auth_session( $sess_key, update => 1 ) ) {
-				$self->log( "info", "Successfull authentication by session '$sess_key', uid=$user_id" );
-				$self->auth_ok(1);
-				$self->auth_session($sess_key);
-				$self->auth_uid($user_id);
-				$self->auth_login( $self->authdb->get_user($user_id)->{login} );
-			} else {
-				$self->log( "warning", "Cannot authenticate by session: SESSID='$sess_key'; IP='" . $self->remote_ip() . "'" );
-			}
-
-		} else {
-			$self->log( "info", "Anonymous request: IP='" . $self->remote_ip() . "'" );
-		}
-
-	} ## end else [ if ( my $login = $self...)]
-
-} ## end sub authenticate
+	my ($self)      = @_;
+	my $sess_cookie = $self->get_cookie('SESSID');
+	my ($sess_key)  = $sess_cookie ? @{$sess_cookie} : undef;
+	$self->user(NetSDS::Portal::User->new($self->authdb));
+	if ($sess_key) {
+		$self->user()->authenticate( session_key => $sess_key );
+	}
+}
 
 sub set_cookie {
 

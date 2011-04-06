@@ -4,7 +4,7 @@ use Data::Dumper;
 
 MyApp->run( daemon => 0 );
 
-print Dumper($c);
+#print Dumper($c);
 
 1;
 
@@ -30,7 +30,7 @@ sub process {
 
 	for (my $i=1; $i<10; $i++) {
 
-		$this->log( "info", "My PID: " . $$a ."; iteration: $i" );
+#		$this->log( "info", "My PID: " . $$a ."; iteration: $i" );
 
 		sleep 1;
 	}

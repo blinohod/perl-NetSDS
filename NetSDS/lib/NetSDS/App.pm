@@ -596,7 +596,7 @@ sub initialize {
 
 	# Initialize configuration
 	if ( $self->{has_conf} ) {
-
+		$self->log("info", "Conffile: ".$self->{conf_file});
 		# Automatically determine configuration file name
 		if ( !$self->{conf_file} ) {
 			$self->{conf_file} = $self->config_file( $self->{name} . ".conf" );
