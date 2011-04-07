@@ -17,11 +17,13 @@ use mro 'c3';
 
 __PACKAGE__->mk_accessors(qw(dataset));
 __PACKAGE__->mk_class_accessors(qw(column_defaults table_defaults params head_defaults understands tags head_renderers foot_renderers columns defaults columns_order));
-__PACKAGE__->columns(        [] );
+__PACKAGE__->columns(         {} );
+__PACKAGE__->column_defaults( {} );
+__PACKAGE__->table_defaults(  {} );
 __PACKAGE__->columns_order(  [] );
 __PACKAGE__->head_renderers( [] );
 __PACKAGE__->foot_renderers( [] );
-__PACKAGE__->understands(    [ 'NetSDS::Render::Table::Type::Array', 'NetSDS::Render::Table::Type::Iterator' ] );
+__PACKAGE__->understands(    [ 'NetSDS::Render::Table::Type::Array', 'NetSDS::Render::Table::Type::Iterator', 'NetSDS::Render::Table::Type::NDBI' ] );
 __PACKAGE__->tags(
 	{
 		'table'     => [ 'table', { 'class' => 'grid' } ],
@@ -362,6 +364,15 @@ sub _hash_to_attributes {
 		push @results, sprintf( $fmt, HTML::Entities::encode($key), defined( $hash{$key} ) ? HTML::Entities::encode( $hash{$key} ) : "" );
 	}
 	return join " ", @results;
+}
+
+sub render {
+	my $self   = shift;
+	my $buffer = '';
+	while ( !$self->is_exhausted ) {
+		$buffer .= $self->value();
+	}
+	return $buffer;
 }
 
 1;

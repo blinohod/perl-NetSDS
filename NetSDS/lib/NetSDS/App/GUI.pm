@@ -58,6 +58,7 @@ sub initialize {
 	$self->mk_accessors('action');    # Action called
 	$self->mk_accessors('cookie');    # cookies to set
 	$self->mk_accessors('remote_ip');
+	$self->mk_accessors('dbh'); # Main DB handle to use
 
 	# Initialize common properties
 	$self->cookie( [] );              # HTTP cookes

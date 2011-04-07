@@ -8,8 +8,9 @@ sub new {
 	my $self = {};
 	my ( $class, $backend, $service ) = @_;
 	bless $self, $class;
-	$self->mk_accessors(qw(backend is_authenticated session_key uid service));
+	$self->mk_accessors(qw(backend is_authenticated session_key uid service username));
 	$self->backend($backend);
+	$self->uid(0);
 	$self->is_authenticated(0);
 	$self->service($service);
 	return $self;
@@ -19,7 +20,7 @@ sub authenticate {
 	my ( $self, %params ) = @_;
 	$self->is_authenticated(0);
 	$self->session_key(undef);
-	$self->uid(undef);
+	$self->uid(0);
 	$self->username(undef);
 	if ( my $login = $params{'username'} and my $passwd = $params{'password'} ) {
 		# Try password based authentication
@@ -36,10 +37,10 @@ sub authenticate {
 	} else {
 		# Try session based authentication
 		my $sess_cookie = $params{'session_key'};
-		my ($sess_key) = $sess_cookie ? @{$sess_cookie} : undef;
+		my $sess_key = $sess_cookie ? $sess_cookie : undef;
 		if ($sess_key) {
 			$self->log( "info", "Try session based authentication: SESSID='$sess_key'" );
-			if ( my $user_id = $self->authdb->auth_session( $sess_key, update => 1 ) ) {
+			if ( my $user_id = $self->backend->auth_session( $sess_key, update => 1 ) ) {
 				$self->log( "info", "Successfull authentication by session '$sess_key', uid=$user_id" );
 				$self->is_authenticated(1);
 				$self->session_key($sess_key);
@@ -55,9 +56,17 @@ sub authenticate {
 } ## end sub authenticate
 
 sub authorize {
-	my ($self, $action) = @_;
-	my @result = $self->backend()->authorize($self->uid(), $self->service(), $action);
-	return $result[0];
+	my ( $self, $action ) = @_;
+	my @r;
+	if ( $action =~ /^\*\./ ) {
+		$action =~ s/^\*\.//;
+		print STDERR "Action: $action, uid: " . $self->uid() . "\n";
+		@r = $self->backend()->authorize( $self->uid(), '*', $action );
+		print STDERR "Result: " . $r[0] . "\n";
+	} else {
+		@r = $self->backend()->authorize( $self->uid(), $self->service(), $action );
+	}
+	return $r[0];
 }
 
 1;
