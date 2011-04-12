@@ -15,17 +15,17 @@ our $VERSION = '1.0000';
 use base qw/NetSDS::Class::Abstract/;
 use mro 'c3';
 
-__PACKAGE__->mk_accessors(qw(dataset));
-__PACKAGE__->mk_class_accessors(qw(column_defaults table_defaults params head_defaults understands tags head_renderers foot_renderers columns defaults columns_order));
-__PACKAGE__->columns(         {} );
-__PACKAGE__->column_defaults( {} );
-__PACKAGE__->table_defaults(  {} );
-__PACKAGE__->columns_order(  [] );
-__PACKAGE__->head_renderers( [] );
-__PACKAGE__->foot_renderers( [] );
-__PACKAGE__->understands(    [ 'NetSDS::Render::Table::Type::Array', 'NetSDS::Render::Table::Type::Iterator', 'NetSDS::Render::Table::Type::NDBI' ] );
-__PACKAGE__->tags(
-	{
+use constant {
+	columns         => {},
+	column_defaults => {},
+	defaults        => {},
+	head_defaults   => {},
+	table_defaults  => {},
+	columns_order   => [],
+	head_renderers  => [],
+	foot_renderers  => [],
+	understands     => [ 'NetSDS::Render::Table::Type::Array', 'NetSDS::Render::Table::Type::Iterator', 'NetSDS::Render::Table::Type::NDBI' ],
+	tags            => {
 		'table'     => [ 'table', { 'class' => 'grid' } ],
 		'thead'     => ['thead'],
 		'tbody'     => ['tbody'],
@@ -37,7 +37,9 @@ __PACKAGE__->tags(
 		'cell_body' => ['td'],
 		'cell_foot' => ['td']
 	}
-);
+};
+
+__PACKAGE__->mk_accessors(qw(dataset params));
 
 sub new {
 	my $self = {};
@@ -51,7 +53,7 @@ sub new {
 sub convert_dataset {
 	my ( $self, $dataset ) = @_;
 	my $cls = $self->class();
-	foreach my $package ( @{ $self->understands() } ) {
+	foreach my $package ( @{ $self->understands } ) {
 		eval {
 			( my $pkg = $package ) =~ s|::|/|g;    # require need a path
 			require "$pkg.pm";
@@ -166,7 +168,7 @@ sub format_table_footer {
 
 sub value {
 	my $self = shift;
-	return $self->value_json() if lc( $self->params()->{output} ) eq 'json';
+	return $self->value_json() if ( defined( $self->params()->{output} ) && ( lc( $self->params()->{output} ) eq 'json' ) );
 	return $self->value_xml();
 }
 
@@ -225,8 +227,8 @@ sub format_table_body_cell {
 	my ( $self, $row, $column ) = @_;
 	my $renderer = 'builtin_render_cell_text';
 	my $r        = undef;
-	if ( defined( $self->columns->{$column}->{renderer} ) ) {
-		$r = $self->columns->{$column}->{renderer};
+	if ( defined( $self->class->columns->{$column}->{renderer} ) ) {
+		$r = $self->class->columns->{$column}->{renderer};
 	} elsif ( defined( $self->column_defaults->{renderer} ) ) {
 		$r = $self->column_defaults->{renderer};
 	}

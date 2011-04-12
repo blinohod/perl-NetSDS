@@ -4,8 +4,7 @@ use warnings;
 use URI::Escape;
 use base qw(NetSDS::App::GUI);
 
-__PACKAGE__->mk_class_accessors qw(authorize_map);
-__PACKAGE__->authorize_map( {} );
+use constant authorize_map => {};
 
 sub is_authorized {
 	my ( $self, @acls ) = @_;
@@ -27,6 +26,7 @@ sub initialize {
 		passwd => $self->conf->{db}->{main}->{passwd}
 	) or die "Cannot start up without a DBMS. Please fix your configuration.";
 	$self->dbh($dbh);
+	$self->authorize_map({});
 }
 
 sub error_403 {
@@ -38,9 +38,11 @@ sub error_403 {
 sub dispatch_action {
 	my ( $self, $action ) = @_;
 	my $acls =
-	  ( __PACKAGE__->authorize_map()->{$action} )
-	  ? __PACKAGE__->authorize_map()->{$action}
-	  : ( ( __PACKAGE__->authorize_map()->{'*'} ) ? __PACKAGE__->authorize_map()->{"*"} : [] );
+	  ( $self->authorize_map()->{$action} )
+	  ? $self->authorize_map()->{$action}
+	  : ( ( $self->authorize_map()->{'*'} ) ? $self->authorize_map()->{"*"} : [] );
+	print STDERR sprintf("Authorizing via [%s]\n", join(', ', @$acls));
+	print STDERR sprintf("Current UID: [%s]\n", $self->user->uid);
 	if ( scalar(@$acls) ) {
 		if ( $self->is_authorized(@$acls) ) {
 			return $self->SUPER::dispatch_action($action);
@@ -70,7 +72,8 @@ sub dispatch_result_page {
 		available_applications => $self->get_available_applications,
 		logged_in              => $self->user->is_authenticated,
 		username               => $self->user->username,
-		available_actions      => $self->get_available_actions
+		available_actions      => $self->get_available_actions,
+		logout_url             => $self->conf->{web}->{logout_url}
 	};
 	my @params = ( %$default_params, %$res_data );
 	print $self->cgi()->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );

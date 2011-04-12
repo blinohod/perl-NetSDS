@@ -3,7 +3,7 @@ package NetSDS::Render::Table::Editable;
 use mro 'c3';
 use base qw(NetSDS::Render::Table);
 
-__PACKAGE__->mk_class_accessors(qw(edit_url));
+use constant edit_url => '';
 
 sub format_table_start {
 	my ( $self, %params ) = @_;

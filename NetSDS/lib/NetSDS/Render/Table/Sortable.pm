@@ -3,7 +3,7 @@ package NetSDS::Render::Table::Sortable;
 use mro 'c3';
 use base qw(NetSDS::Render::Table);
 
-__PACKAGE__->mk_class_accessors(qw(sort_url));
+use constant sort_url => '';
 
 sub _switch_dir {
 	my $param = shift;
