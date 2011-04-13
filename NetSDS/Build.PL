@@ -59,8 +59,6 @@ my $build = Module::Build->new(
 		'Storable'               => '2.15',
 		'Unix::Syslog'           => '1.0',
 		'URI::Escape'            => '0',
-		'NetSDS::Util::DateTime' => '0',
-		'NetSDS::Util::File'     => '0',
 	},
 	recommends   => {},
 	script_files => {},
