@@ -33,7 +33,7 @@ sub authenticate {
 			$self->uid($user_id);
 			$self->username( $self->backend->get_user($user_id)->{login} );
 		} else {
-			$self->log( "warning", "Cannot authenticate by password: user='$login'; IP='" . $self->parent->remote_ip() . "'" );
+			$self->log( "warning", "Cannot authenticate by password: user='$login'; IP='" . $self->parent()->remote_ip() . "'" );
 		}
 	} else {
 		# Try session based authentication
@@ -48,7 +48,7 @@ sub authenticate {
 				$self->uid($user_id);
 				$self->username( $self->backend->get_user($user_id)->{login} );
 			} else {
-				$self->log( "warning", "Cannot authenticate by session: SESSID='$sess_key'; IP='" . $self->parent->remote_ip() . "'" );
+				$self->log( "warning", "Cannot authenticate by session: SESSID='$sess_key'; IP='" . $self->parent()->remote_ip() . "'" );
 			}
 		} else {
 			$self->log( "info", "Anonymous request: IP='" . $self->remote_ip() . "'" );
