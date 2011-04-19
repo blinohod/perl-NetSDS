@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use version; our $VERSION = '1.000';
 use mro 'c3';
+use URI::Escape;
 use base 'NetSDS::Class::Abstract';
 
 sub new {
