@@ -79,15 +79,12 @@ sub initialize {
 } ## end sub initialize
 
 sub main_loop {
-
+	$CGI::Fast::Ext_Request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, 0, FCGI::FAIL_ACCEPT_ON_INTR());
 	my ( $self, $method, $params ) = @_;
-
 	$self->start();
+	while ( !$self->{to_finalize} && (my $cgi = CGI::Fast->new()) ) {
 
-	while ( my $cgi = CGI::Fast->new() ) {
-
-		$self->cgi($cgi);    # initialize CGI.pm object
-
+		$self->cgi($cgi);
 		$self->remote_ip( $self->cgi->remote_addr() );
 
 		# Retrieve request cookies

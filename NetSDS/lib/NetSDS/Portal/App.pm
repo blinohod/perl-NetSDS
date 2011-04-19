@@ -2,6 +2,7 @@ package NetSDS::Portal::App;
 use strict;
 use warnings;
 use URI::Escape;
+use Module::Load;
 use base qw(NetSDS::App::GUI);
 
 use constant authorize_map => {};
@@ -9,12 +10,20 @@ use constant authorize_map => {};
 sub is_authorized {
 	my ( $self, @acls ) = @_;
 	foreach my $acl (@acls) {
-		print STDERR "$acl\n";
 		if ( !$self->user()->authorize($acl) ) {
 			return 0;
 		}
 	}
 	return 1;
+}
+
+sub new {
+	my ( $class, %params ) = @_;
+	my $self = $class->SUPER::new(%params);
+	bless $self, $class;
+	$self->mk_accessors(qw(module));
+	$self->module( $params{module} );
+	return $self;
 }
 
 sub initialize {
@@ -26,7 +35,6 @@ sub initialize {
 		passwd => $self->conf->{db}->{main}->{passwd}
 	) or die "Cannot start up without a DBMS. Please fix your configuration.";
 	$self->dbh($dbh);
-	$self->authorize_map({});
 }
 
 sub error_403 {
@@ -37,15 +45,14 @@ sub error_403 {
 
 sub dispatch_action {
 	my ( $self, $action ) = @_;
+
 	my $acls =
 	  ( $self->authorize_map()->{$action} )
 	  ? $self->authorize_map()->{$action}
 	  : ( ( $self->authorize_map()->{'*'} ) ? $self->authorize_map()->{"*"} : [] );
-	print STDERR sprintf("Authorizing via [%s]\n", join(', ', @$acls));
-	print STDERR sprintf("Current UID: [%s]\n", $self->user->uid);
 	if ( scalar(@$acls) ) {
 		if ( $self->is_authorized(@$acls) ) {
-			return $self->SUPER::dispatch_action($action);
+			return $self->render_slave( $self->module, $action, 'master', {} );
 		} else {
 			# Unauthorized access
 			if ( $self->conf->{web}->{login_url} ) {
@@ -57,43 +64,46 @@ sub dispatch_action {
 			}
 		}
 	} else {
-		return $self->SUPER::dispatch_action($action);
+		return $self->render_slave( $self->module, $action, 'master', {} );
 	}
 } ## end sub dispatch_action
 
-sub get_available_actions {
-	my $self = shift;
-	return undef;
+sub module_object {
+	my ( $self, $module ) = @_;
+	my $object;
+	load $module;
+	$object = $module->new( parent => $self );
+	return $object;
+}
+
+sub render_slave {
+	my ( $self, $module, $action, $aspect, $params ) = @_;
+	my $object = $self->module_object($module);
+	my ( $res_type, @params ) = $object->dispatch_result( $action, $aspect, $object->dispatch_action( $action, $aspect, $params ) );
+	if ( $res_type eq 'page' ) {
+		return ( $res_type, @params ) if wantarray;
+		return $params[0]->{'content'};
+	}
+	return ( $res_type, @params );
 }
 
 sub dispatch_result_page {
 	my ( $self, $action, $res_data, $res_opts ) = @_;
 	my $default_params = {
-		available_applications => $self->get_available_applications,
-		logged_in              => $self->user->is_authenticated,
-		username               => $self->user->username,
-		available_actions      => $self->get_available_actions,
-		logout_url             => $self->conf->{web}->{logout_url}
+		appbar            => { module => 'NetSDS::Portal::Dashboard', action => 'default' },
+		logged_in         => $self->user->is_authenticated,
+		available_actions => $self->module_object( $self->module )->get_available_actions,
+		userbar           => { module => 'NetSDS::Portal::Login',     action => 'userbar' }
 	};
 	my @params = ( %$default_params, %$res_data );
-	print $self->cgi()->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );
-	print $self->{tmpl}->render( $self->name() . "." . $action, @params );
-}
-
-sub get_available_applications {
-	my $self = shift;
-	my $rs   = $self->dbh->call(
-		'select a.uri as link, a.title_tag as title, a.descr from portal.applications a 
-		where auth.authorize(?, a.name, \'access\') order by a.priority asc', $self->user->uid()
-	);
-	my $results = [];
-	while ( my $row = $rs->fetchrow_hashref ) {
-		if ( $row->{link} eq $self->cgi->script_name ) {
-			$row->{current} = 1;
+	my %hashpar = @params;
+	foreach my $param ( keys %hashpar ) {
+		if ( ref( $hashpar{$param} ) eq 'HASH' ) {
+			$hashpar{$param} = $self->render_slave( $hashpar{$param}->{module}, $hashpar{$param}->{action}, ( defined( $hashpar{$param}->{aspect} ) ? $hashpar{$param}->{aspect} : 'slave' ), ( defined( $hashpar{$param}->{params} ) ? $hashpar{$param}->{params} : {} ) );
 		}
-		push @$results, $row;
 	}
-	return $results;
+	print $self->cgi()->header( -type => 'text/html', -charset => 'utf-8', -cookie => $self->cookie );
+	print $self->{tmpl}->render( 'master', %hashpar );
 }
 
 1;

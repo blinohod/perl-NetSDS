@@ -229,13 +229,14 @@ sub main_loop {
 
 	$self->start();
 
-	$SIG{TERM} = undef;
-	$SIG{INT}  = undef;
+	#$SIG{TERM} = 'DEFAULT';
+	#$SIG{INT}  = 'DEFAULT';
 
 	# Switch of verbosity
 	$self->{verbose} = undef;
 
 	# Enter FastCGI loop
+	$CGI::Fast::Ext_Request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, 0, FCGI::FAIL_ACCEPT_ON_INTR());
 	while ( $self->cgi( CGI::Fast->new() ) ) {
 
 		# Retrieve request cookies

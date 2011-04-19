@@ -60,9 +60,7 @@ sub authorize {
 	my @r;
 	if ( $action =~ /^\*\./ ) {
 		$action =~ s/^\*\.//;
-		print STDERR "Action: $action, uid: " . $self->uid() . "\n";
 		@r = $self->backend()->authorize( $self->uid(), '*', $action );
-		print STDERR "Result: " . $r[0] . "\n";
 	} else {
 		@r = $self->backend()->authorize( $self->uid(), $self->service(), $action );
 	}
