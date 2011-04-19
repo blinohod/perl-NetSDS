@@ -55,6 +55,7 @@ my $build = Module::Build->new(
 		'JSON::XS'               => '2.0',
 		'Locale::gettext'        => '1.00',
 		'LWP::UserAgent'         => '2.00',
+		'Module::Load'           => '0',
 		'POSIX'                  => '0',
 		'Proc::Daemon'           => '0.03',
 		'Proc::PID::File'        => '0',
