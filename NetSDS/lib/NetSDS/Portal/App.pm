@@ -45,27 +45,7 @@ sub error_403 {
 
 sub dispatch_action {
 	my ( $self, $action ) = @_;
-
-	my $acls =
-	  ( $self->authorize_map()->{$action} )
-	  ? $self->authorize_map()->{$action}
-	  : ( ( $self->authorize_map()->{'*'} ) ? $self->authorize_map()->{"*"} : [] );
-	if ( scalar(@$acls) ) {
-		if ( $self->is_authorized(@$acls) ) {
-			return $self->render_slave( $self->module, $action, 'master', {} );
-		} else {
-			# Unauthorized access
-			if ( $self->conf->{web}->{login_url} ) {
-				my $url = sprintf( $self->conf->{web}->{login_url}, uri_escape( $self->cgi()->url( -absolute => 1 ) ) );
-				return ( 'redirect', $url );
-			} else {
-				$self->error_403;
-				return ( 'html', '' );
-			}
-		}
-	} else {
-		return $self->render_slave( $self->module, $action, 'master', {} );
-	}
+	return $self->render_slave($self->module, $action, 'master', {});
 } ## end sub dispatch_action
 
 sub module_object {

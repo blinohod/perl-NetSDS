@@ -57,11 +57,35 @@ sub dispatch_result {
 
 sub dispatch_action {
 	my ( $self, $action, $aspect, $params ) = @_;
-	if ($self->can('action_'.$action)) {
-		my $action_method = 'action_'.$action;
-		return $self->$action_method($aspect, $params);
+	my $acls =
+	  ( $self->authorize_map()->{$action} )
+	  ? $self->authorize_map()->{$action}
+	  : ( ( $self->authorize_map()->{'*'} ) ? $self->authorize_map()->{"*"} : [] );
+	if ( scalar(@$acls) ) {
+		if ( $self->is_authorized(@$acls) ) {
+			return $self->_do_dispatch_action( $action, $aspect, $params );
+		} else {
+			# Unauthorized access
+			if ( $self->conf->{web}->{login_url} ) {
+				my $url = sprintf( $self->conf->{web}->{login_url}, uri_escape( $self->cgi()->url( -absolute => 1 ) ) );
+				return ( 'redirect', $url );
+			} else {
+				$self->error_403;
+				return ( 'html', '' );
+			}
+		}
+	} else {
+		return $self->_do_dispatch_action( $action, $aspect, $params );
 	}
-	return $self->action_unknown($aspect, $params);
+} ## end sub dispatch_action
+
+sub _do_dispatch_action {
+	my ( $self, $action, $aspect, $params ) = @_;
+	if ( $self->can( 'action_' . $action ) ) {
+		my $action_method = 'action_' . $action;
+		return $self->$action_method( $aspect, $params );
+	}
+	return $self->action_unknown( $aspect, $params );
 }
 
 sub dispatch_result_page {
@@ -96,7 +120,7 @@ sub is_authorized {
 }
 
 sub authdb {
-	my ( $self ) = @_;
+	my ($self) = @_;
 	return $self->parent->authdb();
 }
 
