@@ -183,7 +183,7 @@ sub authenticate {
 	my ($self)      = @_;
 	my $sess_cookie = $self->get_cookie('SESSID');
 	my ($sess_key)  = $sess_cookie ? @{$sess_cookie} : undef;
-	$self->user(NetSDS::Portal::User->new($self->authdb));
+	$self->user(NetSDS::Portal::User->new($self->authdb, '', parent => $self));
 	if ($sess_key) {
 		$self->user()->authenticate( session_key => $sess_key );
 	}

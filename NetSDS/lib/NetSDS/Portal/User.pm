@@ -6,10 +6,11 @@ use base 'NetSDS::Class::Abstract';
 
 sub new {
 	my $self = {};
-	my ( $class, $backend, $service ) = @_;
+	my ( $class, $backend, $service, $parent ) = @_;
 	bless $self, $class;
-	$self->mk_accessors(qw(backend is_authenticated session_key uid service username));
+	$self->mk_accessors(qw(backend is_authenticated session_key uid service username parent));
 	$self->backend($backend);
+	$self->parent($parent);
 	$self->uid(0);
 	$self->is_authenticated(0);
 	$self->service($service);
@@ -32,7 +33,7 @@ sub authenticate {
 			$self->uid($user_id);
 			$self->username( $self->backend->get_user($user_id)->{login} );
 		} else {
-			$self->log( "warning", "Cannot authenticate by password: user='$login'; IP='" . $self->remote_ip() . "'" );
+			$self->log( "warning", "Cannot authenticate by password: user='$login'; IP='" . $self->parent->remote_ip() . "'" );
 		}
 	} else {
 		# Try session based authentication
@@ -47,7 +48,7 @@ sub authenticate {
 				$self->uid($user_id);
 				$self->username( $self->backend->get_user($user_id)->{login} );
 			} else {
-				$self->log( "warning", "Cannot authenticate by session: SESSID='$sess_key'; IP='" . $self->remote_ip() . "'" );
+				$self->log( "warning", "Cannot authenticate by session: SESSID='$sess_key'; IP='" . $self->parent->remote_ip() . "'" );
 			}
 		} else {
 			$self->log( "info", "Anonymous request: IP='" . $self->remote_ip() . "'" );
