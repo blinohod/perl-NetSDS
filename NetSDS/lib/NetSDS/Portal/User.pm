@@ -17,6 +17,11 @@ sub new {
 	return $self;
 }
 
+sub remote_ip {
+	my $self = shift;
+	return $self->parent->remote_ip();
+}
+
 sub authenticate {
 	my ( $self, %params ) = @_;
 	$self->is_authenticated(0);

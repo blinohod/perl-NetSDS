@@ -129,6 +129,15 @@ Example:
 
 #-----------------------------------------------------------------------
 
+sub functions {
+	my ( $self, $name, %functions ) = @_;
+	my $tpl = $self->{'templates'}->{$name};
+	unless ($tpl) {
+		return $self->error("Wrong template name: '$name'");
+	}
+	$tpl->register_function(%functions);
+}
+
 sub render {
 
 	my ( $self, $name, %params ) = @_;
