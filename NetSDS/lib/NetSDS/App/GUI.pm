@@ -153,7 +153,7 @@ sub dispatch_result_redirect {
 sub dispatch_result_json {
 	my ( $self, $action, $res_data, $res_opts ) = @_;
 	print $self->cgi()->header( -type => 'text/json', -charset => 'utf-8', -cookie => $self->cookie );
-	print JSON::encode($res_data);
+	print encode_json($res_data);
 }
 
 sub action_unknown {

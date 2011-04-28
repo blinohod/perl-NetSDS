@@ -206,7 +206,7 @@ sub value_xml {
 sub format_table_body_row {
 	my ( $self, $row ) = @_;
 	my $cells = $self->get_table_row_cells($row);
-	return $self->wrap_tag( 'row_body', join( "", @$cells ), id => $self->get_table_row_id($row) );
+	return $self->wrap_tag( 'row_body', join( "", @$cells ), 'ns:row-id' => $self->get_table_row_id($row) );
 }
 
 sub get_table_row_cells {
@@ -238,8 +238,15 @@ sub format_table_body_cell {
 		}
 		$renderer = $r;
 	}
+	my %attributes;
+	if(defined($self->class->columns->{$column}->{style})) {
+		$attributes{style} = $self->class->columns->{$column}->{style};
+	}
+	if(defined($self->class->columns->{$column}->{class})) {
+		$attributes{style} = $self->class->columns->{$column}->{class};
+	}
 	my $content = $self->$renderer( $row, $column );
-	return $self->wrap_tag( 'cell_body', $content );
+	return $self->wrap_tag( 'cell_body', $content, %attributes );
 }
 
 sub builtin_render_cell_text {
