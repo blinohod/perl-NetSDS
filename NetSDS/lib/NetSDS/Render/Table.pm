@@ -239,15 +239,15 @@ sub format_table_body_cell {
 		$renderer = $r;
 	}
 	my %attributes;
-	if(defined($self->class->columns->{$column}->{style})) {
+	if ( defined( $self->class->columns->{$column}->{style} ) ) {
 		$attributes{style} = $self->class->columns->{$column}->{style};
 	}
-	if(defined($self->class->columns->{$column}->{class})) {
+	if ( defined( $self->class->columns->{$column}->{class} ) ) {
 		$attributes{style} = $self->class->columns->{$column}->{class};
 	}
 	my $content = $self->$renderer( $row, $column );
 	return $self->wrap_tag( 'cell_body', $content, %attributes );
-}
+} ## end sub format_table_body_cell
 
 sub builtin_render_cell_text {
 	my ( $self, $row, $column ) = @_;

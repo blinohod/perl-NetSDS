@@ -42,6 +42,8 @@ our @EXPORT = qw(
   make_uuid
   csv_num
   format_msisdn
+  hashmerge
+  unwind
 );
 
 use Getopt::Long;
@@ -183,6 +185,61 @@ sub format_msisdn {
 	}
 
 }
+
+#***********************************************************************
+
+=item B<hashmerge($hashref1, $hashref2)> - merge two hash refs and return the result
+
+Parameters: two hashrefs with hashes to merge
+
+Returns: a hashref with combined elements from hashref1 and hashref2.
+
+Duplicate keys are overridden with those from hashref2.
+
+=cut 
+
+#-----------------------------------------------------------------------
+
+sub hashmerge {
+	my ($r1, $r2) = @_;
+	my $r3 = {};
+	foreach my $key (keys %$r1) {
+		$r3->{$key} = $r1->{$key};
+	}
+	foreach my $key (keys %$r2) {
+		$r3->{$key} = $r2->{$key};
+	}
+	return $r3;
+}
+
+sub unwind {
+	my ( $base, $hash ) = @_;
+	my $result = {};
+	if ( ref($hash) eq 'HASH' ) {
+		foreach my $key ( keys %$hash ) {
+			if ( ref($hash->{$key}) eq '' ) {
+				$result->{$base.".$key"} = $hash->{$key};
+			}
+			else {
+				$result = hashmerge($result, unwind($base.".$key", $hash->{$key}));
+			}
+		}
+	} elsif (ref($hash) eq '') {
+		$result->{$base} = $hash;
+	} elsif (ref($hash) eq 'ARRAY') {
+		for (my $i=0; $i <= scalar(@{$hash}); $i++) {
+			if ( ref($hash->[$i]) eq 'SCALAR' ) {
+				$result->{$base."[$i]"} = $hash->[$i];
+			}
+			else {
+				$result = hashmerge($result, unwind($base.".$i", $hash->[$i]));
+			}
+		}
+	}
+	return $result;
+}
+
+
 
 #**************************************************************************
 1;
