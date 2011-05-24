@@ -58,7 +58,7 @@ sub initialize {
 	$self->mk_accessors('action');    # Action called
 	$self->mk_accessors('cookie');    # cookies to set
 	$self->mk_accessors('remote_ip');
-	$self->mk_accessors('dbh'); # Main DB handle to use
+	$self->mk_accessors('dbh');       # Main DB handle to use
 
 	# Initialize common properties
 	$self->cookie( [] );              # HTTP cookes
@@ -78,11 +78,20 @@ sub initialize {
 
 } ## end sub initialize
 
+sub get_action_name {
+	my ( $self, $path ) = @_;
+	if ( $path =~ /\/(\w[a-zA-Z0-9\_]+)/ ) {
+		return lc($1);
+	} else {
+		return 'default';
+	}
+}
+
 sub main_loop {
-	$CGI::Fast::Ext_Request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, 0, FCGI::FAIL_ACCEPT_ON_INTR());
+	$CGI::Fast::Ext_Request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, 0, FCGI::FAIL_ACCEPT_ON_INTR() );
 	my ( $self, $method, $params ) = @_;
 	$self->start();
-	while ( !$self->{to_finalize} && (my $cgi = CGI::Fast->new()) ) {
+	while ( !$self->{to_finalize} && ( my $cgi = CGI::Fast->new() ) ) {
 
 		$self->cgi($cgi);
 		$self->remote_ip( $self->cgi->remote_addr() );
@@ -94,30 +103,31 @@ sub main_loop {
 		my $path = $cgi->path_info();
 
 		# Determine action by PATH_INFO
-		if ( $path =~ /\/(\w[a-zA-Z0-9\_]+)/ ) {
-			$self->action( lc($1) );
-		} else {
-			$self->action('default');
-		}
+		$self->action( $self->get_action_name($path) );
 
 		# Find action handling method
 
-		$self->authenticate(session_key => $self->cgi->cookie('SESSID'));
+		$self->authenticate( session_key => $self->cgi->cookie('SESSID') );
 
 		# Call action method and get result
-		my ( $res_type, $res_data, $res_opts ) = $self->dispatch_action($self->action);
+		my ( $res_type, $res_data, $res_opts ) = $self->dispatch_action( $self->action );
 		$self->dispatch_result( $self->action, $res_type, $res_data, $res_opts );
 
-	} ## end while ( my $cgi = CGI::Fast...)
+	} ## end while ( !$self->{to_finalize...
 
 	$self->stop();
 
 } ## end sub main_loop
 
+sub get_action_method_name {
+	my ( $self, $action ) = @_;
+	return "action_" . $action;
+}
+
 sub dispatch_action {
 	my ( $self, $action ) = @_;
 	$self->action($action);
-	my $action_method = "action_" . $action;
+	my $action_method = $self->get_action_method_name($action);
 	unless ( $self->can($action_method) ) {
 		$action_method = "action_unknown";
 	}
@@ -175,7 +185,7 @@ sub action_default {
 }
 
 sub forward {
-	my ($self, $action) = @_;
+	my ( $self, $action ) = @_;
 	return $self->dispatch_action($action);
 }
 
@@ -183,7 +193,7 @@ sub authenticate {
 	my ($self)      = @_;
 	my $sess_cookie = $self->get_cookie('SESSID');
 	my ($sess_key)  = $sess_cookie ? @{$sess_cookie} : undef;
-	$self->user(NetSDS::Portal::User->new($self->authdb, '', $self));
+	$self->user( NetSDS::Portal::User->new( $self->authdb, '', $self ) );
 	if ($sess_key) {
 		$self->user()->authenticate( session_key => $sess_key );
 	}
