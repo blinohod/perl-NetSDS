@@ -28,6 +28,7 @@ use warnings 'all';
 use strict;
 
 use base 'Exporter';
+use Iterator;
 
 use version; our $VERSION = "1.044";
 
@@ -37,13 +38,13 @@ our @EXPORT = qw(
   arrays_to_hash
   to_array
   merge_hash
+  indbi
 );
 
 use Scalar::Util qw(
   blessed
   reftype
 );
-
 
 #***********************************************************************
 
@@ -188,6 +189,28 @@ sub merge_hash {
 }
 
 #**************************************************************************
+
+=item B<indbi($source)> - create an iterator over a NetSDS::DBI result object.
+
+Parameters: source reference.
+
+=cut
+
+#-----------------------------------------------------------------------
+sub indbi {
+	my ($ndbiresult) = @_;
+	my $trg = Iterator->new(
+		sub {
+			my $row = $ndbiresult->fetchrow_hashref();
+			if ( !$row ) { Iterator::is_done(); return undef; }
+			return $row;
+		}
+	  );
+	  return $trg;
+}
+
+#**************************************************************************
+
 1;
 __END__
 
