@@ -1,3 +1,59 @@
+=head1 NAME
+
+NetSDS::Util::Aggregator - an object to reorganize flat arrays into hierarchies.
+
+=head1 SYNOPSIS
+
+	#!/usr/bin/env perl
+
+	use 5.8.0;
+	use warnings;
+	use strict;
+
+	use Iterator::Util qw(iarray);
+	use NetSDS::Util::Aggregator;
+	use Data::Dumper;
+
+	my $aggregator = NetSDS::Util::Aggregator->new(
+		iarray([
+		{id => 1, name => 'Ivan', 'surname' => 'Petroff', 'group' => 'administrators', 'membership' => 'fulltime'},
+		{id => 1, name => 'Ivan', 'surname' => 'Petroff', 'group' => 'salesmen', 'membership' => 'fulltime'},
+		{id => 1, name => 'Ivan', 'surname' => 'Petroff', 'group' => 'cleaners', 'membership' => 'halftime'},
+		]), 'id', ['id', 'name', 'surname'], {groups => ['group', 'membership']}
+	);
+
+	my $res = $aggregator->iter();
+	
+	while(!$res->is_exhausted) {
+		print Dumper($res->value);
+	}
+
+	1;
+	
+Output:
+
+$VAR1 = {
+          'groups' => [
+                        {
+                          'group' => 'administrators',
+                          'membership' => 'fulltime'
+                        },
+                        {
+                          'group' => 'salesmen',
+                          'membership' => 'fulltime'
+                        }
+                      ],
+          'name' => 'Ivan',
+          'id' => 1,
+          'surname' => 'Petroff'
+        };
+
+=head1 DESCRIPTION
+
+C<NetSDS::Util::Aggregator> module lets a flat structure (like that fetchable from a RDBMS)
+to be reorganized in a hierarchical fashion.
+
+=cut
 package NetSDS::Util::Aggregator;
 
 use version; our $VERSION = 1.000;
