@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 1.400
-Release: alt2
+Release: alt3
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -63,6 +63,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Fri May 27 2011 Dmitriy Kruglikov <dkr@netstyle.com.ua> 1.400-alt3
+- Update $VERSION to 1.403
+
 * Thu May 26 2011 Dmitriy Kruglikov <dkr@netstyle.com.ua> 1.400-alt2
 - Removed unneded BuildRequires for perl-NetSDS-Utils
 
