@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 1.400
-Release: alt1
+Release: alt2
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -19,15 +19,16 @@ License: GPL
 Group: Networking/Other
 Url: http://www.netstyle.com.ua/
 
-Packager: Michael Bochkaryov <misha@altlinux.ru>
+Packager: Dmitriy Kruglikov <dkr@netstyle.com.ua>
 
 BuildArch: noarch
-Source0: %m_distro-%version.tar.gz
+Source0: %m_name-%version.tar
 
 BuildRequires: perl-libwww
 
 # Automatically added by buildreq on Mon Mar 08 2010 (-bi)
-BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Log-Agent perl-Module-Build perl-NetSDS-Util perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog
+BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Log-Agent perl-Module-Build perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog 
+BuildRequires: perl-Data-UUID perl-XML-LibXML-Simple
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -44,6 +45,8 @@ NetSDS - это гибкий и простой в использовании ф�
 
 Этот пакет содержит общие модули Perl для NetSDS
 
+%add_findreq_skiplist */*template*/*pl
+
 %prep
 %setup -q -n %m_distro-%version
 
@@ -57,10 +60,12 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %files
 %perl_vendor_privlib/NetSDS*
-%perl_vendor_man3dir/*
 %doc samples Changes
 
 %changelog
+* Thu May 26 2011 Dmitriy Kruglikov <dkr@netstyle.com.ua> 1.400-alt2
+- Removed unneded BuildRequires for perl-NetSDS-Utils
+
 * Mon Mar 08 2010 Michael Bochkaryov <misha@altlinux.ru> 1.400-alt1
 - NetSDS::LWP - simple wrapper around LWP HTTP library
 
