@@ -203,8 +203,11 @@ sub call {
 	}
 
 	# Execute SQL query
-	$sth->execute(@params);
-
+	my $rv = $sth->execute(@params);
+  unless ( defined ( $rv ) ) { 
+		return undef; 
+	} 
+	
 	return $sth;
 
 } ## end sub call
