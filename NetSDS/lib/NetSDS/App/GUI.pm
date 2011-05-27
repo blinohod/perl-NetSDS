@@ -14,7 +14,7 @@ use NetSDS::AuthDB;
 
 use NetSDS::Template;
 use NetSDS::Util::String;
-use NetSDS::Portal::User;
+use NetSDS::WebUser;
 
 #===============================================================================
 
@@ -54,7 +54,7 @@ sub initialize {
 
 	$self->mk_accessors('cgi');       # CGI.pm object
 	$self->mk_accessors('authdb');    # AAA data source (see NetSDS::AuthDB)
-	$self->mk_accessors('user');      # User object (see NetSDS::Portal::User)
+	$self->mk_accessors('user');      # User object (see NetSDS::WebUser)
 	$self->mk_accessors('action');    # Action called
 	$self->mk_accessors('cookie');    # cookies to set
 	$self->mk_accessors('remote_ip');
@@ -193,7 +193,7 @@ sub authenticate {
 	my ($self)      = @_;
 	my $sess_cookie = $self->get_cookie('SESSID');
 	my ($sess_key)  = $sess_cookie ? @{$sess_cookie} : undef;
-	$self->user( NetSDS::Portal::User->new( $self->authdb, '', $self ) );
+	$self->user( NetSDS::WebUser->new( $self->authdb, '', $self ) );
 	if ($sess_key) {
 		$self->user()->authenticate( session_key => $sess_key );
 	}
