@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 NetSDS::Util::Aggregator - an object to reorganize flat arrays into hierarchies.
@@ -54,6 +55,7 @@ C<NetSDS::Util::Aggregator> module lets a flat structure (like that fetchable fr
 to be reorganized in a hierarchical fashion.
 
 =cut
+
 package NetSDS::Util::Aggregator;
 
 use version; our $VERSION = 1.000;
@@ -68,6 +70,7 @@ sub new {
 		aggregated => $aggregated,
 		current    => undef,
 		keyfield   => $keyfield,
+		am_done => 0
 	};
 	bless $self, $class;
 	return $self;
@@ -77,31 +80,32 @@ sub iter {
 	my $self = shift;
 	return Iterator->new(
 		sub {
-			if ( $self->{source}->is_exhausted ) {
-				Iterator::is_done;
-			}
-			my $currec;
-			if ( !$self->{current} ) {
-				$self->{current} = $self->{source}->value();
-			}
-			$currec = $self->{current};
-			my $tmp_rec = {};
+			Iterator::is_done() if $self->{am_done};
+			my $current_kf = undef;
+			my $tmp_rec    = {};
 			do {
-				$self->{current} = $currec;
-				foreach my $key ( @{ $self->{static} } ) {
-					$tmp_rec->{$key} = $currec->{$key};
+				$self->{current} = $self->{source}->value() unless defined( $self->{current} );
+				unless ($current_kf) {
+					foreach my $key ( @{ $self->{static} } ) {
+						$tmp_rec->{$key} = $self->{current}->{$key};
+					}
+					$current_kf = $self->{current}->{ $self->{keyfield} };
 				}
 				foreach my $akey ( keys %{ $self->{aggregated} } ) {
 					$tmp_rec->{$akey} = [] if !$tmp_rec->{$akey};
 					my $tmp_row = {};
 					foreach my $vkey ( @{ $self->{aggregated}->{$akey} } ) {
-						$tmp_row->{$vkey} = $currec->{$vkey};
+						$tmp_row->{$vkey} = $self->{current}->{$vkey};
 					}
 					push @{ $tmp_rec->{$akey} }, $tmp_row;
 				}
-				$currec = $self->{source}->value();
-			} while ( ( !$self->{source}->is_exhausted() ) && ( $currec->{ $self->{keyfield} } eq $self->{current}->{ $self->{keyfield} } ) );
-			$self->{current} = $currec;
+				unless ( $self->{source}->is_exhausted() ) {
+					$self->{current} = $self->{source}->value();
+				} else {
+					$self->{current} = {};
+					$self->{am_done} = 1;
+				}
+			} while ( ( !$self->{source}->is_exhausted() ) && ( $current_kf eq $self->{current}->{ $self->{keyfield} } ) );
 			return $tmp_rec;
 		}
 	);
