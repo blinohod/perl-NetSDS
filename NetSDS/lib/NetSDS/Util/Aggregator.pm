@@ -105,7 +105,7 @@ sub iter {
 					$self->{current} = {};
 					$self->{am_done} = 1;
 				}
-			} while ( ( !$self->{source}->is_exhausted() ) && ( $current_kf eq $self->{current}->{ $self->{keyfield} } ) );
+			} while ( ( !$self->{am_done} ) && ( $current_kf eq $self->{current}->{ $self->{keyfield} } ) );
 			return $tmp_rec;
 		}
 	);
