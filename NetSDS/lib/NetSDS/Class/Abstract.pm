@@ -1,14 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Abstract.pm
-#
-#  DESCRIPTION:  Abstract Class for other NetSDS code
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  24.04.2008 11:42:42 EEST
-#===============================================================================
-
 =head1 NAME
 
 NetSDS::Class::Abstract - superclass for all NetSDS APIs
@@ -57,17 +46,15 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use base qw(
-  Class::Accessor::Class
-);
+use mro 'c3';
+
+use base 'Class::Accessor::Class';
 
 # Error handling class variables
 our $_ERRSTR;     # error string
 our $_ERRCODE;    # error code
 
-use Data::Structure::Util;    # unblessing objects
-
-use version; our $VERSION = '1.400';
+use version; our $VERSION = '2.000';
 
 #***********************************************************************
 
@@ -157,26 +144,6 @@ sub use_modules {
 
 	return 1;
 
-}
-
-#***********************************************************************
-
-=item B<unbless()> - return unblessed object
-
-Return unblessed data structure of object that may be used when some
-code requires non blessed structures (like JSON serialization).
-
-Example:
-
-	my $var = $obj->unbless();
-
-=cut
-
-#-----------------------------------------------------------------------
-sub unbless {
-
-	my ($self) = @_;
-	return Data::Structure::Util::unbless($self);
 }
 
 #***********************************************************************
