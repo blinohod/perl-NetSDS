@@ -46,6 +46,8 @@ use 5.8.0;
 use strict;
 use warnings;
 
+use diagnostics -traceonly;
+
 use mro 'c3';
 
 use base 'Class::Accessor::Class';
