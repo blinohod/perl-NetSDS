@@ -26,6 +26,18 @@ use Exception::Class (
 		'description' => 'Generic exception',
 		'fields'      => ['message'],
 	},
+	'NetSDS::Exception::DBI' => {
+		'isa'         => 'NetSDS::Exception::Generic',
+		'description' => 'DBMS operation error',
+	},
+	'NetSDS::Exception::DBI::Connect' => {
+		'isa'         => 'NetSDS::Exception::DBI',
+		'description' => 'DBMS connection error',
+	},
+	'NetSDS::Exception::DBI::SQL' => {
+		'isa'         => 'NetSDS::Exception::DBI',
+		'description' => 'SQL statement error',
+	},
 );
 
 1;
