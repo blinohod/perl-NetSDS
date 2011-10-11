@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Conf.pm
-#
-#  DESCRIPTION:  Configuration handling via command line and Config::General
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  16.05.2008 12:24:55 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -36,9 +26,10 @@ use 5.8.0;
 use strict;
 use warnings;
 
+use NetSDS::Exceptions;
 use Config::General;
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = '2.000';
 
 #***********************************************************************
 
@@ -63,28 +54,36 @@ sub getconf {
 
 	my ( $proto, $cf ) = @_;
 
-	# Check if configuration file available for reading and read data
-	if ( $cf and ( -f $cf ) and ( -r $cf ) ) {
-
-		my $conf = Config::General->new(
-			-ConfigFile        => $cf,
-			-AllowMultiOptions => 'yes',
-			-UseApacheInclude  => 'yes',
-			-InterPolateVars   => 'yes',
-			-ConfigPath        => [ $ENV{NETSDS_CONF_DIR}, '/etc/NetSDS' ],
-			-IncludeRelative   => 'yes',
-			-IncludeGlob       => 'yes',
-			-UTF8              => 'yes',
-		);
-
-		# Parse configuration file
-		my %cf_hash = $conf->getall;
-
-		return \%cf_hash;
-
-	} else {
-		return undef;
+	# Check if configuration file name is set.
+	unless ($cf) {
+		NetSDS::Exception::Config->throw( message => 'Configuration file name not set.' );
 	}
+
+	# Check if configuration file exists and is available for reading
+	unless ( ( -f $cf ) or ( -r $cf ) ) {
+		NetSDS::Exception::Config->throw( message => 'Configuration file not exists or is not readable: ' . $cf );
+	}
+
+	# Read configuration file
+	my $conf = Config::General->new(
+		-ConfigFile        => $cf,
+		-AllowMultiOptions => 'yes',
+		-UseApacheInclude  => 'yes',
+		-InterPolateVars   => 'yes',
+		-ConfigPath        => [ $ENV{NETSDS_CONF_DIR}, '/etc/NetSDS' ],
+		-IncludeRelative   => 'yes',
+		-IncludeGlob       => 'yes',
+		-UTF8              => 'yes',
+	);
+
+	unless ( ref $conf ) {
+		NetSDS::Exception::Config->throw( message => 'Configuration file parsing error' );
+	}
+
+	# Parse configuration file
+	my %cf_hash = $conf->getall || ();
+
+	return \%cf_hash;
 
 } ## end sub getconf
 
@@ -103,7 +102,7 @@ Unknown
 
 =head1 SEE ALSO
 
-L<Getopt::Long>, L<Config::General>, L<NetSDS::Class::Abstract>
+L<Config::General>
 
 =head1 TODO
 
