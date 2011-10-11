@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 NetSDS::Class::Abstract - superclass for all NetSDS APIs
@@ -52,6 +53,8 @@ use mro 'c3';
 
 use base 'Class::Accessor::Class';
 
+use NetSDS::Exceptions;
+
 # Error handling class variables
 our $_ERRSTR;     # error string
 our $_ERRCODE;    # error code
@@ -83,6 +86,7 @@ Constructor requres parameters as hash that are set as object properties.
 sub new {
 
 	my ( $proto, %params ) = @_;
+
 	my $class = ref($proto) || $proto;
 
 	my $self = \%params;
@@ -181,6 +185,8 @@ __PACKAGE__->mk_accessors('logger');    # Logger
 
 Paramters: log level, log message
 
+Example:
+
 	$obj->log("info", "We still alive");
 
 =cut 
@@ -205,6 +211,12 @@ sub log {
 
 =head1 ERROR HANDLING
 
+C<NetSDS::Class::Abstract> provides common instruments for handling
+errors in more intelligent way than just return flase value.
+
+When some subroutine should return error, it is recommended to use C<error()>
+method with mentioning error message and optional code.
+
 =over
 
 =item B<error($msg, [$code])> - set error message and code
@@ -214,11 +226,11 @@ It can be invoked in both class and object contexts.
 
 Example 1: set class error
 
-	NetSDS::Foo->error("Mistake found");
+	return NetSDS::Foo->error("Mistake found");
 
 Example 2: set object error with code
 
-	$obj->error("Can't launch rocket", BUG_STUPID);
+	return $obj->error("Can't launch rocket", BUG_STUPID);
 
 =cut
 
@@ -306,7 +318,7 @@ Michael Bochkaryov <misha@rattler.kiev.ua>
 
 =head1 LICENSE
 
-Copyright (C) 2008-2010 Net Style Ltd.
+Copyright (C) 2008-2011 Net Style Ltd.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
