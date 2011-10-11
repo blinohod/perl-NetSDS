@@ -26,6 +26,8 @@ use Exception::Class (
 		'description' => 'Generic exception',
 		'fields'      => ['message'],
 	},
+
+	# DBMS related
 	'NetSDS::Exception::DBI' => {
 		'isa'         => 'NetSDS::Exception::Generic',
 		'description' => 'DBMS operation error',
@@ -38,6 +40,13 @@ use Exception::Class (
 		'isa'         => 'NetSDS::Exception::DBI',
 		'description' => 'SQL statement error',
 	},
+
+	# Application errors
+	'NetSDS::Exception::Config' => {
+		'isa'         => 'NetSDS::Exception::Generic',
+		'description' => 'Configuration file error',
+	},
+
 );
 
 1;
