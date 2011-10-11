@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#         FILE:  DBI.pm
-#
-#  DESCRIPTION:  DBI wrapper for NetSDS
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  31.07.2009 13:56:33 UTC
-#===============================================================================
 
 =head1 NAME
 
@@ -41,7 +31,7 @@ use DBI;
 
 use base 'NetSDS::Class::Abstract';
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = '2.000';
 
 #===============================================================================
 
@@ -87,10 +77,16 @@ sub new {
 				unshift( @{$sets}, "SET DATESTYLE TO 'ISO'" );
 			}
 
+			# Set MySQL default init queries
+			if ( 'mysql' eq $dsn_driver ) {
+				unshift( @{$sets}, "SET NAMES utf8" );
+			}
+
 			# Set UTF-8 support
 			$attrs = {
 				%{$attrs},
-				pg_enable_utf8 => 1,
+				pg_enable_utf8    => 1,
+				mysql_enable_utf8 => 1,
 			};
 
 		} else {
@@ -204,10 +200,10 @@ sub call {
 
 	# Execute SQL query
 	my $rv = $sth->execute(@params);
-  unless ( defined ( $rv ) ) { 
-		return undef; 
-	} 
-	
+	unless ( defined($rv) ) {
+		return undef;
+	}
+
 	return $sth;
 
 } ## end sub call
@@ -455,5 +451,4 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
-
 
