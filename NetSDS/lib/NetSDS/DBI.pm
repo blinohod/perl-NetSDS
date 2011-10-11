@@ -90,11 +90,11 @@ sub new {
 			};
 
 		} else {
-			return $class->error( "Can't parse DBI DSN: " . $params{dsn} );
+			NetSDS::Exception::DBI::Connect->throw( message => 'Cannot parse DSN.' );
 		}
 
 	} else {
-		return $class->error("Can't initialize DBI connection without DSN");
+		NetSDS::Exception::DBI::Connect->throw( message => 'Cannot connect without DSN provided.' );
 	}
 
 	# initialize parent class
@@ -108,10 +108,9 @@ sub new {
 		%params,
 	);
 
-	# Implement SQL debugging
-	if ( $params{debug_sql} ) {
-		$self->{debug_sql} = 1;
-	}
+	# Set module configuration parameters
+	$self->{debug_sql}      = $params{debug_sql};         # SQL debugging flag
+	$self->{prepare_cached} = $params{prepare_cached};    # Cache prepared statements by default
 
 	# Create object accessor for DBMS handler
 	$self->mk_accessors('dbh');
@@ -119,7 +118,8 @@ sub new {
 	# Add initialization SQL queries
 	$self->_add_sets( @{$sets} );
 
-	$attrs->{PrintError} = 0;
+	$attrs->{AutoCommit} = 1;                             # Commit each statement unless implicit transaction
+	$attrs->{PrintError} = 0;                             # Errors output is implemented other way
 	$self->_add_attrs( %{$attrs} );
 
 	# Connect to DBMS
@@ -181,27 +181,24 @@ sub call {
 
 	my ( $self, $sql, @params ) = @_;
 
-	# Debug SQL
+	# Running SQL debug if required
 	if ( $self->{debug_sql} ) {
-		$self->log( "debug", "SQL: $sql" );
+		$self->log( "debug", "RUN SQL:\n$sql" );
 	}
 
-	# First check connection and try to restore if necessary
-	unless ( $self->_check_connection() ) {
-		return $self->error("Database connection error!");
-	}
+	$self->_check_connection();
 
-	# Prepare cached SQL query
-	# FIXME my $sth = $self->dbh->prepare_cached($sql);
-	my $sth = $self->dbh->prepare($sql);
-	unless ($sth) {
-		return $self->error("Can't prepare SQL query: $sql");
+	# Prepare SQL query
+	my $sth = $self->{prepare_cached} ? $self->dbh->prepare_cached($sql) : $self->dbh->prepare($sql);
+
+	unless ( defined $sth ) {
+		NetSDS::Exception::DBI::SQL->throw( message => "Cannot prepare SQL query: $sql" );
 	}
 
 	# Execute SQL query
 	my $rv = $sth->execute(@params);
-	unless ( defined($rv) ) {
-		return undef;
+	unless ( defined $rv ) {
+		NetSDS::Exception::DBI::SQL->throw( message => "Cannot execute SQL query: $sql" );
 	}
 
 	return $sth;
@@ -354,9 +351,9 @@ sub _add_attrs {
 
 #***********************************************************************
 
-=item B<_check_connection()> - ping and reconnect
+=item B<_check_connection()> - check connection to DBMS
 
-Internal method checking connection and implement reconnect
+Internal method checking connection and throw exception in case of problem.
 
 =cut 
 
@@ -370,7 +367,7 @@ sub _check_connection {
 		if ( $self->dbh->ping() ) {
 			return 1;
 		} else {
-			return $self->_connect();
+			NetSDS::Exception::DBI::Connect->throw( message => 'Lost connection to DBMS' );
 		}
 	}
 }
@@ -392,20 +389,19 @@ sub _connect {
 	# Try to connect to DBMS
 	$self->dbh( DBI->connect_cached( $self->{dsn}, $self->{login}, $self->{passwd}, $self->{attrs} ) );
 
-	if ( $self->dbh ) {
+	# Exit with exception if cannot process
+	unless ( $self->dbh ) {
+		NetSDS::Exception::DBI::Connect->throw( message => 'Cannot connect to DBMS: ' . $DBI::errstr );
+	}
 
-		# All OK - drop error state
-		$self->error(undef);
+	# Call startup SQL queries
+	foreach my $row ( @{ $self->{sets} } ) {
 
-		# Call startup SQL queries
-		foreach my $row ( @{ $self->{sets} } ) {
-			unless ( $self->dbh->do($row) ) {
-				return $self->error( $self->dbh->errstr || 'Set error in connect' );
-			}
+		# Disconnect if cannot launch setup queries
+		unless ( $self->dbh->do($row) ) {
+			$self->dbh->disconnect();
+			NetSDS::Exception::DBI::Connect->throw( message => 'Cannot run setup SQL statement: ' . $self->dbh->errstr );
 		}
-
-	} else {
-		return $self->error( "Can't connect to DBMS: " . $DBI::errstr );
 	}
 
 } ## end sub _connect
