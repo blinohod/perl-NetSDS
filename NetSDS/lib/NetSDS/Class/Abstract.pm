@@ -11,9 +11,9 @@ NetSDS::Class::Abstract - superclass for all NetSDS APIs
 	__PACKAGE__->mk_accessors(qw/my_field/);
 
 	sub error_sub {
-		my ($self) = @_;
-		if (!$self->my_field) {
-			return $self->error("No my_field defined");
+		my ($this) = @_;
+		if (!$this->my_field) {
+			return $this->error("No my_field defined");
 		}
 	}
 
@@ -89,11 +89,11 @@ sub new {
 
 	my $class = ref($proto) || $proto;
 
-	my $self = \%params;
+	my $this = \%params;
 
-	bless( $self, $class );
+	bless( $this, $class );
 
-	return $self;
+	return $this;
 
 }
 
@@ -109,7 +109,7 @@ See L<Class::Accessor> for details.
 
 See L<Class::Accessor::Class> for details.
 
-	$self->mk_accessors('foo', 'bar');
+	$this->mk_accessors('foo', 'bar');
 
 Other C<Class::Accessor::Class> methods available as well.
 
@@ -131,7 +131,7 @@ Example:
 
 	# Load modules for daemonization
 	if ($daemon_mode) {
-		$self->use_modules("Proc::Daemon", "Proc::PID::File");
+		$this->use_modules("Proc::Daemon", "Proc::PID::File");
 	}
 
 =cut
@@ -139,12 +139,12 @@ Example:
 #-----------------------------------------------------------------------
 sub use_modules {
 
-	my $self = shift(@_);
+	my $this = shift(@_);
 
 	foreach my $mod (@_) {
 		eval "use $mod;";
 		if ($@) {
-			return $self->error($@);
+			return $this->error($@);
 		}
 	}
 
@@ -195,11 +195,11 @@ Example:
 
 sub log {
 
-	my ( $self, $level, $msg ) = @_;
+	my ( $this, $level, $msg ) = @_;
 
 	# Logger expected to provide "log()" method
-	if ( $self->logger() and $self->logger()->can('log') ) {
-		$self->logger->log( $level, $msg );
+	if ( $this->logger() and $this->logger()->can('log') ) {
+		$this->logger->log( $level, $msg );
 	} else {
 		warn "[$level] $msg\n";
 	}
@@ -238,14 +238,14 @@ Example 2: set object error with code
 
 sub error {
 
-	my ( $self, $msg, $code ) = @_;
+	my ( $this, $msg, $code ) = @_;
 
 	$msg  ||= '';    # error message
 	$code ||= '';    # error code
 
-	if ( ref($self) ) {
-		$self->{_errstr}  = $msg;
-		$self->{_errcode} = $code;
+	if ( ref($this) ) {
+		$this->{_errstr}  = $msg;
+		$this->{_errcode} = $code;
 	} else {
 		$_ERRSTR  = $msg;
 		$_ERRCODE = $code;
@@ -270,8 +270,8 @@ Example:
 
 sub errstr {
 
-	my $self = shift;
-	return ref($self) ? $self->{_errstr} : $_ERRSTR;
+	my $this = shift;
+	return ref($this) ? $this->{_errstr} : $_ERRSTR;
 
 }
 
@@ -293,8 +293,8 @@ Example:
 
 sub errcode {
 
-	my $self = shift;
-	return ref($self) ? $self->{_errcode} : $_ERRCODE;
+	my $this = shift;
+	return ref($this) ? $this->{_errcode} : $_ERRCODE;
 
 }
 
