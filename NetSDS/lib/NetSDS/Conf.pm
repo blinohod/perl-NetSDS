@@ -80,8 +80,8 @@ sub getconf {
 		NetSDS::Exception::Config->throw( message => 'Configuration file parsing error' );
 	}
 
-	# Parse configuration file
-	my %cf_hash = $conf->getall || ();
+	# Fetch parsed configuration
+	my %cf_hash = $conf->getall or ();
 
 	return \%cf_hash;
 
