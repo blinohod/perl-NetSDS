@@ -49,6 +49,7 @@ BuildRequires: perl-Proc-PID-File
 BuildRequires: perl-Test-Pod
 BuildRequires: perl-Test-Pod-Coverage
 BuildRequires: perl-Unix-Syslog
+BuildRequires: perl-Iterator
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -83,6 +84,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt1
+- Build requirements fixed (perl-Iterator).
+
 * Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt1
 - Build requirements fixed (Exception::Class).
 
