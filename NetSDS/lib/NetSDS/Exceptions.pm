@@ -53,8 +53,6 @@ use Exception::Class (
 
 __END__
 
-=back
-
 =head1 EXAMPLES
 
 =head1 BUGS
