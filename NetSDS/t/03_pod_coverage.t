@@ -9,7 +9,6 @@
 #      COMPANY:  Net.Style
 #      VERSION:  1.0
 #      CREATED:  13.07.2008 23:54:48 EEST
-#     REVISION:  $Id: 03_pod_coverage.t 8 2008-07-13 21:11:35Z misha $
 #===============================================================================
 
 use strict;
