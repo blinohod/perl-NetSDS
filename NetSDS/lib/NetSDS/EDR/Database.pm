@@ -126,6 +126,10 @@ sub _prepare_query {
 
 }
 
+=item B<write(@records, $mapping)> - write records
+
+=cut 
+
 sub write { 
 	#my ($this, @records, $mapping) = @_; 
 

@@ -112,6 +112,25 @@ sub new {
 
 #***********************************************************************
 
+=item B<functions($name, %functions)> - register functions
+
+
+=cut
+
+#-----------------------------------------------------------------------
+
+
+sub functions {
+	my ( $self, $name, %functions ) = @_;
+	my $tpl = $self->{'templates'}->{$name};
+	unless ($tpl) {
+		return $self->error("Wrong template name: '$name'");
+	}
+	$tpl->register_function(%functions);
+}
+
+#***********************************************************************
+
 =item B<render($tmpl_name, %params)> - render document by template and paramters
 
 This method prepares set of parameters and applies them to given template.
@@ -128,15 +147,6 @@ Example:
 =cut
 
 #-----------------------------------------------------------------------
-
-sub functions {
-	my ( $self, $name, %functions ) = @_;
-	my $tpl = $self->{'templates'}->{$name};
-	unless ($tpl) {
-		return $self->error("Wrong template name: '$name'");
-	}
-	$tpl->register_function(%functions);
-}
 
 sub render {
 

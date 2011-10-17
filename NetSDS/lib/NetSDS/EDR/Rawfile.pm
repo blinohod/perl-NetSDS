@@ -83,6 +83,10 @@ sub new {
 #-----------------------------------------------------------------------
 #__PACKAGE__->mk_accessors('user');
 
+=item B<write(@records, $mapping)> - write records
+
+=cut
+
 sub write {
 
 	my $self = shift; 

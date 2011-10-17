@@ -84,6 +84,10 @@ sub new {
 
 #-----------------------------------------------------------------------
 
+=item B<write(@records, $mapping)> - write records
+
+=cut
+
 sub write {
 
 	my $this = shift; 
