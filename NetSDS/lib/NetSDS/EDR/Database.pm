@@ -12,15 +12,15 @@
 #===============================================================================
 =head1 NAME
 
-NetSDS::
+NetSDS::EDR::Database
 
 =head1 SYNOPSIS
 
-	use NetSDS::;
+	use NetSDS::EDR::Database;
 
 =head1 DESCRIPTION
 
-C<NetSDS> module contains superclass all other classes should be inherited from.
+C<NetSDS::EDR::Database> module provides EDR to DB functionality.
 
 =cut
 
@@ -79,6 +79,9 @@ sub new {
 };
 
 #***********************************************************************
+
+=back
+
 =head1 OBJECT METHODS
 
 =over
