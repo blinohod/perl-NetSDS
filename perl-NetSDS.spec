@@ -8,7 +8,7 @@
 
 
 Name: perl-NetSDS
-Version: 1.400
+Version: 2.000
 Release: alt3
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -28,7 +28,7 @@ BuildRequires: perl-libwww
 
 # Automatically added by buildreq on Mon Mar 08 2010 (-bi)
 BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Log-Agent perl-Module-Build perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog 
-BuildRequires: perl-Data-UUID perl-XML-LibXML-Simple
+BuildRequires: perl-Data-UUID 
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -63,6 +63,10 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt3
+- version update to 2.000
+- removed modules that aren't relevany to core functionality
+
 * Fri May 27 2011 Dmitriy Kruglikov <dkr@netstyle.com.ua> 1.400-alt3
 - Update $VERSION to 1.403
 
