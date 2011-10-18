@@ -13,7 +13,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;                      # last test to print
+use Test::More;
 
 BEGIN {
 	use_ok('NetSDS');
@@ -28,10 +28,10 @@ BEGIN {
 	use_ok('NetSDS::LWP');
 	use_ok('NetSDS::Session');
 	use_ok('NetSDS::Template');
-	use_ok('NetSDS::Translate');
 	use_ok('NetSDS::App');
 	use_ok('NetSDS::App::FCGI');
 	use_ok('NetSDS::App::JSRPC');
-	use_ok('NetSDS::App::SMTPD');
+
+	done_testing();
 }
 

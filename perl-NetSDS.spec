@@ -8,8 +8,8 @@
 
 
 Name: perl-NetSDS
-Version: 1.400
-Release: alt3
+Version: 2.000
+Release: alt2
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -27,8 +27,29 @@ Source0: %m_name-%version.tar
 BuildRequires: perl-libwww
 
 # Automatically added by buildreq on Mon Mar 08 2010 (-bi)
-BuildRequires: perl-Cache-Memcached-Fast perl-CGI perl-Class-Accessor-Class perl-Class-ErrorHandler perl-Config-General perl-Data-Structure-Util perl-DBD-Pg perl-FCGI perl-HTML-Template-Pro perl-JSON perl-JSON-XS perl-Locale-gettext perl-Log-Agent perl-Module-Build perl-Net-Server-Mail perl-Proc-Daemon perl-Proc-PID-File perl-Test-Pod perl-Test-Pod-Coverage perl-Unix-Syslog 
-BuildRequires: perl-Data-UUID perl-XML-LibXML-Simple
+BuildRequires: perl-CGI 
+BuildRequires: perl-Cache-Memcached-Fast
+BuildRequires: perl-Class-Accessor-Class
+BuildRequires: perl-Class-ErrorHandler
+BuildRequires: perl-Config-General
+BuildRequires: perl-DBD-Pg
+BuildRequires: perl-Data-UUID 
+BuildRequires: perl-Data-Structure-Util
+BuildRequires: perl-Exception-Class
+BuildRequires: perl-FCGI
+BuildRequires: perl-HTML-Template-Pro
+BuildRequires: perl-JSON
+BuildRequires: perl-JSON-XS
+BuildRequires: perl-Locale-gettext
+BuildRequires: perl-Log-Agent
+BuildRequires: perl-Module-Build
+BuildRequires: perl-Net-Server-Mail
+BuildRequires: perl-Proc-Daemon
+BuildRequires: perl-Proc-PID-File
+BuildRequires: perl-Test-Pod
+BuildRequires: perl-Test-Pod-Coverage
+BuildRequires: perl-Unix-Syslog
+BuildRequires: perl-Iterator
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -63,6 +84,19 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt2
+- Clear build.
+
+* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt1
+- Build requirements fixed (perl-Iterator).
+
+* Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt1
+- Build requirements fixed (Exception::Class).
+
+* Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt0
+- version update to 2.000
+- removed modules that aren't relevany to core functionality
+
 * Fri May 27 2011 Dmitriy Kruglikov <dkr@netstyle.com.ua> 1.400-alt3
 - Update $VERSION to 1.403
 

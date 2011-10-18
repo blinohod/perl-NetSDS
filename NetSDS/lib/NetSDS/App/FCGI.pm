@@ -1,14 +1,3 @@
-#===============================================================================
-#
-#         FILE:  FCGI.pm
-#
-#  DESCRIPTION:  Common FastCGI applications framework
-#
-#        NOTES:  This fr
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  15.07.2008 16:54:45 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -55,7 +44,7 @@ use base 'NetSDS::App';
 use CGI::Fast;
 use CGI::Cookie;
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = '2.000';
 
 #***********************************************************************
 
@@ -236,7 +225,7 @@ sub main_loop {
 	$self->{verbose} = undef;
 
 	# Enter FastCGI loop
-	$CGI::Fast::Ext_Request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, 0, FCGI::FAIL_ACCEPT_ON_INTR());
+	$CGI::Fast::Ext_Request = FCGI::Request( \*STDIN, \*STDOUT, \*STDERR, \%ENV, 0, FCGI::FAIL_ACCEPT_ON_INTR() );
 	while ( $self->cgi( CGI::Fast->new() ) ) {
 
 		# Retrieve request cookies
@@ -281,9 +270,9 @@ sub main_loop {
 				binmode STDOUT;
 				print $self->data;
 			}
-		} ## end else [ if ( $self->redirect )
+		} ## end else [ if ( $self->redirect )]
 
-	} ## end while ( $self->cgi( CGI::Fast...
+	} ## end while ( $self->cgi( CGI::Fast...))
 
 	# Call finalization hooks
 	$self->stop();
@@ -575,7 +564,7 @@ See C<samples> catalog for more example code.
 
 =head1 SEE ALSO
 
-L<CGI>, L<CGI::Fast>, L<NetSDS::App>
+L<CGI>, L<CGI::Fast>, L<FCGI::ProcManager>, L<NetSDS::App>
 
 =head1 AUTHOR
 
@@ -600,5 +589,4 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
-
 

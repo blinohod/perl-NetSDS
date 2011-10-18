@@ -72,6 +72,8 @@ sub new {
 
 #***********************************************************************
 
+=back
+
 =head1 OBJECT METHODS
 
 =over
@@ -81,6 +83,10 @@ sub new {
 =cut
 
 #-----------------------------------------------------------------------
+
+=item B<write(@records, $mapping)> - write records
+
+=cut
 
 sub write {
 

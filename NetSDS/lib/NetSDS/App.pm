@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#       MODULE:  NetSDS::App
-#
-#  DESCRIPTION:  Common NetSDS application framework
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#
-#===============================================================================
 
 =head1 NAME
 
@@ -37,22 +27,22 @@ B<NetSDS::App> - common application superclass
 
 	# Startup hook
 	sub start {
-		my ($self) = @_;
+		my ($this) = @_;
 
 		# Use configuration
-		$self->{listen_port} = $self->conf->{listen_port};
+		$this->{listen_port} = $this->conf->{listen_port};
 
 		# Use logging subsystem
-		$self->log("info", "Application successfully started with PID=".$self->pid);
+		$this->log("info", "Application successfully started with PID=".$this->pid);
 	}
 
 	# Main processing hook
 	sub process {
-		my ($self) = @_;
+		my ($this) = @_;
 		print "Hello!";
 
 		# Use verbose output
-		$self->speak("Trying to be more verbose");
+		$this->speak("Trying to be more verbose");
 
 	}
 
@@ -262,7 +252,7 @@ sub new {
 
 	my ( $class, %params ) = @_;
 
-	my $self = $class->SUPER::new(
+	my $this = $class->SUPER::new(
 		name          => undef,                # application name
 		pid           => $$,                   # proccess PID
 		debug         => undef,                # debug mode flag
@@ -280,7 +270,7 @@ sub new {
 		%params,
 	);
 
-	return $self;
+	return $this;
 
 } ## end sub new
 
@@ -348,7 +338,7 @@ sub run {
 This method is an accessor to application name allowing to retrieve
 this or set new one.
 
-	print "My name is " . $self->name;
+	print "My name is " . $this->name;
 
 =cut 
 
@@ -362,7 +352,7 @@ __PACKAGE__->mk_accessors('name');
 
 Read only access to process identifier (PID).
 
-	print "My PID is " . $self->pid;
+	print "My PID is " . $this->pid;
 
 =cut 
 
@@ -377,7 +367,7 @@ __PACKAGE__->mk_ro_accessors('pid');
 This method provides an accessor to debugging flag.
 If application called with --debug option it will return TRUE value.
 
-	if ($self->debug) {
+	if ($this->debug) {
 		print "Debug info: " . $debug_data;
 	}
 
@@ -395,7 +385,7 @@ This method provides an accessor to verbosity flag.
 
 It may be used to increase application verbosity level if necessary.
 
-	if ($self->verbose) {
+	if ($this->verbose) {
 		print "I'm working!";
 	};
 
@@ -444,8 +434,8 @@ Configuration sample:
 Code sample:
 
 	# Retrieve configuration
-	my $content_dir = $self->conf->{content_dir};
-	my $kannel_url = $self->conf->{kannel}->{send_url};
+	my $content_dir = $this->conf->{content_dir};
+	my $kannel_url = $this->conf->{kannel}->{send_url};
 
 =cut
 
@@ -483,8 +473,8 @@ __PACKAGE__->mk_accessors('pid_dir');
 
 Paramters: TRUE if application should be a daemon
 
-	if ($self->daemon()) {
-		$self->log("info", "Yeah! I'm daemon!");
+	if ($this->daemon()) {
+		$this->log("info", "Yeah! I'm daemon!");
 	};
 
 =cut 
@@ -554,80 +544,80 @@ Common application initialization:
 
 #-----------------------------------------------------------------------
 sub initialize {
-	my ( $self, %params ) = @_;
+	my ( $this, %params ) = @_;
 
-	$self->speak("Initializing application.");
+	$this->speak("Initializing application.");
 	# Determine application name from process name
-	if ( !$self->{name} ) {
-		$self->_determine_name();
+	if ( !$this->{name} ) {
+		$this->_determine_name();
 	}
 
 	# Get CLI parameters
-	$self->_get_cli_param();
+	$this->_get_cli_param();
 
 	# Daemonize, if needed
-	if ( $self->daemon() ) {
-		$self->speak("Daemonize, switch verbosity to false.");
-		$self->{verbose} = undef;
+	if ( $this->daemon() ) {
+		$this->speak("Daemonize, switch verbosity to false.");
+		$this->{verbose} = undef;
 		Proc::Daemon::Init;
 	}
 
 	# Update PID if necessary
-	$self->{pid} = $$;
+	$this->{pid} = $$;
 
 	# Create syslog handler
-	if ( !$self->logger ) {
-		$self->logger( NetSDS::Logger->new( name => $self->{name} ) );
-		$self->log( "info", "Logger started" );
+	if ( !$this->logger ) {
+		$this->logger( NetSDS::Logger->new( name => $this->{name} ) );
+		$this->log( "info", "Logger started" );
 	}
 
 	# Initialize EDR writer
-	if ( $self->edr_file ) {
-		$self->{edr_writer} = NetSDS::EDR->new( filename => $self->edr_file );
+	if ( $this->edr_file ) {
+		$this->{edr_writer} = NetSDS::EDR->new( filename => $this->edr_file );
 	}
 
 	# Process PID file if necessary
-	if ( $self->use_pidfile() ) {
-		if ( Proc::PID::File->running( dir => $self->pid_dir, name => $self->name ) ) {
-			$self->log( "error", "Application already running, stop immediately!" );
+	if ( $this->use_pidfile() ) {
+		if ( Proc::PID::File->running( dir => $this->pid_dir, name => $this->name ) ) {
+			$this->log( "error", "Application already running, stop immediately!" );
 			die "Application already running, stop immediately!";
 		}
 	}
 
 	# Initialize configuration
-	if ( $self->{has_conf} ) {
-		$self->log("info", "Conffile: ".$self->{conf_file});
+	if ( $this->{has_conf} ) {
+		$this->log( "info", "Conffile: " . $this->{conf_file} );
 		# Automatically determine configuration file name
-		if ( !$self->{conf_file} ) {
-			$self->{conf_file} = $self->config_file( $self->{name} . ".conf" );
+		if ( !$this->{conf_file} ) {
+			$this->{conf_file} = $this->config_file( $this->{name} . ".conf" );
 		}
 
 		# Get configuration file
-		if ( my $conf = NetSDS::Conf->getconf( $self->{conf_file} ) ) {
-			$self->conf($conf);
-			$self->log( "info", "Configuration file read OK: " . $self->{conf_file} );
+		if ( my $conf = NetSDS::Conf->getconf( $this->{conf_file} ) ) {
+			$this->conf($conf);
+			$this->log( "info", "Configuration file read OK: " . $this->{conf_file} );
 		} else {
-			$self->log( "error", "Can't read configuration file: " . $self->{conf_file} );
+			$this->log( "error", "Can't read configuration file: " . $this->{conf_file} );
 		}
 
 		# Add automatic features
-		if ( $self->auto_features ) {
-			$self->use_auto_features();
+		if ( $this->auto_features ) {
+			$this->use_auto_features();
 		}
 
-	} ## end if ( $self->{has_conf})
+	} ## end if ( $this->{has_conf})
 
 	# Add signal handlers
 	$SIG{INT} = sub {
-		$self->speak("SIGINT caught");
-		$self->log( "warn", "SIGINT caught" );
-		$self->{to_finalize} = 1;
+		$this->speak("SIGINT caught");
+		$this->log( "warn", "SIGINT caught" );
+		$this->{to_finalize} = 1;
 	};
 
 	$SIG{TERM} = sub {
-		$self->speak("SIGTERM caught");
-		$self->log( "warn", "SIGTERM caught" );
-		$self->{to_finalize} = 1;
+		$this->speak("SIGTERM caught");
+		$this->log( "warn", "SIGTERM caught" );
+		$this->{to_finalize} = 1;
 	};
 
 } ## end sub initialize
@@ -645,22 +635,22 @@ configuration file (see C<feature> sections).
 
 sub use_auto_features {
 
-	my ($self) = @_;
+	my ($this) = @_;
 
-	if ( !$self->auto_features ) {
-		return $self->error("use_auto_features() called without setting auto_features property");
+	if ( !$this->auto_features ) {
+		return $this->error("use_auto_features() called without setting auto_features property");
 	}
 
 	# Check all sections <feature name> in configuration
-	if ( $self->conf and $self->conf->{feature} ) {
-		my @features = ( keys %{ $self->conf->{feature} } );
+	if ( $this->conf and $this->conf->{feature} ) {
+		my @features = ( keys %{ $this->conf->{feature} } );
 
 		foreach my $f (@features) {
-			my $f_conf = $self->conf->{feature}->{$f};
+			my $f_conf = $this->conf->{feature}->{$f};
 			my $class  = $f_conf->{class};
 
 			# Really add feature object
-			$self->add_feature( $f, $class, $f_conf );
+			$this->add_feature( $f, $class, $f_conf );
 
 		}
 	}
@@ -675,8 +665,8 @@ Paramters: feature name, class name, parameters (optional)
 
 Returns: feature object
 
-	$self->add_feature('kannel','NetSDS::Feature::Kannel', $self->conf->{feature}->{kannel});
-	$self->kannel->send(.....);
+	$this->add_feature('kannel','NetSDS::Feature::Kannel', $this->conf->{feature}->{kannel});
+	$this->kannel->send(.....);
 
 =cut 
 
@@ -684,7 +674,7 @@ Returns: feature object
 
 sub add_feature {
 
-	my $self  = shift @_;
+	my $this  = shift @_;
 	my $name  = shift @_;
 	my $class = shift @_;
 	my $conf  = shift @_;
@@ -692,28 +682,28 @@ sub add_feature {
 	# Try to use necessary classes
 	eval "use $class";
 	if ($@) {
-		return $self->error( "Can't add feature module $class: " . $@ );
+		return $this->error( "Can't add feature module $class: " . $@ );
 	}
 
 	# Feature class invocation
 	eval {
 		# Create feature instance
-		$self->{$name} = $class->create( $self, $conf, @_ );
+		$this->{$name} = $class->create( $this, $conf, @_ );
 		# Add logger
-		$self->{$name}->{logger} = $self->logger;
+		$this->{$name}->{logger} = $this->logger;
 	};
 	if ($@) {
-		return $self->error( "Can't initialize feature module $class: " . $@ );
+		return $this->error( "Can't initialize feature module $class: " . $@ );
 	}
 
 	# Create accessor to feature
-	$self->mk_accessors($name);
+	$this->mk_accessors($name);
 
 	# Send verbose output
-	$self->speak("Feature added: $name => $class");
+	$this->speak("Feature added: $name => $class");
 
 	# Write log message
-	$self->log( "info", "Feature added: $name => $class" );
+	$this->log( "info", "Feature added: $name => $class" );
 
 } ## end sub add_feature
 
@@ -727,9 +717,9 @@ This method called if we need to finish application.
 
 #-----------------------------------------------------------------------
 sub finalize {
-	my ( $self, $msg ) = @_;
+	my ( $this, $msg ) = @_;
 
-	$self->log( 'info', 'Application stopped' );
+	$this->log( 'info', 'Application stopped' );
 
 	exit(0);
 }
@@ -750,7 +740,7 @@ Remember that start() methhod is invoked after initialize()
 #-----------------------------------------------------------------------
 sub start {
 
-	my ( $self, %params ) = @_;
+	my ( $this, %params ) = @_;
 
 	return 1;
 }
@@ -770,7 +760,7 @@ This method should be overwritten in exact application.
 #-----------------------------------------------------------------------
 sub process {
 
-	my ( $self, %params ) = @_;
+	my ( $this, %params ) = @_;
 
 	return 1;
 }
@@ -786,7 +776,7 @@ post processing routines.
 
 #-----------------------------------------------------------------------
 sub stop {
-	my ( $self, %params ) = @_;
+	my ( $this, %params ) = @_;
 
 	return 1;
 }
@@ -804,25 +794,25 @@ be rewritten for alternative logic.
 
 #-----------------------------------------------------------------------
 sub main_loop {
-	my ($self) = @_;
+	my ($this) = @_;
 
 	# Run startup hooks
-	my $ret = $self->start();
+	my $ret = $this->start();
 
 	# Run processing hooks
-	while ( !$self->{to_finalize} ) {
+	while ( !$this->{to_finalize} ) {
 
 		# Call production code
-		$ret = $self->process();
+		$ret = $this->process();
 
 		# Process infinite loop
-		unless ( $self->{infinite} ) {
-			$self->{to_finalize} = 1;
+		unless ( $this->{infinite} ) {
+			$this->{to_finalize} = 1;
 		}
 	}
 
 	# Run finalize hooks
-	$ret = $self->stop();
+	$ret = $this->stop();
 
 } ## end sub main_loop
 
@@ -838,18 +828,18 @@ This method provides ablity to write log messages to syslog.
 
 Example:
 
-	$self->log("info", "New message arrived with id=$msg_id");
+	$this->log("info", "New message arrived with id=$msg_id");
 
 =cut
 
 #-----------------------------------------------------------------------
 sub log {
 
-	my ( $self, $level, $message ) = @_;
+	my ( $this, $level, $message ) = @_;
 
 	# Try to use syslog handler
-	if ( $self->logger() ) {
-		$self->logger->log( $level, $message );
+	if ( $this->logger() ) {
+		$this->logger->log( $level, $message );
 	} else {
 		# No syslog, send error to STDERR
 		carp "[$level] $message";
@@ -869,7 +859,7 @@ logging this message to syslog.
 Example:
 
 	if (!$dbh->ping) {
-		return $self->error("We have problem with DBMS");
+		return $this->error("We have problem with DBMS");
 	}
 
 =cut 
@@ -877,10 +867,10 @@ Example:
 #-----------------------------------------------------------------------
 
 sub error {
-	my ( $self, $message ) = @_;
+	my ( $this, $message ) = @_;
 
-	$self->log( "error", $message );
-	return $self->SUPER::error($message);
+	$this->log( "error", $message );
+	return $this->SUPER::error($message);
 
 }
 
@@ -892,7 +882,7 @@ Paramters: list of strings to be written as verbose output
 
 This method implements verbose output to STDOUT.
 
-	$self->speak("Do something");
+	$this->speak("Do something");
 
 =cut 
 
@@ -900,9 +890,9 @@ This method implements verbose output to STDOUT.
 
 sub speak {
 
-	my ( $self, @params ) = @_;
+	my ( $this, @params ) = @_;
 
-	if ( $self->verbose ) {
+	if ( $this->verbose ) {
 		print join( "", @params );
 		print "\n";
 	}
@@ -925,12 +915,12 @@ Paramters: list of EDR records to write
 
 sub edr {
 
-	my ( $self, @records ) = @_;
+	my ( $this, @records ) = @_;
 
-	if ( $self->{edr_writer} ) {
-		return $self->{edr_writer}->write(@records);
+	if ( $this->{edr_writer} ) {
+		return $this->{edr_writer}->write(@records);
 	} else {
-		return $self->error("Can't write EDR to undefined destination");
+		return $this->error("Can't write EDR to undefined destination");
 	}
 
 }
@@ -947,7 +937,7 @@ sub edr {
 
 sub config_file {
 
-	my ( $self, $file_name ) = @_;
+	my ( $this, $file_name ) = @_;
 
 	my $conf_file;
 	if ( $file_name =~ /^\// ) {
@@ -972,23 +962,23 @@ sub config_file {
 # Determine application name from script name
 sub _determine_name {
 
-	my ($self) = @_;
+	my ($this) = @_;
 
 	# Dont override predefined name
-	if ( $self->{name} ) {
-		return $self->{name};
+	if ( $this->{name} ) {
+		return $this->{name};
 	}
 
-	$self->{name} = $0;    # executable script
-	$self->{name} =~ s/^.*\///;               # remove directory path
-	$self->{name} =~ s/\.(pl|cgi|fcgi)$//;    # remove standard extensions
+	$this->{name} = $0;    # executable script
+	$this->{name} =~ s/^.*\///;               # remove directory path
+	$this->{name} =~ s/\.(pl|cgi|fcgi)$//;    # remove standard extensions
 
 }
 
 # Determine execution parameters from CLI
 sub _get_cli_param {
 
-	my ($self) = @_;
+	my ($this) = @_;
 
 	my $conf    = undef;
 	my $debug   = undef;
@@ -1007,27 +997,27 @@ sub _get_cli_param {
 
 	# Set configuration file name
 	if ($conf) {
-		$self->{conf_file} = $conf;
+		$this->{conf_file} = $conf;
 	}
 
 	# Set debug mode
 	if ( defined $debug ) {
-		$self->{debug} = $debug;
+		$this->{debug} = $debug;
 	}
 
 	# Set daemon mode
 	if ( defined $daemon ) {
-		$self->{daemon} = $daemon;
+		$this->{daemon} = $daemon;
 	}
 
 	# Set verbose mode
 	if ( defined $verbose ) {
-		$self->{verbose} = $verbose;
+		$this->{verbose} = $verbose;
 	}
 
 	# Set application name
 	if ( defined $name ) {
-		$self->{name} = $name;
+		$this->{name} = $name;
 	}
 
 } ## end sub _get_cli_param
@@ -1075,7 +1065,7 @@ Michael Bochkaryov <misha@rattler.kiev.ua>
 
 =head1 LICENSE
 
-Copyright (C) 2008-2010 Net Style Ltd.
+Copyright (C) 2008-2011 Net Style Ltd.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -1092,5 +1082,4 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 =cut
-
 

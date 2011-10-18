@@ -13,7 +13,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;    # last test to print
+use Test::More;
 
 use NetSDS::Class::Abstract;
 
@@ -24,12 +24,13 @@ can_ok( 'NetSDS::Class::Abstract', 'mk_wo_accessors' );
 can_ok( 'NetSDS::Class::Abstract', 'mk_package_accessors' );
 can_ok( 'NetSDS::Class::Abstract', 'mk_class_accessors' );
 can_ok( 'NetSDS::Class::Abstract', 'use_modules' );
-can_ok( 'NetSDS::Class::Abstract', 'unbless' );
 can_ok( 'NetSDS::Class::Abstract', 'log' );
 can_ok( 'NetSDS::Class::Abstract', 'logger' );
 can_ok( 'NetSDS::Class::Abstract', 'error' );
 can_ok( 'NetSDS::Class::Abstract', 'errstr' );
 can_ok( 'NetSDS::Class::Abstract', 'errcode' );
+
+done_testing();
 
 1;
 
