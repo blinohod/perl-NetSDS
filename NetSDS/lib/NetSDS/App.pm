@@ -324,7 +324,7 @@ sub run {
 	if ( my $app = $class->new(@_) ) {
 
 		# Framework initialization
-		$app->initialize();
+		$app->initialize(@_);
 
 		# Application workflow
 		$app->main_loop();
