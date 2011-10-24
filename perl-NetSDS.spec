@@ -51,6 +51,10 @@ BuildRequires: perl-Test-Pod-Coverage
 BuildRequires: perl-Unix-Syslog
 BuildRequires: perl-Iterator
 
+# Add implicit requirements
+Requires: perl-FCGI
+Requires: perl-DBD-Pg
+
 %description
 NetSDS is an easy to use and flexible framework firstly intended
 for mobile VAS developent but may be used as more common thing.
