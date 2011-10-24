@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 2.000
-Release: alt2
+Release: alt3
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -88,10 +88,11 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
-* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt2
-- Clear build.
+* Mon Oct 24 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt3
+- Add implicit requirements.
 
-* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt1
+* Mon Oct 17 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt2
+- Clear build.
 - Build requirements fixed (perl-Iterator).
 
 * Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt1
