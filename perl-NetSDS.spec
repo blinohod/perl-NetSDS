@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 2.000
-Release: alt2
+Release: alt3
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -25,14 +25,13 @@ BuildArch: noarch
 Source0: %m_name-%version.tar
 
 BuildRequires: perl-libwww
-
-# Automatically added by buildreq on Mon Mar 08 2010 (-bi)
 BuildRequires: perl-CGI 
 BuildRequires: perl-Cache-Memcached-Fast
 BuildRequires: perl-Class-Accessor-Class
 BuildRequires: perl-Class-ErrorHandler
 BuildRequires: perl-Config-General
 BuildRequires: perl-DBD-Pg
+BuildRequires: perl-DBD-mysql
 BuildRequires: perl-Data-UUID 
 BuildRequires: perl-Data-Structure-Util
 BuildRequires: perl-Exception-Class
@@ -50,6 +49,33 @@ BuildRequires: perl-Test-Pod
 BuildRequires: perl-Test-Pod-Coverage
 BuildRequires: perl-Unix-Syslog
 BuildRequires: perl-Iterator
+
+Requires: perl-libwww
+Requires: perl-CGI 
+Requires: perl-Cache-Memcached-Fast
+Requires: perl-Class-Accessor-Class
+Requires: perl-Class-ErrorHandler
+Requires: perl-Config-General
+Requires: perl-DBD-Pg
+Requires: perl-DBD-mysql
+Requires: perl-Data-UUID 
+Requires: perl-Data-Structure-Util
+Requires: perl-Exception-Class
+Requires: perl-FCGI
+Requires: perl-HTML-Template-Pro
+Requires: perl-JSON
+Requires: perl-JSON-XS
+Requires: perl-Locale-gettext
+Requires: perl-Log-Agent
+Requires: perl-Module-Build
+Requires: perl-Net-Server-Mail
+Requires: perl-Proc-Daemon
+Requires: perl-Proc-PID-File
+Requires: perl-Test-Pod
+Requires: perl-Test-Pod-Coverage
+Requires: perl-Unix-Syslog
+Requires: perl-Iterator
+
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -76,18 +102,23 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
-
+mkdir -p %buildroot/var/run/NetSDS
 %pre
 
 %files
 %perl_vendor_privlib/NetSDS*
 %doc samples Changes
+/var/run/NetSDS
 
 %changelog
-* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt2
+* Tue Oct 25 2011 Michael Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt3
+- Added Requries for pel-DBD-mysql
+- /var/run/NetSDS creation
+
+* Mon Oct 17 2011 Michael Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt2
 - Clear build.
 
-* Mon Oct 17 2011 Michael Dmitriy Kkkruglikov  <dkr@altlinux.ru> 2.000-alt1
+* Mon Oct 17 2011 Michael Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt1
 - Build requirements fixed (perl-Iterator).
 
 * Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt1
