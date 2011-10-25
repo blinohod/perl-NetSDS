@@ -81,7 +81,7 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
-%__mkdir_p %_builddir/var/run/NetSDS
+%__mkdir_p %_buildroot/var/run/NetSDS
 
 %pre
 
