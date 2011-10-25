@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 2.000
-Release: alt3
+Release: alt4
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -54,6 +54,7 @@ BuildRequires: perl-Iterator
 # Add implicit requirements
 Requires: perl-FCGI
 Requires: perl-DBD-Pg
+Requires: perl-DBD-mysql
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -80,14 +81,19 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
+%__mkdir_p %_builddir/var/run/NetSDS
 
 %pre
 
 %files
 %perl_vendor_privlib/NetSDS*
 %doc samples Changes
+/var/run/NetSDS
 
 %changelog
+* Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt4
+- Add implicit requirements and /var/run/NetSDS creation.
+
 * Mon Oct 24 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt3
 - Add implicit requirements.
 
