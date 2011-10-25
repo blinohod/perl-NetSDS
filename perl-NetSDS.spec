@@ -50,11 +50,13 @@ BuildRequires: perl-Test-Pod
 BuildRequires: perl-Test-Pod-Coverage
 BuildRequires: perl-Unix-Syslog
 BuildRequires: perl-Iterator
+BuildRequires: perl-Module-Load
 
 # Add implicit requirements
 Requires: perl-FCGI
 Requires: perl-DBD-Pg
 Requires: perl-DBD-mysql
+Requires: perl-Module-Load
 
 %description
 NetSDS is an easy to use and flexible framework firstly intended
@@ -81,14 +83,14 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
-%__mkdir_p %_buildroot/var/run/NetSDS
+%__mkdir_p %buildroot/%_runtimedir/NetSDS
 
 %pre
 
 %files
 %perl_vendor_privlib/NetSDS*
 %doc samples Changes
-/var/run/NetSDS
+%dir %_runtimedir/NetSDS
 
 %changelog
 * Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt4
