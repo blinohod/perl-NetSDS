@@ -9,7 +9,7 @@
 
 Name: perl-NetSDS
 Version: 2.000
-Release: alt4
+Release: alt5
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -83,16 +83,17 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
-%__mkdir_p %buildroot/%_runtimedir/NetSDS
 
 %pre
 
 %files
 %perl_vendor_privlib/NetSDS*
 %doc samples Changes
-%dir %_runtimedir/NetSDS
 
 %changelog
+* Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt5
+- Deleted unwanted /var/run/NetSDS creation.
+
 * Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt4
 - Add implicit requirements and /var/run/NetSDS creation.
 
