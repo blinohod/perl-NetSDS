@@ -259,7 +259,7 @@ sub main_loop {
 				-status         => $self->status,
 				-charset        => $self->charset,
 				-cookie         => $self->cookie,
-				-Content_length => bytes::length( $self->data ),
+				-Content_length => int(bytes::length( $self->data )),
 				%{ $self->headers },
 			);
 			no bytes;
