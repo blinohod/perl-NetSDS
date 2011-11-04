@@ -8,8 +8,8 @@
 
 
 Name: perl-NetSDS
-Version: 2.000
-Release: alt5
+Version: 2.001
+Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -24,7 +24,6 @@ Packager: Dmitriy Kruglikov <dkr@netstyle.com.ua>
 BuildArch: noarch
 Source0: %m_name-%version.tar
 
-BuildRequires: perl-libwww
 BuildRequires: perl-CGI 
 BuildRequires: perl-Cache-Memcached-Fast
 BuildRequires: perl-Class-Accessor-Class
@@ -37,51 +36,25 @@ BuildRequires: perl-Data-Structure-Util
 BuildRequires: perl-Exception-Class
 BuildRequires: perl-FCGI
 BuildRequires: perl-HTML-Template-Pro
+BuildRequires: perl-Iterator
 BuildRequires: perl-JSON
 BuildRequires: perl-JSON-XS
-BuildRequires: perl-Locale-gettext
-BuildRequires: perl-Log-Agent
 BuildRequires: perl-Module-Build
-BuildRequires: perl-Net-Server-Mail
 BuildRequires: perl-Proc-Daemon
 BuildRequires: perl-Proc-PID-File
 BuildRequires: perl-Test-Pod
 BuildRequires: perl-Test-Pod-Coverage
+BuildRequires: perl-TimeDate
 BuildRequires: perl-Unix-Syslog
-BuildRequires: perl-Iterator
-BuildRequires: perl-Module-Load
+BuildRequires: perl-libwww
+BuildRequires: perl-unicore
 
 # Add implicit requirements
 Requires: perl-FCGI
 Requires: perl-DBD-Pg
 Requires: perl-DBD-mysql
-Requires: perl-Module-Load
-
 Requires: perl-libwww
-Requires: perl-CGI 
-Requires: perl-Cache-Memcached-Fast
-Requires: perl-Class-Accessor-Class
-Requires: perl-Class-ErrorHandler
-Requires: perl-Config-General
-Requires: perl-DBD-Pg
-Requires: perl-DBD-mysql
-Requires: perl-Data-UUID 
-Requires: perl-Data-Structure-Util
-Requires: perl-Exception-Class
-Requires: perl-FCGI
-Requires: perl-HTML-Template-Pro
-Requires: perl-JSON
-Requires: perl-JSON-XS
-Requires: perl-Locale-gettext
-Requires: perl-Log-Agent
-Requires: perl-Module-Build
-Requires: perl-Net-Server-Mail
-Requires: perl-Proc-Daemon
-Requires: perl-Proc-PID-File
-Requires: perl-Test-Pod
-Requires: perl-Test-Pod-Coverage
-Requires: perl-Unix-Syslog
-Requires: perl-Iterator
+Requires: perl-unicore
 
 
 %description
@@ -109,15 +82,17 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
-mkdir -p %buildroot/var/run/NetSDS
 %pre
 
 %files
 %perl_vendor_privlib/NetSDS*
 %doc samples Changes
-/var/run/NetSDS
 
 %changelog
+* Fri Nov 04 2011 Michael Bochkaryov <misha@altlinux.ru> 2.001-alt1
+- Fixed initialize() call in NetSDS::App
+- Updated requirements list
+
 * Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt5
 - Deleted unwanted /var/run/NetSDS creation.
 
