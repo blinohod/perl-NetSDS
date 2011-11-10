@@ -111,7 +111,7 @@ mkdir -p %buildroot/var/run/NetSDS
 /var/run/NetSDS
 
 %changelog
-* Thu Niv 10 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.001-alt2
+* Thu Nov 10 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.001-alt2
 - Build for v2.0 tag 2.001-alt2
 
 * Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt3
