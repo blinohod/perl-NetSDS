@@ -216,6 +216,8 @@ use Proc::Daemon;      # Daemonization
 use Proc::PID::File;   # Managing PID files
 use Getopt::Long qw(:config auto_version auto_help pass_through);
 
+use constant CONF_DIR => '/etc/NetSDS';
+
 use POSIX;
 use Carp;
 
@@ -938,14 +940,13 @@ sub edr {
 sub config_file {
 
 	my ( $this, $file_name ) = @_;
-
 	my $conf_file;
 	if ( $file_name =~ /^\// ) {
 		$conf_file = $file_name;
 	} else {
 
 		# Try to find path by NETSDS_CONF_DIR environment
-		my $file = ( $ENV{NETSDS_CONF_DIR} || "/etc/NetSDS/" );
+		my $file = ( $ENV{NETSDS_CONF_DIR} || $this->CONF_DIR || "/etc/NetSDS/" );
 		$file =~ s/([^\/])$/$1\//;
 		$conf_file = $file . $file_name;
 
@@ -953,7 +954,6 @@ sub config_file {
 		unless ( -f $conf_file && -r $conf_file ) {
 			$conf_file = "./" . $file_name;
 		}
-
 	}
 
 	return $conf_file;
@@ -972,7 +972,7 @@ sub _determine_name {
 	$this->{name} = $0;    # executable script
 	$this->{name} =~ s/^.*\///;               # remove directory path
 	$this->{name} =~ s/\.(pl|cgi|fcgi)$//;    # remove standard extensions
-
+	return $this->{name};
 }
 
 # Determine execution parameters from CLI
