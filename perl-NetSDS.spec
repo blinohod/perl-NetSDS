@@ -8,8 +8,8 @@
 
 
 Name: perl-NetSDS
-Version: 2.000
-Release: alt3
+Version: 2.001
+Release: alt2
 
 Summary: Common Perl modules for NetSDS VAS framework
 Summary(ru_RU.UTF-8): Общие модули Perl для VAS фремворка NetSDS
@@ -111,14 +111,17 @@ mkdir -p %buildroot/var/run/NetSDS
 /var/run/NetSDS
 
 %changelog
-* Tue Oct 25 2011 Michael Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt3
+* Thu Niv 10 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.001-alt2
+- Build for v2.0 tag 2.001-alt2
+
+* Tue Oct 25 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt3
 - Added Requries for pel-DBD-mysql
 - /var/run/NetSDS creation
 
-* Mon Oct 17 2011 Michael Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt2
+* Mon Oct 17 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt2
 - Clear build.
 
-* Mon Oct 17 2011 Michael Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt1
+* Mon Oct 17 2011 Dmitriy Kruglikov  <dkr@altlinux.ru> 2.000-alt1
 - Build requirements fixed (perl-Iterator).
 
 * Mon Oct 17 2011 Michael Bochkaryov <misha@altlinux.ru> 2.000-alt1
