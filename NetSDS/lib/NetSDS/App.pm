@@ -588,11 +588,11 @@ sub initialize {
 
 	# Initialize configuration
 	if ( $this->{has_conf} ) {
-		$this->log( "info", "Conffile: " . $this->{conf_file} );
 		# Automatically determine configuration file name
 		if ( !$this->{conf_file} ) {
 			$this->{conf_file} = $this->config_file( $this->{name} . ".conf" );
 		}
+		$this->log( "info", "Conffile: " . $this->{conf_file} );
 
 		# Get configuration file
 		if ( my $conf = NetSDS::Conf->getconf( $this->{conf_file} ) ) {
