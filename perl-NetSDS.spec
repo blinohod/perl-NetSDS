@@ -8,7 +8,7 @@
 
 
 Name: perl-NetSDS
-Version: 2.001
+Version: 2.002
 Release: alt1
 
 Summary: Common Perl modules for NetSDS VAS framework
@@ -82,6 +82,7 @@ NetSDS - это гибкий и простой в использовании ф�
 
 %install
 %perl_vendor_install
+
 %pre
 
 %files
@@ -89,6 +90,9 @@ NetSDS - это гибкий и простой в использовании ф�
 %doc samples Changes
 
 %changelog
+* Fri Nov 11 2011 Michael Bochkaryov <misha@altlinux.ru> 2.002-alt1
+- Fixed output of UTF-8 strings in NetSDS::App::FCGI
+
 * Fri Nov 04 2011 Michael Bochkaryov <misha@altlinux.ru> 2.001-alt1
 - Fixed initialize() call in NetSDS::App
 - Updated requirements list
