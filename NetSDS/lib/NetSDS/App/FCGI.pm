@@ -43,6 +43,7 @@ use base 'NetSDS::App';
 
 use CGI::Fast;
 use CGI::Cookie;
+use NetSDS::Util::String;
 
 use version; our $VERSION = '2.000';
 
@@ -259,7 +260,7 @@ sub main_loop {
 				-status         => $self->status,
 				-charset        => $self->charset,
 				-cookie         => $self->cookie,
-				-Content_length => int(bytes::length( $self->data )),
+				-Content_length => int( bytes::length( $self->data ) ),
 				%{ $self->headers },
 			);
 			no bytes;
@@ -268,7 +269,7 @@ sub main_loop {
 			if ( $self->data ) {
 				$| = 1;    # set autoflushing mode to avoid output buffering
 				binmode STDOUT;
-				print $self->data;
+				print str_decode( $self->data );
 			}
 		} ## end else [ if ( $self->redirect )]
 
