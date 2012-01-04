@@ -1,15 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Translit.pm
-#
-#  DESCRIPTION:  Cyrillic transliteration routines
-#
-#         NOTE:  This module ported from Wono framework "as is"
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      VERSION:  1.044
-#      CREATED:  03.08.2008 15:04:22 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -42,7 +30,7 @@ use strict;
 
 use base 'Exporter';
 
-use version; our $VERSION = '1.044';
+use version; our $VERSION = version->declare('v2.3.0');
 
 use NetSDS::Util::String;
 

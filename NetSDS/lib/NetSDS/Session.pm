@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#       MODULE:  NetSDS::Session
-#
-#  DESCRIPTION:  Memcached based session data storage
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#
-#===============================================================================
 
 =head1 NAME
 
@@ -56,7 +46,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 use Cache::Memcached::Fast;
 use JSON;

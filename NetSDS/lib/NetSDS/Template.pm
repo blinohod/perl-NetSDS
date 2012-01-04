@@ -1,15 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Template.pm
-#
-#  DESCRIPTION:  Wrapper for HTML::Template::Pro
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  16.07.2008 23:30:12 EEST
-#
-#===============================================================================
-
 =head1 NAME
 
 NetSDS::Template - NetSDS template engine
@@ -36,7 +24,7 @@ use base 'NetSDS::Class::Abstract';
 use HTML::Template::Pro;
 use NetSDS::Util::File;
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #===============================================================================
 

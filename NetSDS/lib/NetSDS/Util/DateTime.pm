@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#         FILE:  DateTime.pm
-#
-#  DESCRIPTION:  Common date/time processing utilities for NetSDS
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  25.04.2008 15:55:01 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -33,7 +23,7 @@ use warnings;
 
 use base 'Exporter';
 
-use version; our $VERSION = '1.044';
+use version; our $VERSION = version->declare('v2.3.0');
 
 our @EXPORT = qw(
   date_now_array

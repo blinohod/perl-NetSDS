@@ -1,14 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Convert.pm
-#
-#  DESCRIPTION:  Conversion between different data formats
-#
-#        NOTES:  ---
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  17.08.2008 17:01:48 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -44,7 +33,7 @@ use strict;
 
 use base 'Exporter';
 
-use version; our $VERSION = '1.044';
+use version; our $VERSION = version->declare('v2.3.0');
 
 our @EXPORT = qw(
   conv_str_bcd

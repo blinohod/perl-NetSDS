@@ -10,7 +10,7 @@ NetSDS::LWP - wrapper around LWP HTTP client library
 
 =cut
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 use base 'NetSDS::Class::Abstract';
 

@@ -35,7 +35,7 @@ use warnings;
 
 use base 'Exporter';
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 our @EXPORT = qw(
   LANG_BE

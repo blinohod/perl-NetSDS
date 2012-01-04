@@ -1,8 +1,4 @@
 package NetSDS::Util::Struct;
-########################################################################
-# Misc Struct routines
-#
-########################################################################
 
 =head1 NAME
 
@@ -30,7 +26,7 @@ use strict;
 use base 'Exporter';
 use Iterator;
 
-use version; our $VERSION = "1.044";
+use version; our $VERSION = version->declare('v2.3.0');
 
 our @EXPORT = qw(
   dump_to_string

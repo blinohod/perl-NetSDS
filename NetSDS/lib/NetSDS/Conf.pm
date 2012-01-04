@@ -29,7 +29,7 @@ use warnings;
 use NetSDS::Exceptions;
 use Config::General;
 
-use version; our $VERSION = '2.000';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #***********************************************************************
 

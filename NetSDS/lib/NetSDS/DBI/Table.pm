@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Table.pm
-#
-#  DESCRIPTION:  NetSDS::DBI::Table - CRUD implementation for NetSDS
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  25.07.2008 01:06:46 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -46,7 +36,7 @@ use warnings;
 
 use base 'NetSDS::DBI';
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #===============================================================================
 #

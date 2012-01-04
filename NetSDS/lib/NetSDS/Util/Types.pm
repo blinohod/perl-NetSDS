@@ -1,15 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Types.pm
-#
-#  DESCRIPTION:
-#
-#        NOTES:  ---
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      VERSION:  1.044
-#      CREATED:  17.08.2008 17:01:48 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -41,7 +29,7 @@ use strict;
 
 use base 'Exporter';
 
-use version; our $VERSION = '1.044';
+use version; our $VERSION = version->declare('v2.3.0');
 
 use POSIX;
 

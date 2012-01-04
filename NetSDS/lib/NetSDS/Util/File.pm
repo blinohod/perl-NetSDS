@@ -1,14 +1,3 @@
-#===============================================================================
-#
-#         FILE:  File.pm
-#
-#  DESCRIPTION:  NetSDS utilities for file operations
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      VERSION:  1.044
-#      CREATED:  16.07.2008 18:25:48 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -47,7 +36,8 @@ use File::Temp ();
 
 use base 'Exporter';
 
-use version; our $VERSION = "1.044";
+use version; our $VERSION = version->declare('v2.3.0');
+
 our @EXPORT = qw(
   is_handle
   reset_handle

@@ -45,7 +45,7 @@ use CGI::Fast;
 use CGI::Cookie;
 use NetSDS::Util::String;
 
-use version; our $VERSION = '2.000';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #***********************************************************************
 

@@ -1,14 +1,3 @@
-#===============================================================================
-#
-#         FILE:  JSRPC.pm
-#
-#  DESCRIPTION:  NetSDS admin
-#
-#        NOTES:  ---
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  10.08.2009 20:57:57 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -166,7 +155,7 @@ use JSON;
 use base 'NetSDS::App::FCGI';
 
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #===============================================================================
 

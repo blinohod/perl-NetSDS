@@ -1,14 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Feature.pm
-#
-#  DESCRIPTION:  Abstract application feature class.
-#
-#        NOTES:  ---
-#       AUTHOR:  Michael Bochkaryov (RATTLER), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#
-#===============================================================================
 
 =head1 NAME
 
@@ -65,7 +54,7 @@ use warnings;
 use base qw(Class::Accessor Class::ErrorHandler);
 
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #===============================================================================
 

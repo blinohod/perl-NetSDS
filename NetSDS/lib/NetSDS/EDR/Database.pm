@@ -1,15 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Database.pm
-#
-#  DESCRIPTION:  NetSDS::EDR::Database is the class-engine that have to write EDR info via inserts it to database. 
-#
-#        NOTES:  ---
-#       AUTHOR:  Alex Radetsky (Rad), <rad@rad.kiev.ua>
-#      COMPANY:  Net.Style
-#      VERSION:  1.0
-#      CREATED:  03.01.2011 21:04:57 EET
-#===============================================================================
 =head1 NAME
 
 NetSDS::EDR::Database
@@ -36,7 +24,8 @@ use base qw(NetSDS::Class::Abstract);
 
 use Data::Dumper; 
 
-use version; our $VERSION = "0.01";
+use version; our $VERSION = version->declare('v2.3.0');
+
 our @EXPORT_OK = qw();
 
 our @local_cache = ();  

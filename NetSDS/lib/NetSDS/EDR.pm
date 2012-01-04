@@ -1,16 +1,3 @@
-#===============================================================================
-#
-#         FILE:  EDR.pm
-#
-#  DESCRIPTION:  Module for reading/writing Event Details Records
-#
-#        NOTES:  ---
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#       AUTHOR:  Alex Radetsky (rad), <rad@rad.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  28.08.2009 16:43:02 EEST
-#     MODIFIED:  03.01.2011
-#===============================================================================
 
 =head1 NAME
 
@@ -62,8 +49,7 @@ use NetSDS::EDR::Database;
 use NetSDS::EDR::Syslog; 
 use NetSDS::EDR::Rawfile;  
 
-use version;
-our $VERSION = '2.001';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #===============================================================================
 #

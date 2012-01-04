@@ -1,16 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Rawfile.pm
-#
-#  DESCRIPTION:  NetSDS::EDR::Rawfile is the class-engine to NetSDS::EDR that have to write some events
-#  in this case to raw text file.
-#
-#        NOTES:  ---
-#       AUTHOR:  Alex Radetsky (Rad), <rad@rad.kiev.ua>
-#      COMPANY:  Net.Style
-#      VERSION:  1.0
-#      CREATED:  03.01.2011 19:37:32 EET
-#===============================================================================
 
 =head1 NAME
 
@@ -37,7 +24,8 @@ use JSON;
 use Data::Dumper; 
 use NetSDS::Util::DateTime;
 
-use version; our $VERSION = "0.01";
+use version; our $VERSION = version->declare('v2.3.0');
+
 our @EXPORT_OK = qw();
 
 #===============================================================================

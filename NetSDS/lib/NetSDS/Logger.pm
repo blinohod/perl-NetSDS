@@ -1,13 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Logger.pm
-#
-#  DESCRIPTION:  Syslog wrapper for Net SDS
-#
-#       AUTHOR:  Michael Bochkaryov (Rattler), <misha@rattler.kiev.ua>
-#      COMPANY:  Net.Style
-#      CREATED:  25.04.2008 17:32:37 EEST
-#===============================================================================
 
 =head1 NAME
 
@@ -40,7 +30,7 @@ use warnings;
 
 use Unix::Syslog qw(:macros :subs);
 
-use version; our $VERSION = '1.400';
+use version; our $VERSION = version->declare('v2.3.0');
 
 #===============================================================================
 

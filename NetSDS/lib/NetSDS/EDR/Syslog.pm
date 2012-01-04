@@ -1,16 +1,3 @@
-#===============================================================================
-#
-#         FILE:  Syslog.pm
-#
-#  DESCRIPTION:  NetSDS::EDR::Syslog is class-engine for NetSDS::EDR, it have to put EDR via syslog with prefix,
-#  which must be defined as parameter to constructor.
-#
-#        NOTES:  ---
-#       AUTHOR:  Alex Radetsky (Rad), <rad@rad.kiev.ua>
-#      COMPANY:  Net.Style
-#      VERSION:  1.0
-#      CREATED:  03.01.2011 20:50:56 EET
-#===============================================================================
 
 =head1 NAME
 
@@ -39,7 +26,7 @@ use Encode;
 use NetSDS::Util::DateTime;
 use NetSDS::Logger; 
 
-use version; our $VERSION = "0.01";
+use version; our $VERSION = version->declare('v2.3.0');
 our @EXPORT_OK = qw();
 
 #===============================================================================
