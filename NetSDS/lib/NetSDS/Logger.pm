@@ -124,6 +124,10 @@ sub log {
 
 	my ( $self, $level, $message ) = @_;
 
+	if ( !$message ) {
+		return undef;
+	}
+
 	# Level aliases
 	my %LEVFIX = (
 		alert     => LOG_ALERT,
@@ -149,10 +153,6 @@ sub log {
 
 	if ( !$LEV ) {
 		$LEV = LOG_INFO;
-	}
-
-	if ( !$message ) {
-		$message = "";
 	}
 
 	syslog( $LEV, "[$level] $message" );
