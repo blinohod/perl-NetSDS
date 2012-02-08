@@ -54,28 +54,27 @@ Returns a new B<Module::Name> or dies on error.
 =cut
 
 sub new {
-    my ( $class, %params ) = @_;
+	my ( $class, %params ) = @_;
 
-    my $self = $class->SUPER::new(
-        name        => undef,    # application name
-        pid         => $$,       # proccess PID
-        debug       => undef,    # debug mode flag
-        daemon      => undef,    # daemonize if 1
-        verbose     => undef,    # be more verbose if 1
-        use_pidfile => undef,    # check PID file if 1
-        pid_dir     =>
-          '/var/run/NetSDS',    # PID files catalog (default is /var/run/NetSDS)
-        conf_file     => undef, # configuration file name
-        conf          => undef, # configuration data
-        logger        => undef, # logger object
-        has_conf      => 1,     # is configuration file necessary
-        auto_features => 0,     # are automatic features allowed or not
-        infinite      => 1,     # is infinite loop
-        edr_file      => undef, # path to EDR file
-        %params,
-    );
-    return $self;
-}
+	my $self = $class->SUPER::new(
+		name          => undef,                # application name
+		pid           => $$,                   # proccess PID
+		debug         => undef,                # debug mode flag
+		daemon        => undef,                # daemonize if 1
+		verbose       => undef,                # be more verbose if 1
+		use_pidfile   => undef,                # check PID file if 1
+		pid_dir       => '/var/run/NetSDS',    # PID files catalog (default is /var/run/NetSDS)
+		conf_file     => undef,                # configuration file name
+		conf          => undef,                # configuration data
+		logger        => undef,                # logger object
+		has_conf      => 1,                    # is configuration file necessary
+		auto_features => 0,                    # are automatic features allowed or not
+		infinite      => 1,                    # is infinite loop
+		edr_file      => undef,                # path to EDR file
+		%params,
+	);
+	return $self;
+} ## end sub new
 
 =pod
 
@@ -89,42 +88,42 @@ __PACKAGE__->mk_accessors('manager');
 __PACKAGE__->mk_accessors('connected');
 
 sub _connect {
-    my ( $this, $host, $port, $user, $secret ) = @_;
+	my ( $this, $host, $port, $user, $secret ) = @_;
 
-    my $manager = NetSDS::Asterisk::Manager->new ( 
-		host => $this->{'host'},
-		port => $this->{'port'},
+	my $manager = NetSDS::Asterisk::Manager->new(
+		host     => $this->{'host'},
+		port     => $this->{'port'},
 		username => $this->{'username'},
-		secret => $this->{'secret'},
-		events => 'On'
-	); 
-    unless ( defined ($manager) ) { 
-	return undef; 
-    }
+		secret   => $this->{'secret'},
+		events   => 'On'
+	);
+	unless ( defined($manager) ) {
+		return undef;
+	}
 
-    $this->manager( $manager );
-    my $res = $this->manager->connect();
-    unless ( defined ( $res ) ) {
-			$this->{'error'} = $this->manager->geterror(); 
-		return undef; 
-    }
-    $this->connected(1);
+	$this->manager($manager);
+	my $res = $this->manager->connect();
+	unless ( defined($res) ) {
+		$this->{'error'} = $this->manager->geterror();
+		return undef;
+	}
+	$this->connected(1);
 
-    return 1;
-}
+	return 1;
+} ## end sub _connect
 
 sub _getEvent {
-    my $this = shift;
+	my $this = shift;
 
-    unless ( defined ( $this->connected ) )  {
-        $this->connected( $this->_connect() );
-    }
+	unless ( defined( $this->connected ) ) {
+		$this->connected( $this->_connect() );
+	}
 
-    my $event = $this->manager->receive_answer();
-    unless ( defined($event) ) {
-        return undef;
-    }
-    return $event;
+	my $event = $this->manager->receive_answer();
+	unless ( defined($event) ) {
+		return undef;
+	}
+	return $event;
 }
 
 1;
