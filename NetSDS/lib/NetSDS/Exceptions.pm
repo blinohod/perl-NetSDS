@@ -33,7 +33,7 @@ use 5.8.0;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v3.0.0');
 
 =head1 EXCEPTIONS
 

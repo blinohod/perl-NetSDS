@@ -31,7 +31,7 @@ use strict;
 
 use base 'Exporter';
 
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v3.0.0');
 
 our @EXPORT = qw(
   str_encode

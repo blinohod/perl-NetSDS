@@ -26,7 +26,7 @@ use strict;
 use base 'Exporter';
 use Iterator;
 
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v3.0.0');
 
 our @EXPORT = qw(
   dump_to_string

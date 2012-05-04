@@ -58,7 +58,7 @@ to be reorganized in a hierarchical fashion.
 
 package NetSDS::Util::Aggregator;
 
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v3.0.0');
 
 use Iterator;
 

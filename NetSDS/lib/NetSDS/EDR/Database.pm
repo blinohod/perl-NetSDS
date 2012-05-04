@@ -24,7 +24,7 @@ use base qw(NetSDS::Class::Abstract);
 
 use Data::Dumper; 
 
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v3.0.0');
 
 our @EXPORT_OK = qw();
 

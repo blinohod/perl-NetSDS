@@ -59,7 +59,7 @@ use NetSDS::Exceptions;
 our $_ERRSTR;     # error string
 our $_ERRCODE;    # error code
 
-use version; our $VERSION = version->declare('v2.3.0');
+use version; our $VERSION = version->declare('v3.0.0');
 
 #***********************************************************************
 
