@@ -70,7 +70,7 @@ sub new {
 		aggregated => $aggregated,
 		current    => undef,
 		keyfield   => $keyfield,
-		am_done => 0
+		am_done    => 0
 	};
 	bless $self, $class;
 	return $self;
