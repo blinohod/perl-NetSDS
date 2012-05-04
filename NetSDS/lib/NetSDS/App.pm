@@ -163,8 +163,6 @@ application features. Read C<PLUGGABLE APPLICATION FEATURES> section below.
 
 =item * B<infinite> - 1 for inifinite loop (default: yes)
 
-=item * B<edr_file> - EDR (event detail records) file name (default: undef)
-
 =back
  
 =head1 COMMAND LINE PARAMETERS
@@ -210,7 +208,6 @@ use version; our $VERSION = version->declare('v3.0.0');
 
 use NetSDS::Logger;    # API to syslog daemon
 use NetSDS::Conf;      # Configuration file processor
-use NetSDS::EDR;       # Module writing Event Detail Records
 
 use Proc::Daemon;      # Daemonization
 use Proc::PID::File;   # Managing PID files
@@ -268,7 +265,6 @@ sub new {
 		has_conf      => 1,                    # is configuration file necessary
 		auto_features => 0,                    # are automatic features allowed or not
 		infinite      => 1,                    # is infinite loop
-		edr_file      => undef,                # path to EDR file
 		%params,
 	);
 
@@ -514,20 +510,6 @@ __PACKAGE__->mk_accessors('infinite');
 
 #***********************************************************************
 
-#***********************************************************************
-
-=item B<edr_file([$file_name])> - accessor to EDR file name
-
-Paramters: EDR file path
-
-=cut 
-
-#-----------------------------------------------------------------------
-
-__PACKAGE__->mk_accessors('edr_file');
-
-#***********************************************************************
-
 =item B<initialize()>
 
 Common application initialization:
@@ -571,11 +553,6 @@ sub initialize {
 	if ( !$this->logger ) {
 		$this->logger( NetSDS::Logger->new( name => $this->{name} ) );
 		$this->log( "info", "Logger started" );
-	}
-
-	# Initialize EDR writer
-	if ( $this->edr_file ) {
-		$this->{edr_writer} = NetSDS::EDR->new( filename => $this->edr_file );
 	}
 
 	# Process PID file if necessary
@@ -899,35 +876,6 @@ sub speak {
 		print "\n";
 	}
 }
-
-#***********************************************************************
-
-=item B<edr($record [,$record..])> - write EDR
-
-Paramters: list of EDR records to write
-
-	$app->edr({
-		event => "call",
-		status => "rejected",
-	});
-
-=cut 
-
-#-----------------------------------------------------------------------
-
-sub edr {
-
-	my ( $this, @records ) = @_;
-
-	if ( $this->{edr_writer} ) {
-		return $this->{edr_writer}->write(@records);
-	} else {
-		return $this->error("Can't write EDR to undefined destination");
-	}
-
-}
-
-#-----------------------------------------------------------------------
 
 #***********************************************************************
 
