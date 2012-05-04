@@ -91,7 +91,7 @@ In addition to C<message> provides C<dberr> field with DBI specific message.
 
 =over
 
-=item B<NetSDS::Exception::Config> - configuration error
+=item B<NetSDS::Exception::Conf> - configuration error
 
 =item B<NetSDS::Exception::Logic> - critical business logic fault
 
@@ -141,7 +141,7 @@ use Exception::Class (
 	},
 
 	# Application errors
-	'NetSDS::Exception::Config' => {
+	'NetSDS::Exception::Conf' => {
 		'isa'         => 'NetSDS::Exception::Generic',
 		'description' => 'Configuration file error',
 	},
