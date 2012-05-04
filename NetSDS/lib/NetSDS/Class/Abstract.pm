@@ -10,13 +10,6 @@ NetSDS::Class::Abstract - superclass for all NetSDS APIs
 
 	__PACKAGE__->mk_accessors(qw/my_field/);
 
-	sub error_sub {
-		my ($this) = @_;
-		if (!$this->my_field) {
-			return $this->error("No my_field defined");
-		}
-	}
-
 	1;
 
 =head1 DESCRIPTION
@@ -32,8 +25,6 @@ C<NetSDS::Class::Abstract> is a superclass for all other NetSDS classes, contain
 =item * class and objects accessors 
 
 =item * logging
-
-=item * error handling;
 
 =back
 
@@ -54,10 +45,6 @@ use mro 'c3';
 use base 'Class::Accessor::Class';
 
 use NetSDS::Exceptions;
-
-# Error handling class variables
-our $_ERRSTR;     # error string
-our $_ERRCODE;    # error code
 
 use version; our $VERSION = version->declare('v3.0.0');
 
@@ -124,8 +111,7 @@ Other C<Class::Accessor::Class> methods available as well.
 C<use_modules()> provides safe on demand modules loader.
 It requires list of modules names as parameters
 
-Return 1 in case of success or C<undef> if faied. Error messages in case
-of failure are available using C<errstr()> call.
+In case of error throws exception.
 
 Example:
 
@@ -144,7 +130,7 @@ sub use_modules {
 	foreach my $mod (@_) {
 		eval "use $mod;";
 		if ($@) {
-			return $this->error($@);
+			NetSDS::Exception::Generic->throw( error => $@ );
 		}
 	}
 
@@ -203,99 +189,6 @@ sub log {
 	} else {
 		warn "[$level] $msg\n";
 	}
-}
-
-#***********************************************************************
-
-=back
-
-=head1 ERROR HANDLING
-
-C<NetSDS::Class::Abstract> provides common instruments for handling
-errors in more intelligent way than just return flase value.
-
-When some subroutine should return error, it is recommended to use C<error()>
-method with mentioning error message and optional code.
-
-=over
-
-=item B<error($msg, [$code])> - set error message and code
-
-C<error()> method set error message and optional error code.
-It can be invoked in both class and object contexts.
-
-Example 1: set class error
-
-	return NetSDS::Foo->error("Mistake found");
-
-Example 2: set object error with code
-
-	return $obj->error("Can't launch rocket", BUG_STUPID);
-
-=cut
-
-#-----------------------------------------------------------------------
-
-sub error {
-
-	my ( $this, $msg, $code ) = @_;
-
-	$msg  ||= '';    # error message
-	$code ||= '';    # error code
-
-	if ( ref($this) ) {
-		$this->{_errstr}  = $msg;
-		$this->{_errcode} = $code;
-	} else {
-		$_ERRSTR  = $msg;
-		$_ERRCODE = $code;
-	}
-
-	return undef;
-}
-
-#***********************************************************************
-
-=item B<errstr()> - retrieve error message
-
-C<errstr()> method returns error string in both object and class contexts.
-
-Example:
-
-	warn "We have an error: " . $obj->errstr;
-
-=cut
-
-#-----------------------------------------------------------------------
-
-sub errstr {
-
-	my $this = shift;
-	return ref($this) ? $this->{_errstr} : $_ERRSTR;
-
-}
-
-#***********************************************************************
-
-=item B<errcode()> - retrieve error code
-
-C<errcode()> method returns error code in both object and class contexts. 
-
-Example:
-
-	if ($obj->errcode == 42) {
-		print "Epic fail! We've found an answer!";
-	}
-
-=cut
-
-#-----------------------------------------------------------------------
-
-sub errcode {
-
-	my $this = shift;
-	return ref($this) ? $this->{_errcode} : $_ERRCODE;
-
 }
 
 1;
